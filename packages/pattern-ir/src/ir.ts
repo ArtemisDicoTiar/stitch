@@ -112,6 +112,8 @@ export const SectionSchema = z.object({
   }),
   /** 무늬 반복 단위. 코 수 = of × k + plus. 게이지 재계산이 지킵니다. */
   multiple: z.object({ of: z.number().int().min(1), plus: z.number().int().min(0) }).optional(),
+  /** 같은 조각을 몇 개 만드는지 ("팔 2개"). 새로 시작하는 구간에서만 뜻이 있습니다. */
+  copies: z.number().int().min(1).max(50).optional(),
   groups: z.array(RowGroupSchema),
 })
 

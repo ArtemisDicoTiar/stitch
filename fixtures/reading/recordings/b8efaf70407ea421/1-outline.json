@@ -1,7 +1,7 @@
 {
  "kind": "outline",
  "note": "손으로 만든 대역입니다. 실제 LLM 응답을 녹화한 것이 아닙니다.",
- "promptVersion": "2026-11-22.1",
+ "promptVersion": "2026-11-22.2",
  "model": "hand-written",
  "usage": {
   "input_tokens": 0,
@@ -54,7 +54,8 @@
     "multiple": {
      "of": 2,
      "plus": 1
-    }
+    },
+    "copies": 1
    },
    {
     "id": "head",
@@ -65,7 +66,8 @@
      "count": 79,
      "from": "neck"
     },
-    "multiple": null
+    "multiple": null,
+    "copies": 1
    },
    {
     "id": "crown",
@@ -76,7 +78,8 @@
      "count": 94,
      "from": "head"
     },
-    "multiple": null
+    "multiple": null,
+    "copies": 1
    }
   ],
   "finishing": [

@@ -2,7 +2,7 @@ import { stitchesFor, type Issue, type Pattern } from '@stitch/pattern-ir'
 import type { Outline } from './wire'
 
 /** 프롬프트가 바뀌면 녹화해 둔 응답을 다시 만들어야 합니다. */
-export const PROMPT_VERSION = '2026-11-22.1'
+export const PROMPT_VERSION = '2026-11-22.2'
 
 const dictionary = (craft: 'knit' | 'crochet') =>
   stitchesFor(craft)
@@ -24,6 +24,18 @@ export const SYSTEM = `당신은 뜨개 도안 PDF를 읽어 정해진 JSON 형�
 - 평면뜨기에서 겉면은 RS, 안면은 WS, 원통뜨기는 round 입니다.
 - into는 코바늘에서 코를 넣는 자리입니다. 대바늘 도안에서는 늘 null 입니다.
 
+코바늘 도안에서는 다음도 지킵니다.
+- 매직링(원형코, 링)으로 시작하는 구간은 start.kind = ring, start.count = 0 으로 적고, 링 안에 뜨는 첫 단을 다른 단과 똑같이 단으로 적습니다. 그 단의 코는 into = space 입니다. 예: "1단: 매직링에 짧은뜨기 6코" → st sc, n 6, into space. 같은 내용을 start.count에 다시 적지 않습니다.
+- 사슬로 시작하는 구간은 start.kind = chain, start.count = 시작 사슬의 코 수입니다.
+- 구간의 shape: 단 끝을 잇지 않고 계속 돌려 뜨면 spiral, 단마다 빼뜨기로 닫으면 round, 왕복으로 뜨면 flat 입니다. 원형으로 뜨는 단의 side는 round 입니다.
+- 한 코에 짧은뜨기 2코를 뜨는 늘림은 inc, 짧은뜨기 2코를 한 코로 모으는 줄임은 sc2tog 입니다. "늘림 6번"은 st inc, n 6, into null 입니다.
+- into: 다음 코들에 하나씩 뜨면 null. "다음 코에 한길긴뜨기 5코"처럼 한 코에 여러 코를 뜨면 one. 방금 뜬 코와 같은 자리에 더 뜨면 same. 사슬 공간이나 매직링 안에 뜨면 space 입니다.
+- 단을 시작할 때 세우는 기둥코(세워뜨기 사슬)는 사슬 수와 상관없이 n = 1 로 적습니다. 도안이 그 기둥코를 1코로 세면 tch, 세지 않으면 tch0 입니다. 단 중간에 뜨는 사슬은 ch 입니다.
+- 건너뛰는 코는 skip, 단 끝을 첫 코에 잇는 빼뜨기는 join 입니다.
+- "(짧은뜨기 2, 늘림 1) 6번"은 repeat에 end.kind = times, n = 6. "모든 코에", "끝까지"는 end 입니다.
+- "팔 (2개 만들기)"처럼 같은 조각을 여러 개 만드는 구간은 구간을 한 번만 적고 copies에 개수를 적습니다.
+- 영어 도안은 미국식(US)과 영국식(UK)이 같은 약어를 다른 코에 씁니다. terms에 판별한 체계를 적고, st에는 늘 아래 사전의 id(미국식 뜻)를 씁니다. 영국식 도안이면 dc → sc, htr → hdc, tr → dc, dtr → tr, miss → skip, ss → slst 로 바꿔 적습니다. 단의 text는 바꾸지 않고 도안에 적힌 그대로 둡니다.
+
 대바늘 코 사전:
 ${dictionary('knit')}
 
@@ -38,7 +50,7 @@ export const OUTLINE_PROMPT = `이 도안의 개요를 채워 주세요.
 - gauge: 10cm 기준 코 수와 단 수, 잰 무늬, 바늘 굵기. 도안에 없으면 null
 - finished: 완성 크기
 - template: 완성 형태에 가장 가까운 것. hood(목에서 시작해 머리를 감싸는 후드나 바라클라바), flat(목도리, 수세미처럼 평평한 것), tube(넥워머처럼 원통), hat(모자), 맞는 것이 없으면 none
-- sections: 뜨는 순서대로의 구간. 각 구간의 시작 코 수와, 앞 구간에서 이어지는지(continue) 새로 코를 잡는지(cast_on)를 적습니다
+- sections: 뜨는 순서대로의 구간. 각 구간의 시작 코 수와, 앞 구간에서 이어지는지(continue) 새로 코를 잡는지(대바늘은 cast_on, 코바늘은 chain이나 ring)를 적습니다. 같은 조각을 여러 개 만들면 copies에 개수를, 아니면 1을 적습니다
 - finishing: 다 뜬 뒤의 마무리 단계 (코막음, 잇기, 단추 달기 등). 이름과 원문
 - unclear: 사람이 원문을 직접 봐야 하는 곳. 기호 도안 그림이나 사진, 도식으로만 설명되어 글로 옮길 수 없는 부분은 picture_only, 읽었지만 뜻이 둘 이상으로 읽히는 부분은 unclear 로 적습니다. 없으면 빈 배열
 

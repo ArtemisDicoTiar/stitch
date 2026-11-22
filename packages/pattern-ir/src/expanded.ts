@@ -42,6 +42,8 @@ export type ExpandedRow = {
    * IR에는 이 단이 없어서 ref.group과 ref.row가 -1입니다.
    */
   start?: 'chain' | 'ring'
+  /** 같은 조각을 여러 개 만드는 구간에서 몇 번째 조각인지 (1부터). 하나만 만드는 구간에는 없습니다. */
+  copy?: number
   /** IR에서의 위치 */
   ref: { section: number; group: number; row: number; rep: number }
 }
@@ -77,12 +79,16 @@ export type Issue = {
 export type SectionSummary = {
   id: string
   name: string
+  /** 이 구간의 (첫 조각이 놓인) 격자 */
   block: number
   firstRow: number
   lastRow: number
   startCount: number
   endCount: number
+  /** 구간의 단수. 조각을 여러 개 만들면 모두 더한 수입니다. */
   rows: number
+  /** 같은 조각을 몇 개 만드는지. 하나면 없습니다. */
+  copies?: number
 }
 
 export type Expanded = {

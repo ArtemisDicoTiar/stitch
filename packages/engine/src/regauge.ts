@@ -81,6 +81,8 @@ export function regauge(pattern: Pattern, mine: GaugeSize): RegaugeResult {
         prev = r.count
         continue
       }
+      // 같은 조각을 여러 개 만드는 구간은 첫 조각만 잽니다.
+      if (r.copy !== undefined && r.copy > 1) continue
       const gi = info[r.ref.section][r.ref.group]
       if (gi.before < 0) gi.before = prev
       gi.rows += 1

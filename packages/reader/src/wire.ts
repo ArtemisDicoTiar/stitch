@@ -75,6 +75,7 @@ export const OutlineSchema = z.object({
         from: z.string().nullable().describe('continue일 때 이어지는 앞 구간의 id'),
       }),
       multiple: z.object({ of: z.number().int(), plus: z.number().int() }).nullable().describe('무늬 반복 단위. 코 수 = of × k + plus'),
+      copies: z.number().int().describe('같은 조각을 몇 개 만드는지. "팔 2개"면 2. 보통은 1'),
     }),
   ),
   finishing: z.array(z.object({ name: z.string(), text: z.string() })),
@@ -148,6 +149,7 @@ export function toPattern(outline: Outline, rows: WireRows): Pattern {
     shape: s.shape,
     start: { kind: s.start.kind, count: Math.max(0, s.start.count), ...(s.start.from ? { from: s.start.from } : {}) },
     ...(s.multiple && s.multiple.of > 0 ? { multiple: { of: s.multiple.of, plus: Math.max(0, s.multiple.plus) } } : {}),
+    ...(s.copies > 1 && s.start.kind !== 'continue' ? { copies: Math.min(50, s.copies) } : {}),
     groups: toGroups(byId.get(s.id) ?? []),
   }))
   return {
@@ -208,6 +210,7 @@ export function toWire(pattern: Pattern): { outline: Outline; rows: WireRows } {
       shape: s.shape,
       start: { kind: s.start.kind, count: s.start.count, from: s.start.from ?? null },
       multiple: s.multiple ?? null,
+      copies: s.copies ?? 1,
     })),
     finishing: pattern.finishing,
     unclear: (pattern.notes ?? []).map((n) => ({ kind: n.kind, page: n.page ?? null, text: n.text })),

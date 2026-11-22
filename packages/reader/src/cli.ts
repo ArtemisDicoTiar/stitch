@@ -53,7 +53,7 @@ try {
   const r = await readPattern(pdf, {
     llm,
     maxFeedbackRounds: Number(value('--max-feedback') ?? process.env.READER_MAX_FEEDBACK ?? 2),
-    allowCrochet: flag('--crochet'),
+    crochet: flag('--crochet') ? 'all' : 'none',
     onStage: (s, d) => console.error(`· ${s}${d?.round ? ` (${d.round}회)` : ''}`),
   })
   const e = r.verification.expanded

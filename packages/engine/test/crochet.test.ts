@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { practiceBall, practiceBallExpected } from '@stitch/fixtures'
 import { parsePattern, type Op, type Pattern, type Row, type Section } from '@stitch/pattern-ir'
-import { allRows, describeOp, expand, progressFraction, regauge, stitchesDone, verify } from '../src'
+import { allRows, describeOp, expand, normalizeStarts, progressFraction, regauge, stitchesDone, verify } from '../src'
 
 /** 테스트용 작은 코바늘 도안 */
 function crochet(sections: Section[]): Pattern {
@@ -243,5 +243,76 @@ describe('코바늘 안내 글', () => {
     // 대바늘 표현은 그대로입니다.
     expect(describeOp({ st: 'k', n: 3 })).toBe('겉3')
     expect(describeOp({ st: 'k2tog', n: 2 })).toBe('왼코 겹치기 2번')
+  })
+})
+
+describe('읽은 도안 바로잡기: 매직링의 첫 단', () => {
+  const inc: Row = row('round', [{ repeat: [{ st: 'inc', n: 1 }], until: 'end' }], 12, '2단: 모든 코에 늘림 (12코)')
+  const make = (count: number, ...rows: Row[]) => crochet([{ id: 'a', name: '조각', shape: 'spiral', start: { kind: 'ring', count }, groups: rows.map((r) => once(r)) }])
+  const counts = (p: Pattern) => allRows(verify(p).expanded).map((r) => r.count)
+
+  it('시작 코 수와 링에 뜨는 첫 단이 함께 적혀 있으면 첫 단만 남긴다', () => {
+    for (const first of [row('round', [{ st: 'sc', n: 6, into: 'space' }], 6, '1단: 매직링에 짧은뜨기 6코 (6코)'), row('round', [sc(6)], 6, '매직링에 짧은뜨기 6코')]) {
+      const read = make(6, first, inc)
+      // 그대로 두면 같은 단을 두 번 뜨거나 검산이 깨집니다.
+      expect(counts(read)).not.toEqual([6, 12])
+      const fixed = normalizeStarts(read)
+      expect(fixed.sections[0].start).toEqual({ kind: 'ring', count: 0 })
+      expect(verify(fixed).errors).toEqual([])
+      expect(counts(fixed)).toEqual([6, 12])
+      expect(allRows(verify(fixed).expanded).map((r) => r.label)).toEqual(['1단(원통)', '2단(원통)'])
+    }
+  })
+
+  it('첫 단이 글로 적혀 있지 않으면 시작 코 수를 그대로 둔다', () => {
+    const shorthand = make(6, inc)
+    expect(normalizeStarts(shorthand)).toBe(shorthand)
+    expect(counts(shorthand)).toEqual([6, 12])
+    // 2단이 마침 시작 코 수만큼의 짧은뜨기여도, 번호가 2단이면 첫 단으로 보지 않습니다.
+    const tube = make(6, row('round', [sc(6)], 6, '2단: 짧은뜨기 6코'))
+    expect(normalizeStarts(tube)).toBe(tube)
+    expect(counts(tube)).toEqual([6, 6])
+  })
+
+  it('링에 뜬다고 적혀 있으면 코 수가 달라도 그 단을 첫 단으로 본다', () => {
+    const read = make(6, row('round', [{ st: 'sc', n: 8, into: 'space' }], 8, '1단: 링에 짧은뜨기 8코'))
+    expect(counts(normalizeStarts(read))).toEqual([8])
+  })
+
+  it('대바늘 도안과 이미 맞는 도안은 건드리지 않는다', () => {
+    const ok = make(0, row('round', [{ st: 'sc', n: 6, into: 'space' }], 6), inc)
+    expect(normalizeStarts(ok)).toBe(ok)
+    expect(normalizeStarts(practiceBall)).toBe(practiceBall)
+  })
+})
+
+describe('같은 조각을 여러 개 만들기 (copies)', () => {
+  const arm: Section = { id: 'arm', name: '팔', shape: 'spiral', start: { kind: 'ring', count: 5 }, copies: 2, groups: [once(row('round', [{ repeat: [sc(1)], until: 'end' }], 5, '2단'))] }
+  const head: Section = { id: 'head', name: '머리', shape: 'spiral', start: { kind: 'ring', count: 6 }, groups: [once(row('round', [{ repeat: [{ st: 'inc', n: 1 }], until: 'end' }], 12, '2단'))] }
+  const v = verify(crochet([head, arm]))
+  const rows = allRows(v.expanded)
+
+  it('조각마다 처음부터 다시 뜨고, 격자도 조각마다 따로다', () => {
+    expect(v.errors).toEqual([])
+    expect(rows.map((r) => r.count)).toEqual([6, 12, 5, 5, 5, 5])
+    expect(rows.map((r) => r.copy ?? 0)).toEqual([0, 0, 1, 1, 2, 2])
+    expect(v.expanded.blocks.map((b) => b.W)).toEqual([12, 5, 5])
+    expect(rows.slice(2).map((r) => r.label)).toEqual(['1단(원통) · 1/2번째', '2단(원통) · 1/2번째', '1단(원통) · 2/2번째', '2단(원통) · 2/2번째'])
+  })
+
+  it('구간 요약은 구간마다 하나이고, 단수는 조각을 모두 더한 수다', () => {
+    expect(v.expanded.sections.map((s) => ({ id: s.id, rows: s.rows, copies: s.copies, first: s.firstRow, last: s.lastRow, start: s.startCount, end: s.endCount }))).toEqual([
+      { id: 'head', rows: 2, copies: undefined, first: 1, last: 2, start: 6, end: 12 },
+      { id: 'arm', rows: 4, copies: 2, first: 3, last: 6, start: 5, end: 5 },
+    ])
+    expect(v.expanded.totalRows).toBe(6)
+    expect(v.expanded.totalStitches).toBe(6 + 12 + 5 * 4)
+  })
+
+  it('이어 뜨는 구간에서는 무시한다', () => {
+    const body: Section = { id: 'body', name: '몸', shape: 'spiral', start: { kind: 'continue', count: 12 }, copies: 3, groups: [once(row('round', [{ repeat: [sc(1)], until: 'end' }], 12, '3단'))] }
+    const e = verify(crochet([head, body]))
+    expect(e.errors).toEqual([])
+    expect(e.expanded.totalRows).toBe(3)
   })
 })

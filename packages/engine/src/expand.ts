@@ -99,11 +99,32 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
   const stitches = (b: Block) => b.cols.filter((c) => c.alive && c.kind !== 'ring')
 
   pattern.sections.forEach((section, si) => {
+    // 같은 조각을 여러 개 만드는 구간은 조각마다 처음부터 다시 뜹니다. 이어 뜨는 구간에는 해당하지 않습니다.
+    const copies = section.start.kind === 'continue' ? 1 : (section.copies ?? 1)
+    let summary: SectionSummary | null = null
+    for (let copy = 1; copy <= copies; copy++) {
+      const one = runSection(section, si, copies > 1 ? copy : 0, copies)
+      if (!summary) summary = one
+      else {
+        summary.lastRow = one.lastRow
+        summary.rows += one.rows
+      }
+    }
+    if (summary) summaries.push(copies > 1 ? { ...summary, copies } : summary)
+  })
+
+  return finish()
+
+  // ---------------------------------------------------------------------
+
+  /** 구간 하나를 한 번 뜹니다. copy는 몇 번째 조각인지 (하나만 만들면 0). */
+  function runSection(section: Section, si: number, copy: number, copies: number): SectionSummary {
     const startCount = beginSection(section, si)
     const b = block!
+    const which = copy > 0 ? ` · ${copy}/${copies}번째` : ''
     const first = g + 1
     sectionFirstRow.set(section.id, first)
-    let sectionRow = startRows(section, si, b)
+    let sectionRow = startRows(section, si, b, copy, which)
 
     section.groups.forEach((group, gi) => {
       const repeat = group.repeat
@@ -146,8 +167,8 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
         sectionRow += 1
         const side = resolveSide(section, row, rep, si, gi, ri)
         const base = row.label ?? `${sectionRow}단`
-        const label = `${base}(${SIDE_KR[side]})` + (times > 1 ? ` · ${rep}/${times}회` : '')
-        runRow(b, row, side, label, section, { section: si, group: gi, row: ri, rep }, estimated)
+        const label = `${base}(${SIDE_KR[side]})` + (times > 1 ? ` · ${rep}/${times}회` : '') + which
+        runRow(b, row, side, label, section, { section: si, group: gi, row: ri, rep }, estimated, undefined, copy)
         lastSide = side
       }
     })
@@ -155,7 +176,7 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
     if (g < first) {
       issues.push({ level: 'warn', code: 'empty', message: `"${section.name}" 구간에 단이 없습니다.`, ref: { section: si } })
     }
-    summaries.push({
+    return {
       id: section.id,
       name: section.name,
       block: blocks.indexOf(b),
@@ -164,12 +185,8 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
       startCount,
       endCount: stitches(b).length,
       rows: g - first + 1,
-    })
-  })
-
-  return finish()
-
-  // ---------------------------------------------------------------------
+    }
+  }
 
   function beginSection(section: Section, si: number): number {
     const start = section.start
@@ -216,7 +233,7 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
    * - 시작 사슬: 사슬 단 하나. "1단"은 그 위에 뜨는 첫 단이라 번호를 쓰지 않습니다.
    * - 매직링에 코 수가 적혀 있으면 "링에 짧은뜨기 n코"의 줄임말로 보고 그 단을 만듭니다. 이 단이 1단입니다.
    */
-  function startRows(section: Section, si: number, b: Block): number {
+  function startRows(section: Section, si: number, b: Block, copy: number, which: string): number {
     const start = section.start
     if (!crochet || start.count <= 0) return 0
     const ref = { section: si, group: -1, row: -1, rep: 0 }
@@ -230,7 +247,7 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
       b.rows.push({
         g,
         side,
-        label: '시작 사슬',
+        label: '시작 사슬' + which,
         instr: `사슬 ${start.count}코`,
         sectionId: section.id,
         section: section.name,
@@ -240,6 +257,7 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
         markerCols: [],
         h: 0,
         start: 'chain',
+        ...(copy > 0 ? { copy } : {}),
         ref,
       })
       return 0
@@ -247,7 +265,7 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
     if (start.kind === 'ring') {
       g += 1
       const text = `매직링에 짧은뜨기 ${start.count}코`
-      runRow(b, { side: 'round', ops: [{ st: 'sc', n: start.count, into: 'space' }], expect_count: start.count, text }, 'round', '1단(원통)', section, ref, false, 'ring')
+      runRow(b, { side: 'round', ops: [{ st: 'sc', n: start.count, into: 'space' }], expect_count: start.count, text }, 'round', '1단(원통)' + which, section, ref, false, 'ring', copy)
       lastSide = 'round'
       return 1
     }
@@ -295,6 +313,7 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
     ref: ExpandedRow['ref'],
     estimated: boolean,
     start?: ExpandedRow['start'],
+    copy = 0,
   ) {
     const rs = side !== 'WS'
     const before = live(b)
@@ -578,6 +597,7 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
       estimated: estimated || undefined,
       ...(rowH >= 0 ? { h: rowH } : {}),
       ...(start ? { start } : {}),
+      ...(copy > 0 ? { copy } : {}),
       ref,
     })
   }

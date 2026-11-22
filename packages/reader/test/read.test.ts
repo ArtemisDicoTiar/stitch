@@ -4,12 +4,16 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { garterScarf, practiceBall, practiceHood } from '@stitch/fixtures'
-import type { Pattern } from '@stitch/pattern-ir'
+import { parsePattern, type Op, type Pattern, type Section } from '@stitch/pattern-ir'
 import {
   AnthropicLlm,
+  checkTerms,
   extractPages,
+  guessTerms,
   locateText,
+  outOfScope,
   readPattern,
+  reinterpretTerms,
   RecordingLlm,
   ReplayLlm,
   RowsSchema,
@@ -256,7 +260,7 @@ describe('코바늘 도안', () => {
 
   it('받기로 하면 끝까지 읽고 검산한다', async () => {
     const llm = new FromPattern(practiceBall)
-    const r = await readPattern(pdf, { llm, allowCrochet: true })
+    const r = await readPattern(pdf, { llm, crochet: 'rounds' })
     expect(llm.kinds).toEqual(['outline', 'rows'])
     expect(r.pattern.craft).toBe('crochet')
     expect(r.verification.ok).toBe(true)
@@ -267,5 +271,111 @@ describe('코바늘 도안', () => {
     const llm = new FromPattern(garterScarf)
     const r = await readPattern(pdf, { llm })
     expect(r.pattern.craft).toBe('knit')
+  })
+})
+
+describe('코바늘: 받는 범위', () => {
+  const sec = (shape: Section['shape'], kind: Section['start']['kind']) => ({ shape, start: { kind, count: 0, from: null } })
+  const outline = (craft: 'knit' | 'crochet', ...sections: ReturnType<typeof sec>[]) => ({ craft, sections }) as Parameters<typeof outOfScope>[0]
+
+  it('대바늘은 늘 받는다', () => {
+    expect(outOfScope(outline('knit', sec('flat', 'cast_on')), 'none')).toBeNull()
+  })
+
+  it('rounds는 매직링에서 시작해 둥글게 뜨는 도안만 받는다', () => {
+    expect(outOfScope(outline('crochet', sec('spiral', 'ring'), sec('spiral', 'continue'), sec('round', 'ring')), 'rounds')).toBeNull()
+    expect(outOfScope(outline('crochet', sec('flat', 'chain')), 'rounds')).toContain('매직링에서 시작해 둥글게 뜨는 도안')
+    expect(outOfScope(outline('crochet', sec('spiral', 'ring'), sec('flat', 'chain')), 'rounds')).not.toBeNull()
+    expect(outOfScope(outline('crochet', sec('round', 'chain')), 'rounds')).not.toBeNull()
+    expect(outOfScope(outline('crochet', sec('flat', 'chain')), 'all')).toBeNull()
+    expect(outOfScope(outline('crochet', sec('spiral', 'ring')), 'none')).toContain('아직 준비 중')
+  })
+})
+
+describe('코바늘: 읽은 결과 바로잡기', () => {
+  it('매직링의 첫 단이 시작 코 수와 단, 두 군데에 적혀 와도 한 번만 뜬다', async () => {
+    // 실제 응답에서 본 꼴: start.count = 6 이면서 "매직링에 짧은뜨기 6코" 단도 적혀 있습니다.
+    const doubled: Pattern = structuredClone(practiceBall)
+    doubled.sections[0].start.count = 6
+    const w = toWire(doubled)
+    const llm: Llm = {
+      async call<T>(req: LlmRequest<T>): Promise<LlmResponse<T>> {
+        return { output: req.schema.parse(req.kind === 'outline' ? w.outline : w.rows) as T, model: 'stub', usage: ZERO_USAGE }
+      },
+    }
+    const r = await readPattern(pdf, { llm, crochet: 'rounds' })
+    expect(r.pattern.sections[0].start).toEqual({ kind: 'ring', count: 0 })
+    expect(r.verification.ok).toBe(true)
+    expect(r.verification.expanded.totalRows).toBe(14)
+    expect(r.feedbackRounds).toBe(0)
+  })
+
+  it('"2개 만들기"를 오가며 지킨다', () => {
+    const two: Pattern = structuredClone(practiceBall)
+    two.sections[0].copies = 2
+    const w = toWire(two)
+    expect(w.outline.sections[0].copies).toBe(2)
+    expect(toPattern(w.outline, w.rows).sections[0].copies).toBe(2)
+    expect(toWire(practiceBall).outline.sections[0].copies).toBe(1)
+    expect(toPattern(toWire(practiceBall).outline, toWire(practiceBall).rows).sections[0].copies).toBeUndefined()
+  })
+})
+
+describe('코바늘: 미국식과 영국식 약어', () => {
+  const english = (terms: 'us' | 'uk', rows: { text: string; ops: Op[] }[]): Pattern =>
+    parsePattern({
+      craft: 'crochet',
+      terms,
+      title: 'Practice ball',
+      materials: [],
+      gauge: null,
+      finished: {},
+      template: 'none',
+      finishing: [],
+      sections: [{ id: 'a', name: 'Ball', shape: 'spiral', start: { kind: 'ring', count: 0 }, groups: rows.map((r) => ({ rows: [{ side: 'round', ...r }], repeat: { times: 1 } })) }],
+    })
+  const ring = (st: string): Op => ({ st, n: 6, into: 'space' })
+
+  it('한쪽에만 있는 약어로 체계를 가늠한다', () => {
+    expect(guessTerms(['Rnd 1: 6 sc in magic ring', 'Rnd 2: inc around'])?.terms).toBe('us')
+    expect(guessTerms(['Row 3: ch 2, htr in each st'])?.terms).toBe('uk')
+    expect(guessTerms(['Row 1: miss 1 ch, dc across'])?.terms).toBe('uk')
+    expect(guessTerms(['Rnd 1: 6 dc in ring', 'Rnd 2: 2 tr in each st'])).toBeNull()
+    // 한글 도안의 낱말 속 글자는 약어로 보지 않습니다.
+    expect(guessTerms(['1단: 짧은뜨기 6코'])).toBeNull()
+  })
+
+  it('읽은 체계와 도안의 약어가 다르면 확인할 곳으로 남긴다', () => {
+    const p = english('uk', [{ text: 'Rnd 1: 6 sc in magic ring', ops: [ring('sc')] }])
+    expect(checkTerms(p).map((n) => n.text).join(' ')).toContain('미국식에만 있는 약어(sc)')
+  })
+
+  it('가릴 수 없는 도안은 어느 쪽으로 읽었는지 알린다', () => {
+    const p = english('us', [{ text: 'Rnd 1: 6 dc in ring', ops: [ring('dc')] }])
+    expect(checkTerms(p).map((n) => n.text).join(' ')).toContain('가릴 수 없었어요. 미국식으로 읽었습니다')
+  })
+
+  it('영국식인데 약어를 바꾸지 않은 단을 찾는다', () => {
+    const wrong = english('uk', [{ text: 'Rnd 1: 6 dc in ring, miss none', ops: [ring('dc')] }])
+    expect(checkTerms(wrong).some((n) => n.text.includes('바뀌지 않은 것으로 보이는 단이 1개'))).toBe(true)
+    const right = english('uk', [{ text: 'Rnd 1: 6 dc in ring, miss none', ops: [ring('sc')] }])
+    expect(checkTerms(right)).toEqual([])
+  })
+
+  it('한국어 도안과 대바늘 도안에는 아무것도 남기지 않는다', () => {
+    expect(checkTerms(practiceBall)).toEqual([])
+    expect(checkTerms(practiceHood)).toEqual([])
+  })
+
+  it('약어 체계를 바꾸면 같은 약어가 다른 코가 된다', () => {
+    const us = english('us', [{ text: 'Rnd 1: 6 dc in ring', ops: [ring('dc')] }, { text: 'Rnd 2: (dc, tr) around', ops: [{ repeat: [{ st: 'dc', n: 1 }, { st: 'tr', n: 1 }], until: 'end' }] }])
+    const uk = reinterpretTerms(us, 'uk')
+    expect(uk.terms).toBe('uk')
+    expect(uk.sections[0].groups[0].rows[0].ops).toEqual([ring('sc')])
+    expect(uk.sections[0].groups[1].rows[0].ops).toEqual([{ repeat: [{ st: 'sc', n: 1 }, { st: 'dc', n: 1 }], until: 'end' }])
+    // 되돌리면 처음과 같습니다.
+    expect(reinterpretTerms(uk, 'us')).toEqual(us)
+    expect(reinterpretTerms(us, 'us')).toBe(us)
+    expect(reinterpretTerms(practiceHood, 'uk')).toBe(practiceHood)
   })
 })

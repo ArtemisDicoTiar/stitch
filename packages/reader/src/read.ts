@@ -3,24 +3,37 @@
  *   꺼내기 → LLM 구조화(개요, 구간별 단) → 엔진 검산 → 되먹임 → 사람 확인으로 넘기기
  * LLM은 PDF를 IR 초안으로 바꾸는 일만 하고, 그 결과는 엔진 검산과 사람 확인을 거쳐야 페이지가 됩니다.
  */
-import { verify, type Verification } from '@stitch/engine'
+import { normalizeStarts, verify, type Verification } from '@stitch/engine'
 import { safeParsePattern, type Issue, type Pattern } from '@stitch/pattern-ir'
 import { extractPages, locateText, type SourceHit, type SourcePage } from './extract'
 import { addUsage, ReaderError, sha256, ZERO_USAGE, type Llm, type LlmUsage } from './llm'
 import { feedbackPrompt, OUTLINE_PROMPT, rowsPrompt } from './prompts'
-import { OutlineSchema, RowsSchema, toGroups, toPattern } from './wire'
+import { withTermNotes } from './terms'
+import { OutlineSchema, RowsSchema, toGroups, toPattern, type Outline } from './wire'
 
 export type ReadStage = 'extract' | 'structure' | 'verify' | 'feedback' | 'review'
+
+export type CrochetScope = 'none' | 'rounds' | 'all'
+
+/** 받지 않는 도안이면 사람에게 보여 줄 까닭을, 받으면 null을 돌려줍니다. */
+export function outOfScope(outline: Pick<Outline, 'craft' | 'sections'>, scope: CrochetScope): string | null {
+  if (outline.craft !== 'crochet' || scope === 'all') return null
+  if (scope === 'none') return '코바늘 도안 읽기는 아직 준비 중이에요. 지금은 대바늘 도안만 읽습니다.'
+  const rounds = outline.sections.every((s) => s.shape !== 'flat' && (s.start.kind === 'ring' || s.start.kind === 'continue'))
+  return rounds ? null : '코바늘은 지금 매직링에서 시작해 둥글게 뜨는 도안(인형, 소품)만 읽어요. 평면으로 뜨거나 사슬에서 시작하는 도안은 준비 중이에요.'
+}
 
 export type ReadOptions = {
   llm: Llm
   /** 검산에서 어긋난 구간을 LLM에 되돌리는 최대 횟수. 넘기면 "확인 필요"로 사람에게 넘깁니다. */
   maxFeedbackRounds?: number
   /**
-   * 코바늘 도안도 읽을지. 기본은 읽지 않습니다.
-   * 코바늘은 아직 기호 도안과 3D가 준비되지 않아, 개요에서 코바늘로 판별되면 단을 읽기 전에 멈춥니다.
+   * 코바늘 도안을 어디까지 받을지. 기본은 받지 않습니다 (none).
+   * - rounds: 매직링에서 시작해 둥글게 뜨는 도안만 (인형, 소품)
+   * - all: 모두
+   * 받지 않는 도안은 개요에서 판별해, 단을 읽기 전에 까닭을 알리며 멈춥니다.
    */
-  allowCrochet?: boolean
+  crochet?: CrochetScope
   onStage?: (stage: ReadStage, detail?: { round?: number; llmCalls: number; usage: LlmUsage }) => void | Promise<void>
 }
 
@@ -61,9 +74,8 @@ export async function readPattern(pdf: Uint8Array, options: ReadOptions): Promis
   llmCalls += 1
   if (outline.output.sections.length === 0) throw new ReaderError('이 PDF에서 뜨개 도안의 구간을 찾지 못했습니다.', 'bad_output')
   // 단을 읽는 호출이 가장 비쌉니다. 받지 않는 도안은 그 전에 돌려보냅니다.
-  if (outline.output.craft === 'crochet' && !options.allowCrochet) {
-    throw new ReaderError('코바늘 도안 읽기는 아직 준비 중이에요. 지금은 대바늘 도안만 읽습니다.', 'unsupported')
-  }
+  const refused = outOfScope(outline.output, options.crochet ?? 'none')
+  if (refused) throw new ReaderError(refused, 'unsupported')
 
   const rows = await llm.call({ kind: 'rows', pdfSha256, pdf, prompt: rowsPrompt(outline.output), schema: RowsSchema })
   usage = addUsage(usage, rows.usage)
@@ -71,7 +83,8 @@ export async function readPattern(pdf: Uint8Array, options: ReadOptions): Promis
 
   const parsed = safeParsePattern(toPattern(outline.output, rows.output))
   if (!parsed.success) throw new ReaderError('읽은 결과가 도안 형식에 맞지 않습니다.', 'bad_output')
-  let pattern = parsed.data
+  // 매직링의 첫 단이 시작 코 수와 단, 두 군데에 적혀 오면 되먹임으로는 고칠 수 없어 여기서 바로잡습니다.
+  let pattern = normalizeStarts(parsed.data)
 
   await stage('verify')
   let verification = verify(pattern)
@@ -96,7 +109,7 @@ export async function readPattern(pdf: Uint8Array, options: ReadOptions): Promis
       const next: Pattern = { ...pattern, sections: pattern.sections.map((s) => (s.id === first.id ? { ...s, groups: toGroups(fixed.groups) } : s)) }
       const ok = safeParsePattern(next)
       if (!ok.success) break
-      pattern = ok.data
+      pattern = normalizeStarts(ok.data)
       changed = true
       verification = verify(pattern)
       if (verification.ok) break
@@ -105,10 +118,10 @@ export async function readPattern(pdf: Uint8Array, options: ReadOptions): Promis
     if (!changed) break
   }
 
-  pattern = attachSources(pattern, pages)
+  pattern = withTermNotes(attachSources(pattern, pages))
   verification = verify(pattern)
   await stage('review')
-  return { pattern, verification, pages, pdfSha256, llmCalls, feedbackRounds, usage, needsReview: verification.needsReview || verification.notes.length > 0 }
+  return { pattern, verification, pages, pdfSha256, llmCalls, feedbackRounds, usage, needsReview: verification.needsReview || verification.notes.length > 0 || (pattern.notes?.length ?? 0) > 0 }
 }
 
 /** 어긋난 단을 구간별로 모읍니다. 구간 사이가 이어지지 않는 오류는 뒤 구간에 붙입니다. */
