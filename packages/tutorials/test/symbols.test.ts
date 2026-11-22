@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { expand } from '@stitch/engine'
-import { garterScarf, practiceHood } from '@stitch/fixtures'
+import { garterScarf, practiceBall, practiceHood } from '@stitch/fixtures'
 import { KNIT_SYMBOLS, type Expanded } from '@stitch/pattern-ir'
 import { TUTORIALS, symbolsIn, tutorialFor } from '../src'
 
@@ -25,6 +25,20 @@ describe('도안에 나온 기호', () => {
   })
 })
 
+describe('코바늘 도안에 필요한 뜨는 법', () => {
+  it('공: 매직링, 짧은뜨기, 늘림, 줄임을 배우는 순서로 돌려준다', () => {
+    expect(symbolsIn(expand(practiceBall))).toEqual(['RING', 'SC', 'INC', 'SC2'])
+  })
+
+  it('조각의 tech가 코바늘 뜨는 법으로 이어진다: 늘림이 섞인 조각은 늘림', () => {
+    const techs = new Set(expand(practiceBall).blocks.flatMap((b) => b.rows.flatMap((r) => r.segments.map((s) => s.tech))))
+    expect([...techs].sort()).toEqual(['INC', 'SC', 'SC2'])
+    for (const t of techs) expect(tutorialFor(t), t).toBe(t)
+    expect(tutorialFor('CH')).toBe('CH')
+    expect(tutorialFor('ring')).toBe('RING')
+  })
+})
+
 describe('조각의 tech에 맞는 뜨는 법', () => {
   it('기호 이름은 그 기호', () => {
     for (const s of KNIT_SYMBOLS) expect(tutorialFor(s)).toBe(s)
@@ -43,7 +57,7 @@ describe('조각의 tech에 맞는 뜨는 법', () => {
   })
 
   it('뜨는 법이 없는 값은 null', () => {
-    for (const t of ['', 'SC', 'DC', 'CH', 'KFB', 'constructor', 'toString', '__proto__', 'as_set']) expect(tutorialFor(t), t).toBeNull()
+    for (const t of ['', 'HDC', 'DC', 'TR', 'KFB', 'constructor', 'toString', '__proto__', 'as_set']) expect(tutorialFor(t), t).toBeNull()
   })
 
   it('두 도안의 모든 조각이 뜨는 법으로 이어진다', () => {

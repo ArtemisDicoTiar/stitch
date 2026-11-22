@@ -6,10 +6,22 @@ import type { Expanded } from '@stitch/pattern-ir'
 import type { TutorialId } from './types'
 import { TUTORIAL_IDS, isSymbolId } from './frame'
 
-/** 도안에 실제로 나온 기호. 순서는 코 사전(KNIT_SYMBOLS)을 따릅니다. */
+/**
+ * 도안에 필요한 뜨는 법. 대바늘은 도안에 나온 기호이고 순서는 코 사전(KNIT_SYMBOLS)을 따릅니다.
+ * 코바늘은 기호 말고도 매직링으로 시작하는지(RING), 늘림이 있는지(INC)를 보고, 배우는 순서로 돌려줍니다.
+ */
 export function symbolsIn(expanded: Expanded): TutorialId[] {
   const seen = new Set<string>()
-  for (const b of expanded.blocks) for (const r of b.rows) for (const c of r.cells) seen.add(c.s)
+  for (const b of expanded.blocks) {
+    for (const r of b.rows) {
+      if (r.opens === 'ring') seen.add('RING')
+      if (r.opens === 'chain') seen.add('CH')
+      for (const c of r.cells) {
+        seen.add(c.s)
+        if (c.a) seen.add('INC')
+      }
+    }
+  }
   return TUTORIAL_IDS.filter((s) => seen.has(s))
 }
 

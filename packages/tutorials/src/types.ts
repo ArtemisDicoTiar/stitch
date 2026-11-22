@@ -7,8 +7,11 @@ import type { KnitSymbolId } from '@stitch/pattern-ir'
 
 // ---------- 적는 꼴 ----------
 
-/** 바늘 자세. 끝(tx,ty)과 뒤끝(bx,by), z는 그리는 순서(작을수록 먼저). */
-export type NeedlePose = { tx: number; ty: number; bx: number; by: number; z: number }
+/**
+ * 바늘 자세. 끝(tx,ty)과 뒤끝(bx,by), z는 그리는 순서(작을수록 먼저).
+ * kind가 'hook'이면 끝에 갈고리가 있는 코바늘로 그립니다.
+ */
+export type NeedlePose = { tx: number; ty: number; bx: number; by: number; z: number; kind?: 'hook' }
 
 /** 실 색. yarn은 이미 떠 놓은 실, work는 지금 새로 뜨는 실. */
 export type YarnColor = 'yarn' | 'work'
@@ -61,8 +64,15 @@ export type YarnSpec = { id: string; pts: PointSpec[]; z?: Layer; a?: number; co
 /** 움직임을 가리키는 화살표. 점 3개(시작, 휘는 점, 끝)와 글자. */
 export type ArrowSpec = { id: string; pts: PointSpec[]; t?: string }
 export type TagSpec = { id: string; at: PointSpec; text: string }
-/** bar는 코와 코 사이 가로실, chain은 막은 코 */
-export type MarkSpec = { id: string; kind: 'bar' | 'chain'; at: PointSpec; col?: YarnColor }
+/**
+ * 편물에 놓이는 작은 모양.
+ * - bar: 코와 코 사이 가로실, chain: 막은 코나 사슬 한 코
+ * - top: 코바늘 코의 머리 (가로로 누운 고리), post: 코바늘 코의 기둥 (at에서 아래로 h만큼)
+ * - loop: 매직링처럼 둥글게 감은 실 (반지름 h)
+ * hl은 강조 (1이면 "지금 다루는 코").
+ */
+export type MarkKind = 'bar' | 'chain' | 'top' | 'post' | 'loop'
+export type MarkSpec = { id: string; kind: MarkKind; at: PointSpec; col?: YarnColor; hl?: number; h?: number }
 export type ThumbSpec = { x: number; y: number; rot?: number }
 
 /** 한 단계가 끝났을 때의 그림 */
@@ -99,7 +109,8 @@ export type RingState = {
 export type YarnState = { pts: Pt[]; z: Layer; a: number; prog: number; col: YarnColor }
 export type ArrowState = { pts: Pt[]; a: number; t: string }
 export type TagState = { x: number; y: number; text: string; a: number }
-export type MarkState = { x: number; y: number; kind: 'bar' | 'chain'; a: number; col: YarnColor }
+/** hl과 h는 장면에 적었을 때만 있습니다 (대바늘 장면에는 없습니다). */
+export type MarkState = { x: number; y: number; kind: MarkKind; a: number; col: YarnColor; hl?: number; h?: number }
 export type ThumbState = { x: number; y: number; rot?: number; a: number }
 
 export type SceneState = {
@@ -126,10 +137,12 @@ export type TutorialStep = {
 }
 
 /**
- * 뜨는 법의 열쇠. 지금은 대바늘 기호와 같습니다.
- * 코바늘에는 기호가 아닌 동작(매직링, 기둥코)도 있어서 기호 목록과 따로 둡니다.
+ * 코바늘 뜨는 법의 열쇠. 기호(CH, SL, SC, SC2)와, 기호가 아닌 동작(RING 매직링, INC 늘림)이 섞여 있습니다.
  */
-export type TutorialId = KnitSymbolId
+export type CrochetTutorialId = 'RING' | 'CH' | 'SC' | 'INC' | 'SC2' | 'SL'
+
+/** 뜨는 법의 열쇠. 대바늘은 기호와 같고, 코바늘은 기호가 아닌 동작도 있어 기호 목록과 따로 둡니다. */
+export type TutorialId = KnitSymbolId | CrochetTutorialId
 
 export type Tutorial = {
   id: TutorialId

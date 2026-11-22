@@ -322,7 +322,7 @@ export function WorkspaceScreen({ view, ir, initialEntries, initialRings, avatar
     if (key === 'howto') setHowtoSeen(true)
     if (key !== 'chart') setPick(null)
   })
-  const onHowTo = useStable((s: SymbolId) => {
+  const onHowTo = useStable((s: SymbolId | TutorialId) => {
     // 뜨는 법이 있는 기호만 탭을 바꿉니다.
     const id = symbols.find((t) => t === s)
     if (id) setTutorial(id)

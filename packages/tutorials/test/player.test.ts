@@ -126,13 +126,13 @@ describe('재생기: 동작 줄이기', () => {
     drawTutorialFrame(want.ctx, 'CO', 0, 1, { width: 720, height: 430 })
     expect(lines(rec.calls).slice(1)).toEqual(lines(want.calls))
     // 모르는 기호는 무시합니다.
-    h.setSymbol('SC' as never)
+    h.setSymbol('DC' as never)
     expect(h.getSymbol()).toBe('CO')
     h.destroy()
   })
 
   it('모르는 기호로 띄우면 오류', () => {
-    expect(() => mountTutorial(asCanvas(fakeCanvas(recordingContext())), 'SC' as never, { reducedMotion: true })).toThrow(RangeError)
+    expect(() => mountTutorial(asCanvas(fakeCanvas(recordingContext())), 'DC' as never, { reducedMotion: true })).toThrow(RangeError)
   })
 })
 

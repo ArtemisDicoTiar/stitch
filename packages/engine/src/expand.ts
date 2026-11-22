@@ -702,13 +702,24 @@ function simpleName(id: string): string {
 /** 조각을 대표하는 뜨는 법. 단계별 안내가 기호별 뜨는 법을 고르는 데 씁니다. */
 export function techOf(op: Op): string {
   const ids: string[] = []
+  /** 한 자리에 여러 코를 뜨는 조각이 있는지 (코바늘의 늘림) */
+  let adds = false
   const walk = (o: Op) => {
-    if ('st' in o) ids.push(o.st.toLowerCase())
-    else if ('repeat' in o) o.repeat.forEach(walk)
+    if ('st' in o) {
+      ids.push(o.st.toLowerCase())
+      if ((o.into === 'one' && o.n > 1) || o.into === 'same') adds = true
+    } else if ('repeat' in o) o.repeat.forEach(walk)
   }
   walk(op)
   const uniq = [...new Set(ids)]
   if (uniq.length === 0) return 'K'
+  // 코바늘: 늘림이 섞인 조각은 늘림을, 그 밖에는 처음 나오는 코를 보여 줍니다. 기둥코와 건너뛰기는 대표가 되지 않습니다.
+  const crochetIds = uniq.filter((i) => getStitch(i)?.craft === 'crochet')
+  if (crochetIds.length > 0) {
+    if (crochetIds.includes('inc') || adds) return 'INC'
+    const main = crochetIds.find((i) => getStitch(i)?.symbol && i !== 'tch') ?? crochetIds[0]
+    return (getStitch(main)?.symbol as string | null) ?? main.toUpperCase()
+  }
   const special = uniq.filter((i) => i !== 'k' && i !== 'p' && i !== 'pat')
   if (uniq.includes('yo') && special.length > 1) return 'BH'
   if (special.length) return (getStitch(special[0])?.symbol as string) ?? special[0].toUpperCase()

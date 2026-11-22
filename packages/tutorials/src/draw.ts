@@ -6,6 +6,7 @@
 import type {
   ArrowState,
   FabricGlyph,
+  MarkState,
   NeedleState,
   Pt,
   RingState,
@@ -228,7 +229,54 @@ function vStitch(g: TutorialContext2D, L: Look, x: number, y: number, type: Fabr
   }
 }
 
+/**
+ * 코바늘. 대바늘과 같은 자루에, 끝에는 실을 거는 갈고리가 있습니다.
+ * 갈고리의 목(파인 곳)은 바늘의 아래쪽(화면에서 아래)을 향합니다.
+ */
+function hook(g: TutorialContext2D, L: Look, p: NeedleState, a: number): void {
+  const dx = p.tx - p.bx
+  const dy = p.ty - p.by
+  const len = Math.hypot(dx, dy)
+  const ux = dx / len
+  const uy = dy / len
+  // 아래쪽을 향하는 수직 방향
+  let nx = -uy
+  let ny = ux
+  if (ny < 0) {
+    nx = -nx
+    ny = -ny
+  }
+  const w = 6
+  const at = (along: number, side: number): [number, number] => [p.tx - ux * along + nx * side, p.ty - uy * along + ny * side]
+  g.globalAlpha = a
+  const grd = g.createLinearGradient(p.bx + nx * w, p.by + ny * w, p.bx - nx * w, p.by - ny * w)
+  grd.addColorStop(0, L.c.needleShade)
+  grd.addColorStop(0.55, L.c.needleShine)
+  grd.addColorStop(1, L.c.needleEdge)
+  g.fillStyle = grd
+  g.strokeStyle = L.c.needleLine
+  g.lineWidth = 1
+  g.beginPath()
+  // 위쪽 변: 뒤끝에서 머리까지
+  g.moveTo(...at(len, -w))
+  g.lineTo(...at(16, -w))
+  // 둥근 머리
+  g.quadraticCurveTo(...at(-2, -w), ...at(-2, 0))
+  g.quadraticCurveTo(...at(-2, w + 1), ...at(5, w + 1))
+  // 갈고리의 목: 안으로 파였다가 자루로 돌아옵니다
+  g.lineTo(...at(9, 0.5))
+  g.quadraticCurveTo(...at(15, -1), ...at(22, w - 1.5))
+  g.lineTo(...at(30, w))
+  // 아래쪽 변: 뒤끝으로
+  g.lineTo(...at(len, w))
+  g.closePath()
+  g.fill()
+  g.stroke()
+  g.globalAlpha = 1
+}
+
 function needle(g: TutorialContext2D, L: Look, p: NeedleState, a: number): void {
+  if (p.kind === 'hook') return hook(g, L, p, a)
   const dx = p.tx - p.bx
   const dy = p.ty - p.by
   const len = Math.hypot(dx, dy)
@@ -328,6 +376,72 @@ function thumb(g: TutorialContext2D, L: Look, t: ThumbState): void {
   g.globalAlpha = 1
 }
 
+/** 코바늘 편물의 조각: 코 머리, 기둥, 둥글게 감은 실 */
+function crochetMark(g: TutorialContext2D, L: Look, mark: MarkState): void {
+  const m = { ...mark, hl: mark.hl ?? 0, h: mark.h ?? 0 }
+  if (m.hl > 0.01) {
+    g.globalAlpha = m.a * m.hl * 0.4
+    g.fillStyle = L.c.highlight
+    g.beginPath()
+    if (m.kind === 'post') g.ellipse(m.x, m.y + m.h / 2, 13, m.h / 2 + 8, 0, 0, 7)
+    else if (m.kind === 'loop') g.ellipse(m.x, m.y, m.h + 12, m.h * 0.78 + 12, 0, 0, 7)
+    else g.ellipse(m.x, m.y, 24, 13, 0, 0, 7)
+    g.fill()
+    g.globalAlpha = 1
+  }
+  if (m.kind === 'top') {
+    // 머리는 가로로 누운 고리입니다. 바늘은 이 두 가닥 아래로 들어갑니다.
+    strand(
+      g,
+      L,
+      () => {
+        g.beginPath()
+        g.ellipse(m.x, m.y, 18, 6.5, 0, 0, 7)
+      },
+      m.col,
+      m.a,
+      5,
+    )
+  } else if (m.kind === 'post') {
+    strand(
+      g,
+      L,
+      () => {
+        g.beginPath()
+        g.moveTo(m.x - 5, m.y + 5)
+        g.quadraticCurveTo(m.x - 2, m.y + m.h * 0.55, m.x, m.y + m.h - 4)
+      },
+      m.col,
+      m.a,
+      6,
+    )
+    strand(
+      g,
+      L,
+      () => {
+        g.beginPath()
+        g.moveTo(m.x + 5, m.y + 5)
+        g.quadraticCurveTo(m.x + 2, m.y + m.h * 0.55, m.x, m.y + m.h - 4)
+      },
+      m.col,
+      m.a,
+      6,
+    )
+  } else {
+    strand(
+      g,
+      L,
+      () => {
+        g.beginPath()
+        g.ellipse(m.x, m.y, m.h, m.h * 0.78, 0, 0, 7)
+      },
+      m.col,
+      m.a,
+      6,
+    )
+  }
+}
+
 function paint(g: TutorialContext2D, L: Look, S: SceneState): void {
   const rings = Object.values(S.rings)
   // 편물: 고리마다 다리와 그 아래 코들
@@ -392,6 +506,7 @@ function paint(g: TutorialContext2D, L: Look, S: SceneState): void {
         5,
       )
     }
+    if (m.kind === 'top' || m.kind === 'post' || m.kind === 'loop') crochetMark(g, L, m)
   }
   // 바늘 뒤: 꿰인 고리의 뒤쪽 가닥과 뒤에 있는 실
   for (const r of rings) if (r.a > 0.02 && r.thru) ringHalf(g, L, r, false)

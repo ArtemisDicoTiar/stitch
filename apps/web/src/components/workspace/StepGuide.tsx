@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { rowAt } from '@stitch/engine'
-import type { Craft, Expanded, SymbolId } from '@stitch/pattern-ir'
+import type { Craft, Expanded } from '@stitch/pattern-ir'
 import type { ChartRing } from '@stitch/render-chart'
-import { TUTORIALS, tutorialFor } from '@stitch/tutorials'
+import { TUTORIALS, tutorialFor, type TutorialId } from '@stitch/tutorials'
 import { ChartView, type ChartViewHandle } from '@/components/knit/ChartView'
 import { NumberField } from './NumberField'
 import { sectionText, segmentAt, segmentStart, sideName, workingPos, type Pos } from './position'
@@ -20,7 +20,7 @@ type Props = {
   rings: ChartRing[]
   /** 단 재생이 보여 줄 위치. null이면 재생을 끝냅니다. 기록은 저장하지 않습니다. */
   onPlayPos: (pos: Pos | null) => void
-  onHowTo: (symbol: SymbolId) => void
+  onHowTo: (id: TutorialId) => void
 }
 
 const MINI_OPTIONS = { controls: false, height: 'fill', zoom: 1.5, sections: false } as const

@@ -3,6 +3,8 @@
  * 단계마다 앞 단계의 장면을 복사해 달라진 것만 고쳐 적습니다.
  * 좌표는 720×430 그림 기준입니다.
  */
+import type { KnitSymbolId } from '@stitch/pattern-ir'
+import { CROCHET_TUTORIALS } from './crochet'
 import { npt } from './scene'
 import type { Layer, NeedlePose, SceneSpec, TagSpec, Tutorial, TutorialId, TutorialStep } from './types'
 
@@ -551,8 +553,8 @@ function bindOff(): Tutorial {
   return tut('BO', '3 needle bind off', '두 바늘의 코를 함께 떠서 이어 붙이며 코막음해요. 꼭대기 이음에 써요.', L)
 }
 
-/** 기호별 뜨는 법. 순서는 코 사전(KNIT_SYMBOLS)과 같습니다. */
-export const TUTORIALS: Record<TutorialId, Tutorial> = {
+/** 대바늘 기호별 뜨는 법. 순서는 코 사전(KNIT_SYMBOLS)과 같습니다. */
+export const KNIT_TUTORIALS: Record<KnitSymbolId, Tutorial> = {
   K: knit(),
   P: purl(),
   YO: yarnOver(),
@@ -564,3 +566,7 @@ export const TUTORIALS: Record<TutorialId, Tutorial> = {
   CO: castOn(),
   BO: bindOff(),
 }
+
+/** 뜨는 법 전부. 대바늘 다음에 코바늘입니다. */
+export const TUTORIALS: Record<TutorialId, Tutorial> = { ...KNIT_TUTORIALS, ...CROCHET_TUTORIALS }
+

@@ -32,6 +32,7 @@ API 키가 없어도 앱은 뜹니다. 그때는 **예시 도안**(직접 쓴 �
 | `pnpm exec tsx scripts/compare-read.ts <IR.json> <도안 이름>` | 실제로 읽은 결과를 직접 쓴 도안과 단별로 비교 |
 | `node scripts/verify-deployed.mjs <주소> <대바늘 PDF> [코바늘 PDF]` | 배포 주소에서 방문자 둘로 API 흐름 확인. 읽기가 켜져 있으면 실제 변환 비용이 듭니다 |
 | `node scripts/live-browser.mjs <주소> <캡처 폴더> <대바늘 PDF>` | 배포 주소를 실제 브라우저로 처음부터 끝까지 따라가기 |
+| `pnpm exec tsx scripts/tutorial-sheet.ts <폴더> [이름...]` | 뜨는 법의 단계들을 그림 한 장으로 뽑기 (그림은 눈으로 확인합니다) |
 
 환경 변수의 기본값과 설명은 `.env.example`에 있습니다. 로컬에서 꼭 필요한 것은 PDF를 읽을 때의 `ANTHROPIC_API_KEY` 하나입니다.
 로컬 데이터(DB, 올린 PDF)는 `data/`에 쌓이고 git에서 빠져 있습니다.

@@ -99,7 +99,7 @@ export function resolve(s: SceneSpec): SceneState {
   }
   for (const m of s.marks || []) {
     const p = at(m.at)
-    out.marks[m.id] = { x: p.x, y: p.y, kind: m.kind, a: 1, col: m.col || 'yarn' }
+    out.marks[m.id] = { x: p.x, y: p.y, kind: m.kind, a: 1, col: m.col || 'yarn', ...(m.hl !== undefined ? { hl: m.hl } : {}), ...(m.h !== undefined ? { h: m.h } : {}) }
   }
   if (s.thumb) out.thumb = { ...s.thumb, a: 1 }
   return out

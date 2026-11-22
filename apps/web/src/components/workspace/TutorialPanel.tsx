@@ -9,6 +9,13 @@ import { TutorialPlayer, type TutorialPlayerHandle, type TutorialState } from '@
 import { onTabKey } from './tabs'
 import styles from './Workspace.module.css'
 
+/** 탭의 작은 그림. 기호가 있는 뜨는 법은 그 기호, 매직링과 늘림은 따로 그립니다. */
+function tabIcon(id: TutorialId): string {
+  if (id === 'RING') return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="30" height="30"><rect x="0.4" y="0.4" width="29.2" height="29.2" fill="#fff6cc" stroke="#888" stroke-width="0.8"/><circle cx="15" cy="15" r="8" fill="none" stroke="#262626" stroke-width="2.1"/></svg>'
+  if (id === 'INC') return symbolSvg('SC', 30, { bg: '#d9f2cf' })
+  return symbolSvg(id, 30)
+}
+
 type Props = {
   expanded: Expanded
   /** 도안에 나온 기호 */
@@ -69,7 +76,7 @@ export function TutorialPanel({ expanded, symbols, symbol, onSymbol, workRow }: 
             className={styles.symTab}
             onClick={() => onSymbol(s)}
           >
-            <span className={styles.legendSym} aria-hidden="true" dangerouslySetInnerHTML={{ __html: symbolSvg(s, 30) }} />
+            <span className={styles.legendSym} aria-hidden="true" dangerouslySetInnerHTML={{ __html: tabIcon(s) }} />
             {TUTORIALS[s].label}
           </button>
         ))}
