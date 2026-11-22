@@ -1,0 +1,33 @@
+{
+  "name": "stitch",
+  "type": "module",
+  "private": true,
+  "version": "0.1.0",
+  "description": "떠보기(가칭): 뜨개 도안 PDF를 따라 뜨기 페이지로 바꿔 주는 서비스",
+  "packageManager": "pnpm@12.21.0",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @stitch/web dev",
+    "build": "pnpm --filter @stitch/web build",
+    "start": "pnpm --filter @stitch/web start",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "pnpm --filter @stitch/web test:e2e",
+    "typecheck": "tsc -p tsconfig.json --noEmit && pnpm --filter @stitch/web typecheck",
+    "reader": "tsx packages/reader/src/cli.ts",
+    "fixtures:reading": "tsx fixtures/make-reading-fixture.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "~6.0.3",
+    "vitest": "^5.1.1",
+    "@playwright/test": "^1.65.1",
+    "@stitch/fixtures": "workspace:*",
+    "@stitch/reader": "workspace:*",
+    "@stitch/pattern-ir": "workspace:*",
+    "@stitch/engine": "workspace:*"
+  }
+}

@@ -1,0 +1,265 @@
+{
+ "kind": "feedback",
+ "note": "손으로 만든 대역입니다. 실제 LLM 응답을 녹화한 것이 아닙니다.",
+ "promptVersion": "2026-11-21.2",
+ "model": "hand-written",
+ "usage": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation_input_tokens": 0
+ },
+ "output": {
+  "sections": [
+   {
+    "id": "neck",
+    "groups": [
+     {
+      "rows": [
+       {
+        "side": "RS",
+        "label": "고무단 겉면",
+        "text": "겉2, (안1, 겉1)을 마지막 3코 전까지 반복, 안1, 겉2",
+        "expect_count": null,
+        "ops": [
+         {
+          "op": "st",
+          "st": "k",
+          "n": 2,
+          "text": null
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "p",
+            "n": 1,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "k",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "remaining",
+           "n": 3
+          },
+          "text": "(안1, 겉1)을 마지막 3코 전까지 반복"
+         },
+         {
+          "op": "st",
+          "st": "p",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "k",
+          "n": 2,
+          "text": null
+         }
+        ]
+       },
+       {
+        "side": "WS",
+        "label": "고무단 안면",
+        "text": "안2, (겉1, 안1)을 마지막 3코 전까지 반복, 겉1, 안2",
+        "expect_count": null,
+        "ops": [
+         {
+          "op": "st",
+          "st": "p",
+          "n": 2,
+          "text": null
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "k",
+            "n": 1,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "p",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "remaining",
+           "n": 3
+          },
+          "text": "(겉1, 안1)을 마지막 3코 전까지 반복"
+         },
+         {
+          "op": "st",
+          "st": "k",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "p",
+          "n": 2,
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 4,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "RS",
+        "label": "줄임과 단춧구멍",
+        "text": "11코 무늬대로, 3코 모아뜨기, 17코 무늬대로, 3코 모아뜨기, 17코 무늬대로, 3코 모아뜨기, 마지막 5코 전까지 무늬대로, 바늘비우기, 왼코 겹치기, 안1, 겉2",
+        "expect_count": 79,
+        "ops": [
+         {
+          "op": "st",
+          "st": "pat",
+          "n": 11,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "sk2p",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "pat",
+          "n": 17,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "sk2p",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "pat",
+          "n": 17,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "sk2p",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "pat",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "remaining",
+           "n": 5
+          },
+          "text": "마지막 5코 전까지 무늬대로"
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "yo",
+            "n": 1,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "k2tog",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "times",
+           "n": 1
+          },
+          "text": "바늘비우기, 왼코 겹치기 (단춧구멍)"
+         },
+         {
+          "op": "st",
+          "st": "p",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "k",
+          "n": 2,
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "WS",
+        "label": "무늬대로",
+        "text": "아랫단 코 모양대로 뜨기",
+        "expect_count": null,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "pat",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": "끝까지 무늬대로"
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 9,
+       "cm": 0,
+       "from": ""
+      }
+     }
+    ]
+   }
+  ]
+ }
+}

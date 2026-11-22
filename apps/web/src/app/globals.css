@@ -1,0 +1,93 @@
+/* 디자인 캔버스의 색과 글자 크기를 그대로 옮긴 토큰입니다. */
+:root {
+  --bg: #fffdfa;
+  --panel: #faf7f3;
+  --panel-2: #f3ebe3;
+  --panel-3: #efe8df;
+  --white: #ffffff;
+  --ink: #241d19;
+  --ink-2: #4d3d33;
+  --ink-soft: #6d625a;
+  --line: #e6ded5;
+  --line-2: #cfc3b6;
+  --cocoa: #2a201b;
+  --cocoa-2: #3d3029;
+  --cocoa-line: #6b5a4f;
+  --cocoa-ink: #f3ebe3;
+  --cocoa-ink-2: #e9ddd2;
+  --accent: #c2410c;
+  --accent-ink: #b8450a;
+  --accent-hover: #8f3407;
+  --accent-soft: #fff6ef;
+  --ring: #e8590c;
+  --peach: #f6b48f;
+  --ok: #2f7d32;
+  --ok-ink: #1f5e23;
+  --ok-bg: #e4f2e4;
+  --warn-bg: #fff9ea;
+  --warn-line: #e3c877;
+  --warn-ink: #6b4e00;
+  --danger: #b3261e;
+  --danger-bg: #fdecea;
+  --r-sm: 10px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --gutter: max(24px, 4.7vw);
+  --page: 1360px;
+  --font: var(--font-plex), 'IBM Plex Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.6;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+h1, h2, h3, h4, p { margin: 0; }
+a { color: var(--accent-ink); }
+a:hover { color: var(--accent-hover); }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+img, svg, canvas { max-width: 100%; }
+:focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; border-radius: 4px; }
+
+.wrap { max-width: var(--page); margin: 0 auto; padding-left: var(--gutter); padding-right: var(--gutter); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.skip { position: absolute; left: 8px; top: -60px; z-index: 100; background: var(--white); color: var(--ink); padding: 10px 14px; border-radius: var(--r-sm); border: 2px solid var(--ring); }
+.skip:focus { top: 8px; }
+
+/* 버튼. 눌리는 영역은 44px 이상입니다. */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: var(--r-sm); border: 1px solid var(--line-2); background: var(--white); color: var(--ink); font-weight: 600; font-size: 15px; text-decoration: none; }
+.btn:hover { background: var(--panel); color: var(--ink); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #ffffff; }
+.btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: #ffffff; }
+.btn-dark { background: var(--cocoa); border-color: var(--cocoa); color: var(--cocoa-ink); }
+.btn-dark:hover { background: var(--cocoa-2); color: var(--cocoa-ink); }
+.btn-ghost { border-color: transparent; background: transparent; }
+.btn-lg { min-height: 52px; padding: 0 24px; font-size: 17px; border-radius: var(--r-md); }
+.btn[disabled], .btn[aria-disabled='true'] { opacity: 0.55; }
+
+.card { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-lg); }
+.chip { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 0 12px; border-radius: 999px; background: var(--panel-2); color: var(--ink-2); font-size: 13px; font-weight: 600; }
+.chip-ok { background: var(--ok-bg); color: var(--ok-ink); }
+.chip-warn { background: var(--warn-bg); color: var(--warn-ink); border: 1px solid var(--warn-line); }
+.chip-accent { background: var(--accent-soft); color: var(--accent-ink); }
+.muted { color: var(--ink-soft); }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field > label { font-weight: 600; font-size: 14px; }
+.input { min-height: 44px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: var(--r-sm); background: var(--white); }
+.notice { padding: 12px 16px; border-radius: var(--r-md); background: var(--warn-bg); border: 1px solid var(--warn-line); color: var(--warn-ink); font-size: 14px; }
+.notice-error { background: var(--danger-bg); border-color: #f1b5b0; color: #7a1c16; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}

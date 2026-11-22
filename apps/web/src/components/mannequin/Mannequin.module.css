@@ -1,0 +1,668 @@
+/* 마네킹 꾸미기. 디자인(Mannequin)의 배치와 크기를 옮겼습니다. */
+.root {
+  /* 디자인에만 있고 공통 토큰에는 없는 색 */
+  --stage-deep: #1d1612;
+  --stage-line: #4d3f36;
+  --cocoa-soft: #d9cbbf;
+  /* 좁은 화면에서 위에 붙는 미리보기의 높이 */
+  --stage-h: clamp(240px, 38vh, 400px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+@supports (height: 1svh) {
+  .root {
+    --stage-h: clamp(240px, 38svh, 400px);
+  }
+}
+
+/* ---- 머리말 ---- */
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.back {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  min-height: 44px;
+  font-weight: 600;
+  font-size: 15px;
+}
+.titleRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+.h1 {
+  font-size: 32px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+.plusChip {
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: var(--cocoa);
+  color: var(--peach);
+  font-size: 13px;
+  font-weight: 700;
+}
+.planChip {
+  margin-left: auto;
+  padding: 3px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  background: var(--white);
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+.planChip[data-plan='plus'] {
+  border-color: var(--cocoa);
+  background: var(--cocoa);
+  color: var(--peach);
+}
+.lead {
+  margin-top: 4px;
+  color: var(--ink-soft);
+}
+.lapsed {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 16px;
+  margin-top: 12px;
+  padding: 8px 16px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--warn-line);
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+  font-size: 15px;
+}
+.lapsed p {
+  flex: 1 1 28em;
+  padding: 4px 0;
+}
+.lapsed .textLink {
+  color: inherit;
+}
+/* 글 옆에 따로 놓는 링크. 누르는 영역을 44px로 맞춥니다. */
+.textLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ---- 두 칸: 미리보기와 고르기 ---- */
+.columns {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 24px;
+}
+.stageCol {
+  flex: 1 1 420px;
+  min-width: 0;
+  position: sticky;
+  top: 16px;
+  height: min(720px, calc(100vh - 32px));
+  min-height: 420px;
+}
+.optionsCol {
+  flex: 1.2 1 520px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---- 미리보기 ---- */
+.stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: radial-gradient(90% 80% at 50% 36%, var(--ink-2) 0%, var(--cocoa) 66%, var(--stage-deep) 100%);
+  color: var(--cocoa-ink);
+}
+.canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: grab;
+  touch-action: none;
+}
+.canvas:active {
+  cursor: grabbing;
+}
+.canvas[data-ready] {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+.canvas[hidden] {
+  display: none;
+}
+.loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cocoa-line);
+  pointer-events: none;
+}
+.bust {
+  flex: none;
+  width: 96px;
+  height: 96px;
+}
+
+/* 3D를 쓸 수 없을 때: 조용한 자리 표시와 설명 한 줄 */
+.fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  text-align: center;
+}
+.fallback .bust {
+  width: 72px;
+  height: 72px;
+  color: var(--cocoa-line);
+}
+.fallbackLine {
+  max-width: 26em;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--cocoa-ink);
+}
+.fallbackSummary {
+  max-width: 30em;
+  font-size: 14px;
+  color: var(--cocoa-soft);
+}
+.stageCol[data-preview='unavailable'] {
+  position: static;
+  height: auto;
+  min-height: 0;
+}
+.stageCol[data-preview='unavailable'] .stage {
+  height: auto;
+  min-height: 240px;
+}
+.stageCol[data-preview='unavailable'] .fallback {
+  position: static;
+  min-height: 240px;
+}
+
+.badge {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--stage-line);
+  background: var(--stage-deep);
+  color: var(--cocoa-ink);
+  font-size: 13px;
+  font-weight: 700;
+  pointer-events: none;
+}
+.badge[data-unsaved] {
+  border-color: var(--peach);
+  background: var(--peach);
+  color: var(--cocoa);
+}
+
+/* 보기 조작. 끌어서 돌리는 것과 같은 일을 키보드로도 할 수 있게 버튼으로 둡니다. */
+.views,
+.zoom,
+.hood {
+  position: absolute;
+  display: flex;
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid var(--stage-line);
+  background: var(--stage-deep);
+}
+.views {
+  right: 14px;
+  top: 14px;
+}
+.zoom {
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  flex-direction: column;
+}
+.viewBtn,
+.home {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--cocoa-ink);
+  font-size: 15px;
+  font-weight: 600;
+}
+/* 누른 뒤에 강조가 남지 않게, 마우스처럼 올려 둘 수 있는 기기에서만 */
+@media (hover: hover) {
+  .viewBtn:hover,
+  .home:hover {
+    background: var(--cocoa-2);
+    color: #ffffff;
+  }
+  .hoodBtn[aria-pressed='false']:hover {
+    background: var(--cocoa-2);
+  }
+}
+.viewBtn:active,
+.home:active {
+  background: var(--cocoa-2);
+}
+.home {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  border: 1px solid var(--stage-line);
+  background: var(--stage-deep);
+}
+.hood {
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.hoodBtn {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--cocoa-ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+.hoodBtn[aria-pressed='true'] {
+  background: var(--panel-2);
+  color: var(--cocoa);
+  font-weight: 700;
+}
+.stage :focus-visible {
+  outline-color: #ffffff;
+  border-radius: 999px;
+}
+
+/* ---- 고르기 ---- */
+.card {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--white);
+}
+.group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.legend {
+  padding: 0;
+  margin-bottom: 10px;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+.tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+/* 피부 톤 여섯 칸은 한 줄에 들어가게 폭을 나눕니다. */
+.tiles[data-part='skin'] {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 100px));
+}
+.tile {
+  position: relative;
+  display: block;
+  width: 100px;
+  min-width: 0;
+}
+.tiles[data-part='skin'] .tile {
+  width: auto;
+}
+/* 진짜 라디오 버튼을 칸 전체에 겹쳐 둡니다. 화살표 키와 화면 낭독기가 그대로 됩니다. */
+.radio {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.tileBody {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  height: 108px;
+  padding: 28px 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+}
+.tileIcon {
+  flex: none;
+  width: 44px;
+  height: 44px;
+}
+.swatch {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  margin: 2px 0;
+  border-radius: 50%;
+  border: 1px solid var(--line-2);
+}
+.tileLabel {
+  white-space: nowrap;
+}
+.plusBadge {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--cocoa);
+  color: var(--peach);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+/* 고른 칸: 테두리와 바탕에 더해 체크 표시와 굵은 글씨로도 알립니다 (색에만 기대지 않습니다). */
+.check {
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #ffffff;
+}
+.radio:hover + .tileBody {
+  border-color: var(--line-2);
+  background: var(--panel-2);
+}
+.radio:checked + .tileBody {
+  padding: 27px 3px 7px;
+  border: 2px solid var(--accent);
+  background: var(--accent-soft);
+  font-weight: 700;
+}
+.radio:checked + .tileBody .check {
+  display: flex;
+  left: 4px;
+  top: 4px;
+}
+.radio:checked + .tileBody .plusBadge {
+  right: 4px;
+  top: 4px;
+}
+.radio:focus-visible + .tileBody {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* ---- 저장 ---- */
+.savePanel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border-radius: var(--r-lg);
+  background: var(--cocoa);
+  color: var(--cocoa-ink);
+}
+.saveTitle {
+  font-size: 18px;
+  line-height: 1.6;
+}
+.picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.picks li {
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--cocoa-line);
+  font-size: 14px;
+}
+.saveText {
+  color: var(--cocoa-soft);
+  font-size: 15px;
+}
+.savePanel a {
+  color: var(--peach);
+}
+.savePanel a:hover {
+  color: #ffffff;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.saveBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: var(--r-md);
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 700;
+}
+.saveBtn:hover {
+  background: var(--accent-hover);
+}
+.resetBtn {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--cocoa-line);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--cocoa-ink);
+  font-size: 15px;
+  font-weight: 600;
+}
+.resetBtn:hover {
+  background: var(--cocoa-2);
+}
+.saveBtn[aria-disabled='true'],
+.resetBtn[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.saveBtn[aria-disabled='true']:hover {
+  background: var(--accent);
+}
+.resetBtn[aria-disabled='true']:hover {
+  background: transparent;
+}
+.savePanel :focus-visible {
+  outline-color: #ffffff;
+}
+/* 저장 결과와 설명. 화면 낭독기가 바뀐 내용을 읽을 수 있게 빈 자리도 늘 그려 둡니다 (display: none 을 쓰지 않습니다). */
+.messages {
+  display: flex;
+  flex-direction: column;
+  margin-top: -12px;
+  scroll-margin: 16px;
+}
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--cocoa-ink);
+}
+.status[data-on],
+.plusNotice,
+.messages :global(.notice) {
+  margin-top: 12px;
+}
+.status svg {
+  flex: none;
+  color: var(--peach);
+}
+.plusNotice {
+  padding: 12px 16px 4px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--cocoa-line);
+  background: var(--cocoa-2);
+  color: var(--cocoa-ink);
+  font-size: 15px;
+}
+.plusNotice strong {
+  color: var(--peach);
+}
+
+/* 고르기 칸이 좁으면(두 칸 배치의 좁은 쪽) 피부 톤을 세 칸씩 두 줄로 놓습니다. */
+@container (max-width: 600px) {
+  .tiles[data-part='skin'] {
+    grid-template-columns: repeat(3, minmax(0, 100px));
+  }
+}
+
+/* ---- 좁은 화면: 미리보기를 위에 붙이고 고르기는 아래에서 스크롤 ---- */
+/* 1079px 아래에서는 두 칸이 한 줄에 들어가지 않습니다 (420 + 520 + 간격, 양옆 여백). */
+@media (max-width: 1079px) {
+  .columns {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 16px;
+  }
+  .stageCol {
+    flex: none;
+    z-index: 5;
+    top: 0;
+    height: calc(var(--stage-h) + 16px);
+    min-height: 0;
+    /* 붙어 있을 때 아래로 지나가는 칸이 둥근 모서리 밖으로 비치지 않게 */
+    padding: 8px 0;
+    background: var(--panel);
+  }
+  .optionsCol {
+    flex: none;
+  }
+  /* 키보드로 옮긴 초점이 붙어 있는 미리보기 밑에 가려지지 않게 */
+  .radio,
+  .saveBtn,
+  .resetBtn {
+    scroll-margin-top: calc(var(--stage-h) + 40px);
+  }
+}
+@media (max-width: 680px) {
+  .h1 {
+    font-size: 28px;
+  }
+  .tiles,
+  .tiles[data-part='skin'] {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  }
+  .tile {
+    width: auto;
+  }
+}
+@media (max-width: 480px) {
+  .badgeLong {
+    display: none;
+  }
+  /* 휴대폰에서는 가운데의 마네킹을 가리지 않게 보는 방향은 오른쪽에 세로로, 확대와 축소는 왼쪽에 둡니다. */
+  .views {
+    flex-direction: column;
+  }
+  .zoom {
+    left: 14px;
+    right: auto;
+  }
+  .hoodBtn {
+    padding: 0 12px;
+  }
+  .home {
+    right: 14px;
+    bottom: 14px;
+  }
+  .card,
+  .savePanel {
+    padding: 16px;
+  }
+  .saveBtn {
+    flex: 1 1 100%;
+  }
+  .resetBtn {
+    flex: 1 1 100%;
+  }
+}
+/* 화면이 낮으면(가로로 눕힌 휴대폰) 미리보기를 붙이지 않습니다. 화면을 다 가리기 때문입니다. */
+@media (max-width: 1079px) and (max-height: 560px) {
+  .stageCol {
+    position: static;
+  }
+  .radio,
+  .saveBtn,
+  .resetBtn {
+    scroll-margin-top: 0;
+  }
+}
