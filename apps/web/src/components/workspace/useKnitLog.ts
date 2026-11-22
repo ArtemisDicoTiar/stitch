@@ -134,7 +134,9 @@ export function useKnitLog(patternId: string, expanded: Expanded, initialEntries
         try {
           const { entry } = await apiFetch<{ entry: ProgressEntry }>(`${base}/progress`, {
             method: 'POST',
-            json: { row: pos.row, stitch: pos.stitch, finishingStep, memo, ...(opts.at ? { at: opts.at } : {}) },
+            // 시각은 늘 이 기기에서 정한 값을 보냅니다. 서버가 받은 시각을 쓰면, 빠르게 여러 번 눌렀을 때
+            // 먼저 저장된 기록이 아직 저장 중인 기록보다 뒤로 가서 지금 위치가 한 단 물러납니다.
+            json: { row: pos.row, stitch: pos.stitch, finishingStep, memo, at },
           })
           realIds.current.set(tmp, entry.id)
           setEntries((l) => l.map((e) => (e.id === tmp ? { ...entry, id: tmp, memo: e.memo } : e)))
