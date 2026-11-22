@@ -1,0 +1,1045 @@
+{
+ "kind": "rows",
+ "note": "손으로 만든 대역입니다. 실제 LLM 응답을 녹화한 것이 아닙니다.",
+ "promptVersion": "2026-11-21.2",
+ "model": "hand-written",
+ "usage": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation_input_tokens": 0
+ },
+ "output": {
+  "sections": [
+   {
+    "id": "neck",
+    "groups": [
+     {
+      "rows": [
+       {
+        "side": "RS",
+        "label": "고무단 겉면",
+        "text": "겉2, (안1, 겉1)을 마지막 3코 전까지 반복, 안1, 겉2",
+        "expect_count": null,
+        "ops": [
+         {
+          "op": "st",
+          "st": "k",
+          "n": 2,
+          "text": null
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "p",
+            "n": 1,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "k",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "remaining",
+           "n": 3
+          },
+          "text": "(안1, 겉1)을 마지막 3코 전까지 반복"
+         },
+         {
+          "op": "st",
+          "st": "p",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "k",
+          "n": 2,
+          "text": null
+         }
+        ]
+       },
+       {
+        "side": "WS",
+        "label": "고무단 안면",
+        "text": "안2, (겉1, 안1)을 마지막 3코 전까지 반복, 겉1, 안2",
+        "expect_count": null,
+        "ops": [
+         {
+          "op": "st",
+          "st": "p",
+          "n": 2,
+          "text": null
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "k",
+            "n": 1,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "p",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "remaining",
+           "n": 3
+          },
+          "text": "(겉1, 안1)을 마지막 3코 전까지 반복"
+         },
+         {
+          "op": "st",
+          "st": "k",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "p",
+          "n": 2,
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 4,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "RS",
+        "label": "줄임과 단춧구멍",
+        "text": "11코 무늬대로, 3코 모아뜨기, 17코 무늬대로, 3코 모아뜨기, 17코 무늬대로, 3코 모아뜨기, 마지막 5코 전까지 무늬대로, 바늘비우기, 왼코 겹치기, 안1, 겉2",
+        "expect_count": 79,
+        "ops": [
+         {
+          "op": "st",
+          "st": "pat",
+          "n": 11,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "pat",
+          "n": 17,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "sk2p",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "pat",
+          "n": 17,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "sk2p",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "pat",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "remaining",
+           "n": 5
+          },
+          "text": "마지막 5코 전까지 무늬대로"
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "yo",
+            "n": 1,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "k2tog",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "times",
+           "n": 1
+          },
+          "text": "바늘비우기, 왼코 겹치기 (단춧구멍)"
+         },
+         {
+          "op": "st",
+          "st": "p",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "k",
+          "n": 2,
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "WS",
+        "label": "무늬대로",
+        "text": "아랫단 코 모양대로 뜨기",
+        "expect_count": null,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "pat",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": "끝까지 무늬대로"
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 9,
+       "cm": 0,
+       "from": ""
+      }
+     }
+    ]
+   },
+   {
+    "id": "head",
+    "groups": [
+     {
+      "rows": [
+       {
+        "side": "RS",
+        "label": null,
+        "text": "겉4, 안1, 왼쪽 늘림, 마지막 5코 전까지 겉뜨기, 안1, 겉4, 감아코 4코",
+        "expect_count": 84,
+        "ops": [
+         {
+          "op": "st",
+          "st": "k",
+          "n": 4,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "p",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "m1l",
+          "n": 1,
+          "text": "왼쪽 늘림"
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "k",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "remaining",
+           "n": 5
+          },
+          "text": "마지막 5코 전까지 겉뜨기"
+         },
+         {
+          "op": "st",
+          "st": "p",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "k",
+          "n": 4,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "co",
+          "n": 4,
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "WS",
+        "label": null,
+        "text": "안8, 겉1, 마지막 5코 전까지 안뜨기, 겉1, 안4, 감아코 4코",
+        "expect_count": 88,
+        "ops": [
+         {
+          "op": "st",
+          "st": "p",
+          "n": 8,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "k",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "p",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "remaining",
+           "n": 5
+          },
+          "text": "마지막 5코 전까지 안뜨기"
+         },
+         {
+          "op": "st",
+          "st": "k",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "p",
+          "n": 4,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "co",
+          "n": 4,
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "RS",
+        "label": null,
+        "text": "겉8, 안1, 가운데 2코 앞까지 겉뜨기, 오른쪽 늘림, 마커, 겉2, 마커, 왼쪽 늘림, 마지막 9코 전까지 겉뜨기, 안1, 겉8",
+        "expect_count": null,
+        "ops": [
+         {
+          "op": "st",
+          "st": "k",
+          "n": 8,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "p",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "k",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "before_center",
+           "n": 1
+          },
+          "text": "가운데 2코 앞까지 겉뜨기"
+         },
+         {
+          "op": "st",
+          "st": "m1r",
+          "n": 1,
+          "text": "오른쪽 늘림"
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "marker",
+            "action": "place",
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "k",
+            "n": 2,
+            "text": null
+           },
+           {
+            "op": "marker",
+            "action": "place",
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "times",
+           "n": 1
+          },
+          "text": "마커, 겉2, 마커"
+         },
+         {
+          "op": "st",
+          "st": "m1l",
+          "n": 1,
+          "text": "왼쪽 늘림"
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "k",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "remaining",
+           "n": 9
+          },
+          "text": "마지막 9코 전까지 겉뜨기"
+         },
+         {
+          "op": "st",
+          "st": "p",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "k",
+          "n": 8,
+          "text": null
+         }
+        ]
+       },
+       {
+        "side": "WS",
+        "label": null,
+        "text": "안8, 겉1, 마지막 9코 전까지 안뜨기, 겉1, 안8",
+        "expect_count": null,
+        "ops": [
+         {
+          "op": "st",
+          "st": "p",
+          "n": 8,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "k",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "p",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "remaining",
+           "n": 9
+          },
+          "text": "마지막 9코 전까지 안뜨기"
+         },
+         {
+          "op": "st",
+          "st": "k",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "p",
+          "n": 8,
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 2,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "RS",
+        "label": null,
+        "text": "겉8, 안1, 가운데 2코 앞까지 겉뜨기, 오른쪽 늘림, 마커, 겉2, 마커, 왼쪽 늘림, 마지막 9코 전까지 겉뜨기, 안1, 겉8",
+        "expect_count": 94,
+        "ops": [
+         {
+          "op": "st",
+          "st": "k",
+          "n": 8,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "p",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "k",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "before_center",
+           "n": 1
+          },
+          "text": "가운데 2코 앞까지 겉뜨기"
+         },
+         {
+          "op": "st",
+          "st": "m1r",
+          "n": 1,
+          "text": "오른쪽 늘림"
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "marker",
+            "action": "remove",
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "k",
+            "n": 2,
+            "text": null
+           },
+           {
+            "op": "marker",
+            "action": "remove",
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "times",
+           "n": 1
+          },
+          "text": "마커, 겉2, 마커"
+         },
+         {
+          "op": "st",
+          "st": "m1l",
+          "n": 1,
+          "text": "왼쪽 늘림"
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "k",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "remaining",
+           "n": 9
+          },
+          "text": "마지막 9코 전까지 겉뜨기"
+         },
+         {
+          "op": "st",
+          "st": "p",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "k",
+          "n": 8,
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "WS",
+        "label": "무늬대로",
+        "text": "무늬대로 뜨기 (고무단 위에서 22cm가 될 때까지)",
+        "expect_count": null,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "pat",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": "끝까지 무늬대로"
+         }
+        ]
+       },
+       {
+        "side": "RS",
+        "label": "무늬대로",
+        "text": "무늬대로 뜨기 (고무단 위에서 22cm가 될 때까지)",
+        "expect_count": null,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "pat",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": "끝까지 무늬대로"
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "until_cm",
+       "times": 0,
+       "cm": 22,
+       "from": "head"
+      }
+     }
+    ]
+   },
+   {
+    "id": "crown",
+    "groups": [
+     {
+      "rows": [
+       {
+        "side": "RS",
+        "label": "줄임단",
+        "text": "겉8, 안1, 가운데 2코 앞까지 겉뜨기, 오른코 겹치기, 마커, 왼코 겹치기, 마지막 9코 전까지 겉뜨기, 안1, 겉8",
+        "expect_count": null,
+        "ops": [
+         {
+          "op": "st",
+          "st": "k",
+          "n": 8,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "p",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "k",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "before_center",
+           "n": 2
+          },
+          "text": "가운데 2코 앞까지 겉뜨기"
+         },
+         {
+          "op": "st",
+          "st": "ssk",
+          "n": 1,
+          "text": "오른코 겹치기"
+         },
+         {
+          "op": "marker",
+          "action": "place",
+          "text": "마커"
+         },
+         {
+          "op": "st",
+          "st": "k2tog",
+          "n": 1,
+          "text": "왼코 겹치기"
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "k",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "remaining",
+           "n": 9
+          },
+          "text": "마지막 9코 전까지 겉뜨기"
+         },
+         {
+          "op": "st",
+          "st": "p",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "k",
+          "n": 8,
+          "text": null
+         }
+        ]
+       },
+       {
+        "side": "WS",
+        "label": "무늬대로",
+        "text": "아랫단 코 모양대로 뜨기",
+        "expect_count": null,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "pat",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": "끝까지 무늬대로"
+         }
+        ]
+       },
+       {
+        "side": "RS",
+        "label": "무늬대로",
+        "text": "아랫단 코 모양대로 뜨기",
+        "expect_count": null,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "pat",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": "끝까지 무늬대로"
+         }
+        ]
+       },
+       {
+        "side": "WS",
+        "label": "무늬대로",
+        "text": "아랫단 코 모양대로 뜨기",
+        "expect_count": null,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "pat",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": "끝까지 무늬대로"
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 3,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "RS",
+        "label": "줄임단",
+        "text": "겉8, 안1, 가운데 2코 앞까지 겉뜨기, 오른코 겹치기, 마커, 왼코 겹치기, 마지막 9코 전까지 겉뜨기, 안1, 겉8",
+        "expect_count": null,
+        "ops": [
+         {
+          "op": "st",
+          "st": "k",
+          "n": 8,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "p",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "k",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "before_center",
+           "n": 2
+          },
+          "text": "가운데 2코 앞까지 겉뜨기"
+         },
+         {
+          "op": "st",
+          "st": "ssk",
+          "n": 1,
+          "text": "오른코 겹치기"
+         },
+         {
+          "op": "marker",
+          "action": "place",
+          "text": "마커"
+         },
+         {
+          "op": "st",
+          "st": "k2tog",
+          "n": 1,
+          "text": "왼코 겹치기"
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "k",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "remaining",
+           "n": 9
+          },
+          "text": "마지막 9코 전까지 겉뜨기"
+         },
+         {
+          "op": "st",
+          "st": "p",
+          "n": 1,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "k",
+          "n": 8,
+          "text": null
+         }
+        ]
+       },
+       {
+        "side": "WS",
+        "label": "무늬대로",
+        "text": "아랫단 코 모양대로 뜨기",
+        "expect_count": null,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "pat",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": "끝까지 무늬대로"
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 4,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "RS",
+        "label": "코막음",
+        "text": "모든 코를 느슨하게 막기",
+        "expect_count": 0,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "bo",
+            "n": 1,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": "끝까지 코막음"
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     }
+    ]
+   }
+  ]
+ }
+}

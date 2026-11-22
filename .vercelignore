@@ -1,0 +1,31 @@
+# Vercel에 올리지 않는 것. (.vercelignore가 있으면 .gitignore 대신 이 파일이 쓰이므로 빠짐없이 적습니다.)
+
+# 구매한 도안에서 나온 데이터. 어디에도 올리지 않습니다.
+/prototype/
+/private/
+
+# 로컬 데이터 (DB, 올린 PDF, 응답 녹화)
+/data/
+.workflow-data/
+
+# 환경 변수 파일. 배포 환경 변수는 Vercel에 따로 둡니다.
+.env
+.env.*
+
+# 의존성과 빌드 결과
+node_modules/
+.next/
+.next-*/
+out/
+dist/
+coverage/
+*.tsbuildinfo
+.turbo/
+.git/
+
+# 테스트 산출물
+test-results/
+playwright-report/
+
+.DS_Store
+*.log

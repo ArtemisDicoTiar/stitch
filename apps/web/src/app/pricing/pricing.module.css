@@ -1,0 +1,62 @@
+/* 요금제. 디자인(Pricing)의 간격과 크기를 그대로 옮겼습니다. */
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+}
+.main {
+  flex: 1;
+  padding: 40px max(20px, 4.7vw) 48px;
+}
+.inner {
+  max-width: 1040px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.h1 {
+  font-size: 32px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+.soft {
+  color: var(--ink-soft);
+}
+
+.faq {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.h2 {
+  font-size: 18px;
+}
+.faqGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: 16px;
+}
+.faqItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--white);
+}
+.q {
+  font-size: 16px;
+  font-weight: 700;
+}
+.a {
+  font-size: 15px;
+  color: var(--ink-soft);
+}

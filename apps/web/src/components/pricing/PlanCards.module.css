@@ -1,0 +1,211 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 지금 플랜 표시 */
+.now {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+.nowChip {
+  padding: 3px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  background: var(--white);
+  color: var(--ink);
+  font-size: 14px;
+}
+.nowChip[data-plan='plus'] {
+  border-color: var(--cocoa);
+  background: var(--cocoa);
+  color: var(--peach);
+}
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 24px;
+}
+.free,
+.plus {
+  flex: 1 1 360px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 28px;
+  border-radius: 20px;
+}
+.free {
+  border: 1px solid var(--line);
+  background: var(--white);
+}
+.plus {
+  background: var(--cocoa);
+  color: var(--cocoa-ink);
+}
+.name {
+  font-size: 22px;
+  line-height: 1.6;
+}
+.plus .name {
+  color: var(--peach);
+}
+.price {
+  font-size: 40px;
+  line-height: 1.1;
+  font-weight: 700;
+}
+.amount {
+  white-space: nowrap;
+}
+.per {
+  white-space: nowrap;
+  font-size: 16px;
+  font-weight: 500;
+  color: #cdbfb3;
+}
+.soft {
+  color: var(--ink-soft);
+}
+.plusLead {
+  color: #d9cbbf;
+}
+.plusTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.plusHead {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.plusArt {
+  flex: none;
+  width: 104px;
+  height: 124px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: radial-gradient(90% 80% at 50% 38%, var(--ink-2) 0%, #241b17 78%);
+}
+
+.list {
+  flex: 1;
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.check {
+  flex: none;
+  margin-top: 4px;
+  color: var(--ok);
+}
+.plus .check {
+  color: var(--peach);
+}
+
+/* 카드 아래쪽: 지금 쓰는 플랜 표시이거나 바꾸는 버튼 */
+.current,
+.backButton,
+.plusButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  border-radius: var(--r-md);
+  font-weight: 600;
+}
+.current {
+  border: 1px solid var(--line-2);
+  color: var(--ink-soft);
+}
+.plus .current {
+  border-color: var(--cocoa-line);
+  color: var(--cocoa-ink-2);
+}
+.backButton {
+  border: 1px solid var(--line-2);
+  background: var(--white);
+  color: var(--ink);
+}
+.backButton:hover {
+  background: var(--panel);
+}
+.plusButton {
+  border: 0;
+  background: var(--accent);
+  color: var(--white);
+  font-size: 17px;
+  font-weight: 700;
+}
+.plusButton:hover {
+  background: var(--accent-hover);
+}
+/* 스크립트가 준비되기 전의 꺼진 상태는 흐리게 하지 않고, 바꾸는 중에만 흐리게 합니다. */
+.backButton[data-busy],
+.plusButton[data-busy] {
+  opacity: 0.6;
+}
+
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.testNote {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--warn-line);
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+  font-size: 15px;
+  font-weight: 600;
+}
+.testNote svg {
+  flex: none;
+  margin-top: 3px;
+}
+.undecided {
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+.status {
+  min-height: 22px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ok-ink);
+}
+
+@media (max-width: 420px) {
+  .free,
+  .plus {
+    padding: 22px 20px;
+  }
+  .price {
+    font-size: 30px;
+  }
+  .plusTop {
+    gap: 12px;
+  }
+}

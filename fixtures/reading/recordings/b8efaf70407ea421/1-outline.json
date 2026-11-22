@@ -1,0 +1,98 @@
+{
+ "kind": "outline",
+ "note": "손으로 만든 대역입니다. 실제 LLM 응답을 녹화한 것이 아닙니다.",
+ "promptVersion": "2026-11-21.2",
+ "model": "hand-written",
+ "usage": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation_input_tokens": 0
+ },
+ "output": {
+  "craft": "knit",
+  "terms": "kr",
+  "title": "연습용 후드 워머",
+  "materials": [
+   {
+    "kind": "실",
+    "spec": "굵은 울 혼방사",
+    "qty": "약 180g"
+   },
+   {
+    "kind": "바늘",
+    "spec": "4.5mm 줄바늘 (80cm)",
+    "qty": null
+   },
+   {
+    "kind": "부자재",
+    "spec": "단추 1개, 마커 2개, 돗바늘",
+    "qty": null
+   }
+  ],
+  "gauge": {
+   "stitches": 18,
+   "rows": 24,
+   "in_stitch": "메리야스뜨기",
+   "tool_mm": 4.5
+  },
+  "finished": {
+   "width_cm": 26,
+   "height_cm": 44
+  },
+  "template": "hood",
+  "sections": [
+   {
+    "id": "neck",
+    "name": "1. 목 고무단",
+    "shape": "flat",
+    "start": {
+     "kind": "cast_on",
+     "count": 85,
+     "from": null
+    },
+    "multiple": {
+     "of": 2,
+     "plus": 1
+    }
+   },
+   {
+    "id": "head",
+    "name": "2. 머리",
+    "shape": "flat",
+    "start": {
+     "kind": "continue",
+     "count": 79,
+     "from": "neck"
+    },
+    "multiple": null
+   },
+   {
+    "id": "crown",
+    "name": "3. 정수리 줄임",
+    "shape": "flat",
+    "start": {
+     "kind": "continue",
+     "count": 94,
+     "from": "head"
+    },
+    "multiple": null
+   }
+  ],
+  "finishing": [
+   {
+    "name": "정수리 잇기",
+    "text": "코막음한 단을 반으로 접어 돗바늘로 잇습니다."
+   },
+   {
+    "name": "실 정리",
+    "text": "남은 실을 안쪽에서 숨깁니다."
+   },
+   {
+    "name": "단추 달기",
+    "text": "단춧구멍 반대편 고무단에 단추를 답니다."
+   }
+  ],
+  "unclear": []
+ }
+}

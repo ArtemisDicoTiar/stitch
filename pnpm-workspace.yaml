@@ -1,0 +1,11 @@
+packages:
+  - apps/*
+  - packages/*
+  - fixtures
+
+# 설치할 때 빌드 스크립트를 돌려도 되는 의존성
+allowBuilds:
+  esbuild: true
+
+minimumReleaseAgeExclude:
+  - '@anthropic-ai/sdk@1.12.0'
