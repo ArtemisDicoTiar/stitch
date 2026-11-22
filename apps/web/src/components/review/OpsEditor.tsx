@@ -1,8 +1,9 @@
 'use client'
 
 import { describeOp } from '@stitch/engine'
-import { getStitch, stitchesFor, type Craft, type Op } from '@stitch/pattern-ir'
+import { getStitch, stitchesFor, type Craft, type Into, type Op } from '@stitch/pattern-ir'
 import { END_KINDS, addOp, endOf, isRepeat, moveOp, newMarker, newRepeat, newStitch, removeOp, setOp, withEnd, type EndKind, type OpPath } from './edit'
+import { INTO_KR } from './model'
 import { NumberField } from './NumberField'
 import styles from './Review.module.css'
 
@@ -71,6 +72,24 @@ function OpItem({ op, path, count, craft, change }: { op: Op; path: OpPath; coun
         <span className={styles.opUnit}>
           <NumberField aria-label={`${name} 횟수`} value={op.n} min={1} max={999} onCommit={(n) => n !== undefined && change((ops) => setOp(ops, path, { ...op, n }))} />번
         </span>
+        {craft === 'crochet' && (
+          <select
+            className={styles.select}
+            aria-label={`${name} 코를 넣는 자리`}
+            value={op.into ?? 'next'}
+            onChange={(e) => {
+              const into = e.target.value as Into
+              const { into: _old, ...rest } = op
+              change((ops) => setOp(ops, path, into === 'next' ? rest : { ...rest, into }))
+            }}
+          >
+            {INTO_KR.map((o) => (
+              <option key={o.id} value={o.id}>
+                {o.name}
+              </option>
+            ))}
+          </select>
+        )}
         <Tools name={name} path={path} count={count} change={change} />
       </div>
     )

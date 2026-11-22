@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { rowAt } from '@stitch/engine'
-import type { Expanded, SymbolId } from '@stitch/pattern-ir'
+import type { Craft, Expanded, SymbolId } from '@stitch/pattern-ir'
 import type { ChartRing } from '@stitch/render-chart'
 import { TUTORIALS, tutorialFor } from '@stitch/tutorials'
 import { ChartView, type ChartViewHandle } from '@/components/knit/ChartView'
@@ -12,6 +12,7 @@ import styles from './Workspace.module.css'
 
 type Props = {
   expanded: Expanded
+  craft: Craft
   /** 사용자의 지금 위치 (고치는 중이면 그 값) */
   form: Pos
   /** 화면이 보여 주는 위치. 작은 도안도 같은 값을 씁니다. */
@@ -46,7 +47,7 @@ function useReducedMotion(): boolean {
  * 단계별 안내. 단의 지시문을 조각으로 나눠 지금 뜨는 조각을 강조하고,
  * "단 재생"으로 그 단의 코가 뜨는 순서대로 채워지는 모습을 도안에서 바로 보여 줍니다.
  */
-export function StepGuide({ expanded, form, shown, rings, onPlayPos, onHowTo }: Props) {
+export function StepGuide({ expanded, craft, form, shown, rings, onPlayPos, onHowTo }: Props) {
   const uid = useId()
   const chart = useRef<ChartViewHandle>(null)
   const reduced = useReducedMotion()
@@ -153,13 +154,13 @@ export function StepGuide({ expanded, form, shown, rings, onPlayPos, onHowTo }: 
               {g}단{row.label && row.label !== `${g}단` ? ` · ${row.label}` : ''}
             </h3>
             <span className={styles.sideChip} data-side={row.side}>
-              {row.side === 'WS' ? '안면 → 방향' : row.side === 'RS' ? '겉면 ← 방향' : '원통 ← 방향'}
+              {row.side === 'WS' ? '안면 → 방향' : row.side === 'RS' ? '겉면 ← 방향' : craft === 'crochet' ? '원형 ← 방향' : '원통 ← 방향'}
             </span>
             {g === work.row && <span className={styles.nowChip}>지금 뜰 단</span>}
             <span className={styles.countPill}>뜬 뒤 {row.count}코</span>
           </div>
           <p className={styles.stepMeta}>
-            {[sectionText(expanded, g), sideName(row.side), row.estimated ? '길이로 적힌 구간 (게이지로 추정한 단)' : '', row.markers.length ? `마커 ${row.markers.length}개` : ''].filter(Boolean).join(' · ')}
+            {[sectionText(expanded, g), sideName(row.side, craft), row.estimated ? '길이로 적힌 구간 (게이지로 추정한 단)' : '', row.markers.length ? `마커 ${row.markers.length}개` : ''].filter(Boolean).join(' · ')}
           </p>
           <blockquote className={styles.instr}>{row.instr}</blockquote>
 
@@ -203,7 +204,7 @@ export function StepGuide({ expanded, form, shown, rings, onPlayPos, onHowTo }: 
                 )}
               </>
             ) : rowDone ? (
-              <p>이 단을 끝까지 떴어요. 뜬 뒤 바늘에는 {row.count}코가 걸려 있어요.</p>
+              <p>{craft === 'crochet' ? `이 단을 끝까지 떴어요. 이 단은 ${row.count}코예요.` : `이 단을 끝까지 떴어요. 뜬 뒤 바늘에는 ${row.count}코가 걸려 있어요.`}</p>
             ) : (
               <p className={styles.note}>조각을 누르거나 ‘단 재생’을 누르면 그 자리부터 도안에서 보여 줘요.</p>
             )}

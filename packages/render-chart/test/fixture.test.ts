@@ -255,6 +255,16 @@ describe('연습용 코바늘 공: 기호 도안 SVG', () => {
     expect([...seen].sort()).toEqual(['SC', 'SC2'])
   })
 
+  it('늘림으로 생긴 코는 같은 기호를 다른 바탕색으로 그린다', () => {
+    const added = expanded.blocks.flatMap((b) => b.rows).reduce((n, r) => n + r.cells.filter((c) => c.a).length, 0)
+    expect(added).toBe(24)
+    expect((svg.match(/href="#sc-SC-a"/g) ?? []).length).toBe(24)
+    expect(svg).toContain('<g id="sc-SC-a"><path')
+    expect(svg).toContain('fill="#d9f2cf"')
+    // 대바늘 도안에는 이 정의가 없습니다.
+    expect(renderChartSvg(expand(practiceHood))).not.toContain('-a"')
+  })
+
   it('늘어나기 전과 줄어든 뒤의 자리는 코 없음 칸이다', () => {
     const r = checkStructure(expanded)
     const slots = expanded.blocks.reduce((a, b) => a + b.W * b.rows.length, 0)

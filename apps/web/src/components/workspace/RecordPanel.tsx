@@ -2,13 +2,14 @@
 
 import { useId, useState } from 'react'
 import { rowAt } from '@stitch/engine'
-import type { Expanded } from '@stitch/pattern-ir'
+import type { Craft, Expanded } from '@stitch/pattern-ir'
 import { NumberField } from './NumberField'
 import { cellsIn, isComplete, localInput, sideFrom, sideName, workingPos, type Pos } from './position'
 import styles from './Workspace.module.css'
 
 type Props = {
   expanded: Expanded
+  craft: Craft
   /** 입력 칸에 보이는 위치: 고치는 중이면 그 값, 아니면 저장된 지금 위치 */
   pos: Pos
   /** 저장하지 않은 변경이 있는지 */
@@ -30,7 +31,7 @@ type Props = {
 /**
  * 기록하기. 넓은 화면에서는 3D 옆의 패널이고, 휴대폰에서는 엄지가 닿는 아래쪽 막대입니다.
  */
-export function RecordPanel({ expanded, pos, dirty, complete, finishing, finishingDone, onDraft, onReset, onRowUp, onSave, onFinish }: Props) {
+export function RecordPanel({ expanded, craft, pos, dirty, complete, finishing, finishingDone, onDraft, onReset, onRowUp, onSave, onFinish }: Props) {
   const uid = useId()
   const [memo, setMemo] = useState('')
   const [when, setWhen] = useState<string | null>(null)
@@ -86,7 +87,7 @@ export function RecordPanel({ expanded, pos, dirty, complete, finishing, finishi
             )
           ) : row ? (
             <>
-              <strong>{work.row}단</strong> · {sideName(row.side)}, {sideFrom(row.side)} <span className={styles.recordInstr}>· {row.instr}</span>
+              <strong>{work.row}단</strong> · {sideName(row.side, craft)}, {sideFrom(row.side)} <span className={styles.recordInstr}>· {row.instr}</span>
             </>
           ) : null}
         </p>

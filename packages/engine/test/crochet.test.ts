@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { practiceBall, practiceBallExpected } from '@stitch/fixtures'
+import { practiceBall, practiceBallExpected, practiceHood } from '@stitch/fixtures'
 import { parsePattern, type Op, type Pattern, type Row, type Section } from '@stitch/pattern-ir'
 import { allRows, describeOp, expand, normalizeStarts, progressFraction, regauge, stitchesDone, verify } from '../src'
 
@@ -52,6 +52,14 @@ describe('연습용 코바늘 공 (직접 쓴 도안)', () => {
     expect(rows.map((r) => r.cells.length)).toEqual(practiceBallExpected.counts)
   })
 
+  it('늘림으로 생긴 코에 표시가 붙는다', () => {
+    const added = rows.map((r) => r.cells.filter((c) => c.a).length)
+    // 2~5단에서 6코씩 늘고, 나머지 단에는 없습니다. 매직링에 처음 뜨는 6코는 늘림이 아닙니다.
+    expect(added).toEqual([0, 6, 6, 6, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+    // 대바늘 도안에는 이 표시가 없습니다.
+    expect(allRows(verify(practiceHood).expanded).some((r) => r.cells.some((c) => c.a))).toBe(false)
+  })
+
   it('진행률은 뜬 코 수를 따른다', () => {
     expect(stitchesDone(v.expanded, { row: 2, stitch: 6 })).toBe(12)
     expect(progressFraction(v.expanded, { row: 14, stitch: 6 })).toBe(1)
@@ -70,9 +78,9 @@ describe('매직링', () => {
     const rows = allRows(v.expanded)
     expect(v.errors).toEqual([])
     expect(rows.map((r) => r.count)).toEqual([6, 12])
-    expect(rows[0]).toMatchObject({ start: 'ring', label: '1단(원통)', instr: '매직링에 짧은뜨기 6코', ref: { section: 0, group: -1, row: -1, rep: 0 } })
+    expect(rows[0]).toMatchObject({ start: 'ring', label: '1단(원형)', instr: '매직링에 짧은뜨기 6코', ref: { section: 0, group: -1, row: -1, rep: 0 } })
     expect(rows[0].cells.map((c) => c.s)).toEqual(Array(6).fill('SC'))
-    expect(rows[1].label).toBe('2단(원통)')
+    expect(rows[1].label).toBe('2단(원형)')
     expect(v.expanded.sections[0]).toMatchObject({ startCount: 6, endCount: 12, rows: 2 })
   })
 
@@ -240,6 +248,8 @@ describe('코바늘 안내 글', () => {
     expect(describeOp({ st: 'sc2tog', n: 2 })).toBe('짧은뜨기 줄임 2번')
     expect(describeOp({ st: 'tch', n: 1 })).toBe('기둥코 세우기 (1코로 셈)')
     expect(describeOp({ st: 'join', n: 1 })).toBe('첫 코에 빼뜨기로 잇기')
+    expect(describeOp({ repeat: [{ st: 'inc', n: 1 }], until: 'end' })).toBe('끝까지 짧은뜨기 늘림')
+    expect(describeOp({ repeat: [{ st: 'sc', n: 2 }, { st: 'inc', n: 1 }], times: 6 })).toBe('(짧은뜨기 2코, 짧은뜨기 늘림) 6번')
     // 대바늘 표현은 그대로입니다.
     expect(describeOp({ st: 'k', n: 3 })).toBe('겉3')
     expect(describeOp({ st: 'k2tog', n: 2 })).toBe('왼코 겹치기 2번')
@@ -260,7 +270,7 @@ describe('읽은 도안 바로잡기: 매직링의 첫 단', () => {
       expect(fixed.sections[0].start).toEqual({ kind: 'ring', count: 0 })
       expect(verify(fixed).errors).toEqual([])
       expect(counts(fixed)).toEqual([6, 12])
-      expect(allRows(verify(fixed).expanded).map((r) => r.label)).toEqual(['1단(원통)', '2단(원통)'])
+      expect(allRows(verify(fixed).expanded).map((r) => r.label)).toEqual(['1단(원형)', '2단(원형)'])
     }
   })
 
@@ -297,7 +307,7 @@ describe('같은 조각을 여러 개 만들기 (copies)', () => {
     expect(rows.map((r) => r.count)).toEqual([6, 12, 5, 5, 5, 5])
     expect(rows.map((r) => r.copy ?? 0)).toEqual([0, 0, 1, 1, 2, 2])
     expect(v.expanded.blocks.map((b) => b.W)).toEqual([12, 5, 5])
-    expect(rows.slice(2).map((r) => r.label)).toEqual(['1단(원통) · 1/2번째', '2단(원통) · 1/2번째', '1단(원통) · 2/2번째', '2단(원통) · 2/2번째'])
+    expect(rows.slice(2).map((r) => r.label)).toEqual(['1단(원형) · 1/2번째', '2단(원형) · 1/2번째', '1단(원형) · 2/2번째', '2단(원형) · 2/2번째'])
   })
 
   it('구간 요약은 구간마다 하나이고, 단수는 조각을 모두 더한 수다', () => {

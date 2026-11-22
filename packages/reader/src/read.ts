@@ -3,12 +3,11 @@
  *   꺼내기 → LLM 구조화(개요, 구간별 단) → 엔진 검산 → 되먹임 → 사람 확인으로 넘기기
  * LLM은 PDF를 IR 초안으로 바꾸는 일만 하고, 그 결과는 엔진 검산과 사람 확인을 거쳐야 페이지가 됩니다.
  */
-import { normalizeStarts, verify, type Verification } from '@stitch/engine'
+import { normalizeStarts, verify, withTermNotes, type Verification } from '@stitch/engine'
 import { safeParsePattern, type Issue, type Pattern } from '@stitch/pattern-ir'
 import { extractPages, locateText, type SourceHit, type SourcePage } from './extract'
 import { addUsage, ReaderError, sha256, ZERO_USAGE, type Llm, type LlmUsage } from './llm'
 import { feedbackPrompt, OUTLINE_PROMPT, rowsPrompt } from './prompts'
-import { withTermNotes } from './terms'
 import { OutlineSchema, RowsSchema, toGroups, toPattern, type Outline } from './wire'
 
 export type ReadStage = 'extract' | 'structure' | 'verify' | 'feedback' | 'review'

@@ -10,7 +10,11 @@ type Created = { id: string; status: 'reading' | 'needs_review' | 'ready' | 'fai
 
 /** 서버 설정(/api/me의 maxPdfBytes)을 받기 전에 쓰는 기본 상한입니다. 서버가 다시 확인합니다. */
 const DEFAULT_MAX_BYTES = 20 * 1024 * 1024
-const SAMPLE = 'practice-hood'
+/** 직접 쓴 예시 도안. 대바늘과 코바늘 하나씩 */
+const SAMPLES = [
+  { id: 'practice-hood', label: '예시 도안으로 둘러보기', name: '대바늘 예시 도안' },
+  { id: 'practice-ball', label: '코바늘 예시로 둘러보기', name: '코바늘 예시 도안' },
+] as const
 
 export function FileIcon() {
   return (
@@ -90,13 +94,13 @@ export function UploadClient() {
     }
   }
 
-  async function startSample() {
+  async function startSample(sample: (typeof SAMPLES)[number]) {
     if (busy) return
     setError(null)
     setReused(null)
-    setBusy({ kind: 'sample', name: '예시 도안' })
+    setBusy({ kind: 'sample', name: sample.name })
     try {
-      const made = await apiFetch<Created>('/api/patterns', { method: 'POST', json: { sample: SAMPLE } })
+      const made = await apiFetch<Created>('/api/patterns', { method: 'POST', json: { sample: sample.id } })
       router.push(`/patterns/${made.id}/review`)
     } catch (e) {
       setError(e instanceof ApiError ? e.message : '예시 도안을 열지 못했습니다. 잠시 뒤 다시 시도해 주세요.')
@@ -173,12 +177,16 @@ export function UploadClient() {
       <section className={styles.sample} aria-labelledby="sample-title">
         <div className={styles.sampleText}>
           <strong id="sample-title">PDF가 없어도 둘러볼 수 있어요</strong>
-          <span>직접 쓴 연습용 도안으로 읽은 내용 확인부터 작업 화면까지 바로 가 볼 수 있어요.</span>
+          <span>직접 쓴 연습용 도안(대바늘 후드 워머, 코바늘 공)으로 읽은 내용 확인부터 작업 화면까지 바로 가 볼 수 있어요.</span>
         </div>
-        <button type="button" className="btn" onClick={startSample} disabled={!!busy}>
-          {busy?.kind === 'sample' && <span className={styles.spinner} aria-hidden="true" />}
-          예시 도안으로 둘러보기
-        </button>
+        <div className={styles.sampleBtns}>
+          {SAMPLES.map((sample) => (
+            <button key={sample.id} type="button" className="btn" onClick={() => startSample(sample)} disabled={!!busy}>
+              {busy?.kind === 'sample' && busy.name === sample.name && <span className={styles.spinner} aria-hidden="true" />}
+              {sample.label}
+            </button>
+          ))}
+        </div>
       </section>
     </div>
   )

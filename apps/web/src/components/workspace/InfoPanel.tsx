@@ -30,6 +30,7 @@ type Props = {
 /** 준비물과 도안 정보: 재료, 게이지 상태, 완성 크기 */
 export function InfoPanel({ patternId, ir, patternGauge, gaugeMode, myGauge, hasPdf }: Props) {
   const base = `/patterns/${encodeURIComponent(patternId)}`
+  const tool = ir.craft === 'crochet' ? '코바늘' : '바늘'
   const size = [ir.finished.width_cm ? `가로 ${num(ir.finished.width_cm)}cm` : '', ir.finished.height_cm ? `세로 ${num(ir.finished.height_cm)}cm` : ''].filter(Boolean).join(', ')
   return (
     <section className={styles.info} id="info" aria-labelledby="info-h">
@@ -60,7 +61,7 @@ export function InfoPanel({ patternId, ir, patternGauge, gaugeMode, myGauge, has
           <h3 className={styles.infoK}>게이지</h3>
           <p>
             <span className="chip chip-accent" data-testid="gauge-state">
-              {GAUGE_STATE[gaugeMode]}
+              {gaugeMode === 'remeasure' ? `${tool}을 바꿔 다시 재기` : GAUGE_STATE[gaugeMode]}
             </span>
           </p>
           <p className={styles.infoV}>
@@ -77,7 +78,7 @@ export function InfoPanel({ patternId, ir, patternGauge, gaugeMode, myGauge, has
               내 게이지 <strong>{gaugeText(myGauge)}</strong> · 이 화면의 코 수와 단수는 내 게이지로 다시 계산한 값이에요.
             </p>
           )}
-          {gaugeMode === 'remeasure' && <p className={styles.infoV}>바늘을 바꿔 다시 잴 때까지 도안 숫자 그대로 보여 드려요.</p>}
+          {gaugeMode === 'remeasure' && <p className={styles.infoV}>{tool}을 바꿔 다시 잴 때까지 도안 숫자 그대로 보여 드려요.</p>}
           <p className={styles.infoV}>언제든 다시 맞출 수 있습니다.</p>
           <p className={styles.infoV}>
             <Link href={`${base}/gauge`} className={styles.infoLink}>
@@ -90,7 +91,9 @@ export function InfoPanel({ patternId, ir, patternGauge, gaugeMode, myGauge, has
           <h3 className={styles.infoK}>완성 크기</h3>
           <p className={styles.infoV}>{size || '도안에 완성 크기가 적혀 있지 않아요.'}</p>
           <h3 className={styles.infoK}>게이지가 다르면</h3>
-          <p className={styles.infoV}>10cm 안의 코 수가 도안보다 많으면 더 굵은 바늘로, 적으면 더 가는 바늘로 바꿔 보세요.</p>
+          <p className={styles.infoV}>
+            10cm 안의 코 수가 도안보다 많으면 더 굵은 {tool}로, 적으면 더 가는 {tool}로 바꿔 보세요.
+          </p>
         </div>
 
         <div className={styles.infoCard}>

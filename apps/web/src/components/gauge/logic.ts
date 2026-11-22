@@ -231,6 +231,8 @@ export function availableFits(cmp: GaugeComparison, result: RegaugeResult): Fit[
   const canRecalc = result.ok && changes
   if (cmp.same) return !cmp.sameRows && canRecalc ? ['keep', 'recalc'] : ['keep']
   if (canRecalc) return ['recalc', 'needle']
+  // 코 수를 바꿔 계산하지 않는 도안(둥글게 뜨는 코바늘)은 그대로 뜨는 것이 기본입니다.
+  if (result.fixedShape) return ['keep', 'needle']
   // 통과는 했지만 바뀌는 숫자가 없으면 그대로 뜨는 것과 같습니다.
   return result.ok ? ['keep', 'needle'] : ['needle']
 }

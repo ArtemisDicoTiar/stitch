@@ -15,7 +15,7 @@ type Props = {
 const START_TEXT: Record<string, (n: number) => string> = {
   cast_on: (n) => `코 ${n}코를 잡고 시작해요.`,
   chain: (n) => `사슬 ${n}코로 시작해요.`,
-  ring: (n) => `원형 코 ${n}코로 시작해요.`,
+  ring: (n) => (n > 0 ? `매직링에 ${n}코를 떠서 시작해요.` : '매직링에서 시작해요.'),
 }
 
 /**

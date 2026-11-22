@@ -5,8 +5,11 @@
 import type { Side } from './ir'
 import type { SymbolId } from './stitches'
 
-/** 격자 한 칸. x는 기둥 위치(0이 왼쪽 끝), k는 그 단에서 뜬 순서. */
-export type ChartCell = { x: number; k: number; s: SymbolId }
+/**
+ * 격자 한 칸. x는 기둥 위치(0이 왼쪽 끝), k는 그 단에서 뜬 순서.
+ * a는 코바늘에서 아랫단의 한 자리에 더 떠 넣어 늘어난 코입니다 (늘림, 한 코에 여러 번).
+ */
+export type ChartCell = { x: number; k: number; s: SymbolId; a?: 1 }
 
 /** 지시문의 한 조각과 그 조각이 만든 칸들 */
 export type Segment = { text: string; tech: string; xs: number[] }

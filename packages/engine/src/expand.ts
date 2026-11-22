@@ -52,7 +52,7 @@ type Marker = {
   gapRS: number
 }
 
-type Cell = { col: Col; sym: SymbolId; k: number }
+type Cell = { col: Col; sym: SymbolId; k: number; added?: true }
 
 /** 코 하나를 뜨는 방법: 아랫단에서 쓰는 기둥 수와 새로 생기는 칸 수 */
 type Work = { need: number; make: number }
@@ -71,6 +71,8 @@ export type ExpandOptions = {
 }
 
 const SIDE_KR: Record<Side, string> = { RS: '겉면', WS: '안면', round: '원통' }
+/** 코바늘에서는 둘러 뜨는 단을 원통이 아니라 원형이라고 부릅니다. */
+const SIDE_KR_CROCHET: Record<Side, string> = { ...SIDE_KR, round: '원형' }
 
 /** 평면뜨기는 겉면과 안면 순서가 유지되도록 단수를 짝수로 맞춥니다. */
 export function rowsForLength(cm: number, rowGauge: number, flat = true): number {
@@ -92,6 +94,7 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
   let lastSide: Side | null = null
 
   const crochet = pattern.craft === 'crochet'
+  const sideKr = crochet ? SIDE_KR_CROCHET : SIDE_KR
   /** 사전에 기호가 없는 코를 그릴 때 쓰는 기호 */
   const plain: SymbolId = crochet ? 'SC' : 'K'
   const live = (b: Block) => b.cols.filter((c) => c.alive)
@@ -167,7 +170,7 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
         sectionRow += 1
         const side = resolveSide(section, row, rep, si, gi, ri)
         const base = row.label ?? `${sectionRow}단`
-        const label = `${base}(${SIDE_KR[side]})` + (times > 1 ? ` · ${rep}/${times}회` : '') + which
+        const label = `${base}(${sideKr[side]})` + (times > 1 ? ` · ${rep}/${times}회` : '') + which
         runRow(b, row, side, label, section, { section: si, group: gi, row: ri, rep }, estimated, undefined, copy)
         lastSide = side
       }
@@ -265,7 +268,7 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
     if (start.kind === 'ring') {
       g += 1
       const text = `매직링에 짧은뜨기 ${start.count}코`
-      runRow(b, { side: 'round', ops: [{ st: 'sc', n: start.count, into: 'space' }], expect_count: start.count, text }, 'round', '1단(원통)' + which, section, ref, false, 'ring', copy)
+      runRow(b, { side: 'round', ops: [{ st: 'sc', n: start.count, into: 'space' }], expect_count: start.count, text }, 'round', '1단(원형)' + which, section, ref, false, 'ring', copy)
       lastSide = 'round'
       return 1
     }
@@ -364,7 +367,7 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
     }
 
     /** 아랫단의 기둥 need개를 쓰고 칸 make개를 만듭니다. */
-    const work = (def: StitchDef, { need, make }: Work, sink: Col[]): boolean => {
+    const work = (def: StitchDef, { need, make }: Work, sink: Col[], markAdded = true): boolean => {
       if (pos + need > total) {
         issue('error', 'overrun', `${label}: 남은 코보다 많이 뜨도록 적혀 있습니다. (${def.name.kr}, 남은 코 ${total - pos})`)
         return false
@@ -395,10 +398,12 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
         return true
       }
       if (need === 0) {
+        // 코바늘에서 아랫단을 쓰지 않고 생긴 코는, 사슬이 아니면 이미 뜬 자리에 더 떠 넣은 코입니다.
+        const added = crochet && markAdded && !def.chain ? ({ added: true } as const) : {}
         for (let j = 0; j < make; j++) {
           const c = new Col('K', g, kind)
           insertNew(c)
-          produced.push({ col: c, sym: (def.symbol === 'as_set' || !def.symbol ? plain : def.symbol) as SymbolId, k: produced.length })
+          produced.push({ col: c, sym: (def.symbol === 'as_set' || !def.symbol ? plain : def.symbol) as SymbolId, k: produced.length, ...added })
           sink.push(c)
         }
         return true
@@ -427,7 +432,7 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
       for (let j = 1; j < make; j++) {
         const c = new Col(keep.base, g, kind)
         insertNew(c)
-        produced.push({ col: c, sym, k: produced.length })
+        produced.push({ col: c, sym, k: produced.length, ...(crochet && markAdded ? ({ added: true } as const) : {}) })
         sink.push(c)
       }
       return true
@@ -463,14 +468,16 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
         const size = spaceAt()
         if (size === 0) {
           // 같은 공간에 이어 뜨는 것을 다시 "공간에"라고 적은 경우입니다.
-          if (inSpace) return work(def, { need: 0, make }, sink)
+          if (inSpace) return work(def, { need: 0, make }, sink, false)
           issue('warn', 'no_space', `${label}: 사슬 공간에 뜨라고 적혀 있지만 이 자리에는 사슬이 없습니다. (${def.name.kr})`)
           return work(def, { need: 1, make }, sink)
         }
         inSpace = true
-        return work(def, { need: size, make }, sink)
+        // 링이나 사슬 공간은 코가 아니라서, 그 안에 뜬 코는 늘림으로 표시하지 않습니다.
+        return work(def, { need: size, make }, sink, false)
       }
-      if (into === 'same') return work(def, { need: 0, make }, sink)
+      // 공간에 이어 뜨는 중이면 "같은 자리"도 그 공간입니다.
+      if (into === 'same') return work(def, { need: 0, make }, sink, !inSpace)
       inSpace = false
       return work(def, { need: Math.max(1, def.consumes), make }, sink)
     }
@@ -617,7 +624,7 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
         totalStitches += r.cells.length
         const segments: Segment[] = r.segments.map((s) => ({ text: s.text, tech: s.tech, xs: s.cols.map(x) }))
         const { markerCols, cells, ...rest } = r
-        return { ...rest, cells: cells.map((c) => ({ x: x(c.col), k: c.k, s: c.sym })), segments, markers: markerCols.map(x) }
+        return { ...rest, cells: cells.map((c) => ({ x: x(c.col), k: c.k, s: c.sym, ...(c.added ? ({ a: 1 } as const) : {}) })), segments, markers: markerCols.map(x) }
       })
       return { name: b.name, W, rows }
     })
@@ -675,7 +682,8 @@ function simpleName(id: string): string {
   if (s === 'k') return '겉뜨기'
   if (s === 'p') return '안뜨기'
   if (s === 'pat') return '무늬에 맞춰 뜨기'
-  return stitchKr(s)
+  // 코바늘 이름 뒤의 풀이("(한 코에 2번)")는 안내 글에서 뺍니다.
+  return getStitch(s)?.craft === 'crochet' ? stitchKr(s).replace(/\s*\(.*\)$/, '') : stitchKr(s)
 }
 
 /** 조각을 대표하는 뜨는 법. 단계별 안내가 기호별 뜨는 법을 고르는 데 씁니다. */

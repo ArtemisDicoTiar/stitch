@@ -8,7 +8,7 @@ import type { Pattern, SymbolId } from '@stitch/pattern-ir'
 import type { PickPosition } from '@stitch/render-3d'
 import type { Avatar } from '@stitch/render-3d/avatar'
 import { supportsTemplate } from '@stitch/render-3d/garment'
-import type { ChartPick } from '@stitch/render-chart'
+import { symbolOrder, type ChartPick } from '@stitch/render-chart'
 import { symbolsIn, type TutorialId } from '@stitch/tutorials'
 import type { PatternView, ProgressEntry, RingMarker } from '@/server/patterns'
 import { ChartPanel } from './ChartPanel'
@@ -67,7 +67,14 @@ const prefersReducedMotion = () => typeof window !== 'undefined' && window.match
 export function WorkspaceScreen({ view, ir, initialEntries, initialRings, avatar, renderedAt }: Props) {
   const router = useRouter()
   const expanded = useMemo(() => expand(ir), [ir])
+  /** 뜨는 법이 있는 기호 */
   const symbols = useMemo(() => symbolsIn(expanded), [expanded])
+  /** 도안에 나온 기호 모두. 범례에 씁니다. */
+  const chartSymbols = useMemo(() => {
+    const seen = new Set<string>()
+    for (const b of expanded.blocks) for (const r of b.rows) for (const c of r.cells) seen.add(c.s)
+    return symbolOrder(ir.craft).filter((s) => seen.has(s))
+  }, [expanded, ir.craft])
   const log = useKnitLog(view.id, expanded, initialEntries, initialRings)
   const base = `/patterns/${encodeURIComponent(view.id)}`
 
@@ -364,7 +371,7 @@ export function WorkspaceScreen({ view, ir, initialEntries, initialRings, avatar
   }
   const navCurrent: TabKey | 'stage' = bodyInView ? tab : 'stage'
 
-  const gaugeChip = view.gaugeMode === 'recalc' && view.myGauge ? `내 게이지 ${gaugeText(view.myGauge)} 적용` : view.gaugeMode === 'remeasure' ? '바늘을 바꿔 다시 재기' : '도안 숫자 그대로'
+  const gaugeChip = view.gaugeMode === 'recalc' && view.myGauge ? `내 게이지 ${gaugeText(view.myGauge)} 적용` : view.gaugeMode === 'remeasure' ? `${ir.craft === 'crochet' ? '코바늘' : '바늘'}을 바꿔 다시 재기` : '도안 숫자 그대로'
   const pickHasRing = pick ? log.rings.some((r) => r.row === pick.row && r.x === pick.x) : false
 
   const badge = (
@@ -424,6 +431,7 @@ export function WorkspaceScreen({ view, ir, initialEntries, initialRings, avatar
             <div className={styles.side}>
               <div className={styles.dock} ref={dock}>
                 <RecordPanel
+                  craft={ir.craft}
                   expanded={expanded}
                   pos={form}
                   dirty={draft !== null}
@@ -456,7 +464,8 @@ export function WorkspaceScreen({ view, ir, initialEntries, initialRings, avatar
           <div role="tabpanel" id="panel-chart" aria-labelledby="tab-chart" className={styles.panel} hidden={tab !== 'chart'}>
             <ChartPanel
               expanded={expanded}
-              symbols={symbols}
+              craft={ir.craft}
+              symbols={chartSymbols}
               shown={shown}
               saved={log.saved}
               rings={log.rings}
@@ -477,7 +486,7 @@ export function WorkspaceScreen({ view, ir, initialEntries, initialRings, avatar
           </div>
 
           <div role="tabpanel" id="panel-steps" aria-labelledby="tab-steps" className={styles.panel} hidden={tab !== 'steps'}>
-            {tab === 'steps' && <StepGuide expanded={expanded} form={form} shown={shown} rings={log.rings} onPlayPos={onPlayPos} onHowTo={onHowTo} />}
+            {tab === 'steps' && <StepGuide expanded={expanded} craft={ir.craft} form={form} shown={shown} rings={log.rings} onPlayPos={onPlayPos} onHowTo={onHowTo} />}
           </div>
 
           <div role="tabpanel" id="panel-log" aria-labelledby="tab-log" className={styles.panel} hidden={tab !== 'log'}>

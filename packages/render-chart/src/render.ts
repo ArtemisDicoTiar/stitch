@@ -15,6 +15,9 @@ export function renderChartSvg(expanded: Expanded, opts: ChartOptions = {}): str
 }
 
 /** 이미 계산한 자리로 그립니다. chartLayout 을 따로 쓰는 쪽에서 두 번 계산하지 않게 합니다. */
+/** 늘어난 코를 그리는 기호 정의의 id 뒤에 붙는 말 */
+const ADDED_SUFFIX = '-a'
+
 export function renderLayoutSvg(L: ChartLayout): string {
   const { cell: cs, options: o, metrics: m, expanded } = L
   const s = m.scale
@@ -30,6 +33,8 @@ export function renderLayoutSvg(L: ChartLayout): string {
   const dashes = new Map<string, string[]>()
   const uses: string[] = []
   const used = new Set<SymbolId>()
+  /** 늘어난 코로 쓰인 기호. 같은 모양을 다른 바탕색으로 한 번 더 정의합니다. */
+  const usedAdded = new Set<SymbolId>()
   const gridMinor: string[] = []
   const gridMajor: string[] = []
   const frames: string[] = []
@@ -51,10 +56,15 @@ export function renderLayoutSvg(L: ChartLayout): string {
 
     // t는 위에서부터 센 단 순서
     const sym: (SymbolId | null)[][] = []
+    const added = new Set<number>()
     for (let t = 0; t < n; t++) {
       const row = block.rows[n - 1 - t]
       const line: (SymbolId | null)[] = new Array(W).fill(null)
-      for (const c of row.cells) if (c.x >= 0 && c.x < W) line[c.x] = c.s
+      for (const c of row.cells) {
+        if (c.x < 0 || c.x >= W) continue
+        line[c.x] = c.s
+        if (c.a) added.add(t * W + c.x)
+      }
       sym.push(line)
     }
 
@@ -91,8 +101,10 @@ export function renderLayoutSvg(L: ChartLayout): string {
       for (let x = 0; x < W; x++) {
         const id = sym[t][x]
         if (!id || lineIds.has(id)) continue
-        used.add(id)
-        uses.push(`<use href="#${esc(o.idPrefix + id)}" x="${num(b.x + x * cs)}" y="${num(b.y + t * cs)}"/>`)
+        const plus = added.has(t * W + x)
+        if (plus) usedAdded.add(id)
+        else used.add(id)
+        uses.push(`<use href="#${esc(o.idPrefix + id + (plus ? ADDED_SUFFIX : ''))}" x="${num(b.x + x * cs)}" y="${num(b.y + t * cs)}"/>`)
       }
     }
 
@@ -230,11 +242,14 @@ export function renderLayoutSvg(L: ChartLayout): string {
   out.push(
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" font-family="${esc(o.fontFamily)}" role="img" aria-label="${esc(o.labels.title)}">`,
   )
-  const defs = SYMBOL_ORDER.filter((id) => used.has(id)).map((id) => {
-    const bg = bgOf(id)
+  const def = (id: SymbolId, suffix: string, bg: string) => {
     const fill = isWhite(bg) ? '' : `<path d="${rectPath(0, 0, cs, cs)}" fill="${esc(bg)}" stroke="none"/>`
-    return `<g id="${esc(o.idPrefix + id)}">${fill}${symbolGlyph(id, 0, 0, cs, C.ink)}</g>`
-  })
+    return `<g id="${esc(o.idPrefix + id + suffix)}">${fill}${symbolGlyph(id, 0, 0, cs, C.ink)}</g>`
+  }
+  const defs = [
+    ...SYMBOL_ORDER.filter((id) => used.has(id)).map((id) => def(id, '', bgOf(id))),
+    ...SYMBOL_ORDER.filter((id) => usedAdded.has(id)).map((id) => def(id, ADDED_SUFFIX, C.added)),
+  ]
   if (defs.length) out.push(`<defs>${defs.join('')}</defs>`)
   if (o.background) out.push(`<rect class="sc-paper" width="${w}" height="${h}" fill="${esc(C.paper)}"/>`)
   if (estimated.length) out.push(`<path class="sc-estimated" fill="${esc(C.estimated)}" d="${estimated.join('')}"/>`)

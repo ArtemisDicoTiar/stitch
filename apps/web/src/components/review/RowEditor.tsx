@@ -2,7 +2,7 @@
 
 import { useId, useState, type ReactNode } from 'react'
 import type { Craft, Op, Row, Side } from '@stitch/pattern-ir'
-import { SIDE_KR, countText, rowDomId, type GroupInfo, type RowInfo } from './model'
+import { SIDE_KR, countText, rowDomId, sideKr, type GroupInfo, type RowInfo } from './model'
 import { NumberField } from './NumberField'
 import { OpsEditor, OpsSummary } from './OpsEditor'
 import styles from './Review.module.css'
@@ -71,7 +71,7 @@ export function RowEditor({ info, group, craft, changed, onRow, onTimes, onRever
           <select id={`${uid}-side`} className={styles.select} value={row.side} onChange={(e) => onRow((r) => void (r.side = e.target.value as Side))}>
             {(Object.keys(SIDE_KR) as Side[]).map((s) => (
               <option key={s} value={s}>
-                {SIDE_KR[s]}
+                {sideKr(craft)[s]}
               </option>
             ))}
           </select>

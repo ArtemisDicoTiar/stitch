@@ -3,7 +3,7 @@
  * 위치는 어디서나 { row, stitch } = 전체에서의 단 번호와 그 단에서 뜬 코 수입니다.
  */
 import { allRows, progressFraction, rowAt, stitchesDone } from '@stitch/engine'
-import type { Expanded, ExpandedRow, Progress, SectionSummary, Side } from '@stitch/pattern-ir'
+import type { Craft, Expanded, ExpandedRow, Progress, SectionSummary, Side } from '@stitch/pattern-ir'
 
 export type Pos = Progress
 
@@ -76,8 +76,8 @@ export function posText(expanded: Expanded, p: Pos): string {
   return `${p.row}단 ${p.stitch}코`
 }
 
-export function sideName(side: Side): string {
-  return side === 'WS' ? '안면 단' : side === 'RS' ? '겉면 단' : '원통 단'
+export function sideName(side: Side, craft: Craft = 'knit'): string {
+  return side === 'WS' ? '안면 단' : side === 'RS' ? '겉면 단' : craft === 'crochet' ? '원형단' : '원통 단'
 }
 
 /** 그 단을 읽는 방향 */

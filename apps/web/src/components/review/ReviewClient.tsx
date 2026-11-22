@@ -2,14 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { verify } from '@stitch/engine'
+import { reinterpretTerms, verify } from '@stitch/engine'
 import type { Pattern, Row, Template } from '@stitch/pattern-ir'
 import { ApiError, apiFetch } from '@/lib/api'
 import type { JobView } from '@/server/job-view'
 import type { PatternView } from '@/server/patterns'
 import type { JobVerification } from '@/server/types'
 import { ChartPreview } from './ChartPreview'
-import { CRAFT_KR, TEMPLATES, TERMS_KR, buildModel, countText, groupDomId, rowDomId, rowNumbers, sameRow, sectionDomId, sideText, type GroupInfo, type RowAddr, type RowInfo } from './model'
+import { CRAFT_KR, START_KR, TEMPLATES, TERMS_KR, buildModel, countText, groupDomId, rowDomId, rowNumbers, sameRow, sectionDomId, sideText, type GroupInfo, type RowAddr, type RowInfo } from './model'
 import { NumberField } from './NumberField'
 import { RowEditor } from './RowEditor'
 import { SourcePanel, type SourceTarget } from './SourcePanel'
@@ -311,6 +311,34 @@ export function ReviewClient({ pattern, job }: { pattern: PatternView; job: JobV
                   {CRAFT_KR[ir.craft]} · {TERMS_KR[ir.terms]}
                 </dd>
               </div>
+              {ir.craft === 'crochet' && (ir.terms === 'us' || ir.terms === 'uk') && (
+                <div className={styles.factWide}>
+                  <dt>
+                    <label htmlFor="terms">약어 체계</label>
+                  </dt>
+                  <dd>
+                    <select
+                      id="terms"
+                      className={styles.select}
+                      value={ir.terms}
+                      aria-describedby="terms-hint"
+                      onChange={(e) => {
+                        const next = reinterpretTerms(ir, e.target.value as 'us' | 'uk')
+                        update((d) => {
+                          d.terms = next.terms
+                          d.sections = structuredClone(next.sections)
+                        })
+                      }}
+                    >
+                      <option value="us">미국식 (sc = 짧은뜨기)</option>
+                      <option value="uk">영국식 (dc = 짧은뜨기)</option>
+                    </select>
+                    <span id="terms-hint" className={styles.fieldHint}>
+                      같은 약어가 두 체계에서 다른 코를 가리켜요. 바꾸면 도안의 약어를 그 체계로 다시 풉니다.
+                    </span>
+                  </dd>
+                </div>
+              )}
               {ir.materials.map((m, i) => (
                 <div key={i}>
                   <dt>{m.kind}</dt>
@@ -428,10 +456,16 @@ export function ReviewClient({ pattern, job }: { pattern: PatternView; job: JobV
                   <span className={styles.sectionMeta}>
                     {sec.summary && sec.summary.rows > 0 ? `${sec.summary.firstRow}단부터 ${sec.summary.lastRow}단 · 끝나면 ${sec.summary.endCount}코` : '단 없음'}
                   </span>
-                  <span className={styles.startField}>
-                    <label htmlFor={`start-${sec.s}`}>시작 코 수</label>
-                    <NumberField id={`start-${sec.s}`} value={sec.section.start.count} min={0} max={9999} onCommit={(n) => n !== undefined && update((d) => void (d.sections[sec.s].start.count = n))} />
-                  </span>
+                  {ir.craft === 'crochet' && sec.section.start.kind === 'ring' && sec.section.start.count === 0 ? (
+                    <span className={styles.startField} data-testid={`start-${sec.s}`}>
+                      매직링에서 시작{sec.section.copies && sec.section.copies > 1 ? ` · ${sec.section.copies}개 만들기` : ''}
+                    </span>
+                  ) : (
+                    <span className={styles.startField} data-testid={`start-${sec.s}`}>
+                      <label htmlFor={`start-${sec.s}`}>{ir.craft === 'crochet' ? `${START_KR[sec.section.start.kind]} · 시작 코 수` : '시작 코 수'}</label>
+                      <NumberField id={`start-${sec.s}`} value={sec.section.start.count} min={0} max={9999} onCommit={(n) => n !== undefined && update((d) => void (d.sections[sec.s].start.count = n))} />
+                    </span>
+                  )}
                 </div>
                 {sec.issues.length > 0 && (
                   <ul className={styles.rowIssues}>
@@ -497,7 +531,7 @@ export function ReviewClient({ pattern, job }: { pattern: PatternView; job: JobV
                                   <strong>{rowNumbers(info, perRep)}</strong>
                                   <span>
                                     {info.row.label ? `${info.row.label} · ` : ''}
-                                    {sideText(info)}
+                                    {sideText(info, ir.craft)}
                                   </span>
                                 </span>
                                 <span className={styles.rowText}>{info.row.text}</span>

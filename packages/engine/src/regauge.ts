@@ -23,6 +23,11 @@ export type RegaugeResult = {
   ok: boolean
   /** 통과하지 못한 까닭. ok가 false일 때만 */
   reason?: string
+  /**
+   * 계산에 실패한 것이 아니라, 코 수를 바꿔 계산하지 않는 도안이라는 뜻.
+   * 둥글게 뜨는 코바늘 소품이 그렇습니다. 이때는 도안 숫자 그대로 뜨는 것도 좋은 선택입니다.
+   */
+  fixedShape?: true
   /** 파생 IR. 통과했을 때만 */
   pattern: Pattern | null
   factor: { stitches: number; rows: number }
@@ -63,6 +68,20 @@ export function regauge(pattern: Pattern, mine: GaugeSize): RegaugeResult {
   const k = mine.stitches / base.stitches
   const rr = mine.rows / base.rows
   const factor = { stitches: k, rows: rr }
+
+  // 매직링에서 시작하거나 둘러 뜨는 코바늘은 늘림과 줄임의 간격이 모양(공, 원판)을 정합니다.
+  // 코 수를 비율로 바꾸면 모양이 달라지므로 다시 계산하지 않고, 크기가 얼마나 달라지는지만 알려 줍니다.
+  if (pattern.craft === 'crochet' && pattern.sections.some((s) => s.shape !== 'flat' || s.start.kind === 'ring')) {
+    const w = pattern.finished.width_cm
+    return {
+      ok: false,
+      fixedShape: true,
+      reason: '둥글게 뜨는 코바늘 도안은 늘림과 줄임의 간격이 모양을 정해서, 코 수를 바꿔 다시 계산하지 않아요.',
+      factor,
+      ...empty,
+      width: w ? { pattern: w, asIs: (w * base.stitches) / mine.stitches } : {},
+    }
+  }
 
   const orig = expand(pattern)
   if (orig.issues.some((i) => i.level === 'error')) {

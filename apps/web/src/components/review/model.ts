@@ -3,7 +3,7 @@
  * IR의 한 단은 반복 횟수만큼 여러 단으로 펼쳐지므로, 첫 번째와 마지막 펼친 단을 함께 둡니다.
  */
 import { expand, type Verification } from '@stitch/engine'
-import type { ExpandedRow, Issue, Pattern, Row, RowGroup, Section, SectionSummary, Side, Template, Terms } from '@stitch/pattern-ir'
+import type { Craft, ExpandedRow, Into, Issue, Pattern, Row, RowGroup, Section, SectionSummary, Side, Template, Terms } from '@stitch/pattern-ir'
 
 export type RowAddr = { s: number; g: number; r: number }
 export const sameRow = (a: RowAddr | null, b: RowAddr | null) => !!a && !!b && a.s === b.s && a.g === b.g && a.r === b.r
@@ -119,6 +119,17 @@ export function buildModel(ir: Pattern, v: Verification): Model {
 // --- 화면에 쓰는 말 ------------------------------------------------------------
 
 export const SIDE_KR: Record<Side, string> = { RS: '겉면', WS: '안면', round: '원통' }
+/** 코바늘에서는 둘러 뜨는 단을 원형이라고 부릅니다. */
+export const sideKr = (craft: Craft): Record<Side, string> => (craft === 'crochet' ? { ...SIDE_KR, round: '원형' } : SIDE_KR)
+/** 코바늘에서 코를 넣는 자리 */
+export const INTO_KR: { id: Into; name: string }[] = [
+  { id: 'next', name: '다음 코에 하나씩' },
+  { id: 'one', name: '다음 한 코에 모두' },
+  { id: 'same', name: '방금 뜬 자리에 더' },
+  { id: 'space', name: '사슬 공간이나 링 안에' },
+]
+/** 구간을 시작하는 방법 */
+export const START_KR: Record<Section['start']['kind'], string> = { cast_on: '코잡기', chain: '시작 사슬', ring: '매직링', continue: '앞 구간에서 이어서' }
 export const CRAFT_KR = { knit: '대바늘', crochet: '코바늘' } as const
 export const TERMS_KR: Record<Terms, string> = { kr: '한국식 약어', us: '미국식 약어', uk: '영국식 약어', jp: '일본식 약어' }
 export const TEMPLATES: { id: Template; name: string }[] = [
@@ -137,9 +148,10 @@ export function rowNumbers(info: RowInfo, perRep: number): string {
   return `${info.first.g}단부터 ${perRep}단마다 ${info.times}번`
 }
 
-export function sideText(info: RowInfo): string {
+export function sideText(info: RowInfo, craft: Craft = 'knit'): string {
   const side = info.first?.side ?? info.row.side
-  return info.alternates ? `${SIDE_KR[side]}부터 번갈아` : SIDE_KR[side]
+  const kr = sideKr(craft)
+  return info.alternates ? `${kr[side]}부터 번갈아` : kr[side]
 }
 
 export function countText(info: RowInfo): string {

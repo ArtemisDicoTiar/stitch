@@ -2,14 +2,16 @@
 
 import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { rowAt } from '@stitch/engine'
-import type { Expanded, SymbolId } from '@stitch/pattern-ir'
+import type { Craft, Expanded, SymbolId } from '@stitch/pattern-ir'
 import { SYMBOLS, symbolSvg, type ChartPick, type ChartRing } from '@stitch/render-chart'
+import { tutorialFor } from '@stitch/tutorials'
 import { ChartView, type ChartViewHandle, type ChartViewOptions } from '@/components/knit/ChartView'
 import { sectionText, sideFrom, sideName, workingPos, type Pos } from './position'
 import styles from './Workspace.module.css'
 
 type Props = {
   expanded: Expanded
+  craft: Craft
   /** 도안에 나온 기호 */
   symbols: SymbolId[]
   shown: Pos
@@ -31,7 +33,7 @@ type Props = {
 
 
 /** 전체 기호 도안: 확대와 축소, 칸 고르기, 범례 */
-export function ChartPanel({ expanded, symbols, shown, saved, rings, pick, pickHasRing, onPick, onRecordPick, onPreviewPick, onToggleRing, onHowTo, active }: Props) {
+export function ChartPanel({ expanded, craft, symbols, shown, saved, rings, pick, pickHasRing, onPick, onRecordPick, onPreviewPick, onToggleRing, onHowTo, active }: Props) {
   const uid = useId()
   const chart = useRef<ChartViewHandle>(null)
   const box = useRef<HTMLDivElement>(null)
@@ -44,6 +46,11 @@ export function ChartPanel({ expanded, symbols, shown, saved, rings, pick, pickH
 
   const estimated = useMemo(() => expanded.blocks.reduce((n, b) => n + b.rows.filter((r) => r.estimated).length, 0), [expanded])
   const hasGaps = useMemo(() => expanded.blocks.some((b) => b.rows.some((r) => r.cells.length < b.W)), [expanded])
+  /** 늘림으로 생긴 코를 그릴 때 쓰는 기호 (없으면 null) */
+  const addedSymbol = useMemo(() => {
+    for (const b of expanded.blocks) for (const r of b.rows) for (const c of r.cells) if (c.a) return c.s
+    return null
+  }, [expanded])
 
   const toNow = useCallback(
     (smooth: boolean) => {
@@ -170,6 +177,7 @@ export function ChartPanel({ expanded, symbols, shown, saved, rings, pick, pickH
   const pickedRow = pick ? rowAt(expanded, pick.row) : undefined
   const pickedCell = pick && pickedRow ? pickedRow.cells.find((c) => c.x === pick.x) : undefined
   const pickedName = pickedCell ? SYMBOLS[pickedCell.s].name : ''
+  const crochet = craft === 'crochet'
   const how = pickedCell
     ? pickedRow?.side === 'WS' && pickedCell.s === 'K'
       ? '겉뜨기 기호 (안면에서는 안뜨기로 떠요)'
@@ -242,7 +250,7 @@ export function ChartPanel({ expanded, symbols, shown, saved, rings, pick, pickH
                 {pick.row}단 · {sideFrom(pickedRow.side)} {pick.stitch}번째 코
               </strong>
               <span>
-                {[sectionText(expanded, pick.row), sideName(pickedRow.side), how, pick.stitch === pickedRow.cells.length ? '이 단의 마지막 코' : ''].filter(Boolean).join(' · ')}
+                {[sectionText(expanded, pick.row), sideName(pickedRow.side, craft), how, pick.stitch === pickedRow.cells.length ? '이 단의 마지막 코' : ''].filter(Boolean).join(' · ')}
               </span>
             </div>
             <button type="button" className={styles.pickPrimary} onClick={() => onRecordPick(pick)}>
@@ -254,7 +262,7 @@ export function ChartPanel({ expanded, symbols, shown, saved, rings, pick, pickH
             <button type="button" className={styles.pickBtn} onClick={() => onToggleRing(pick)}>
               {pickHasRing ? '단수링 빼기' : '여기에 단수링 달기'}
             </button>
-            {pickedCell && (
+            {pickedCell && tutorialFor(pickedCell.s) && (
               <button type="button" className={styles.pickBtn} onClick={() => onHowTo(pickedCell.s)}>
                 {pickedName} 뜨는 법 보기
               </button>
@@ -271,8 +279,9 @@ export function ChartPanel({ expanded, symbols, shown, saved, rings, pick, pickH
       <div className={styles.readNote}>
         <h3 className={styles.h3}>도안 읽는 법</h3>
         <p>
-          한 칸이 1코 1단이고, 겉면에서 보이는 모양으로 그렸습니다. 아래에서 위로 올라가며 뜨고, 겉면 단은 오른쪽에서 왼쪽으로, 안면 단은 왼쪽에서 오른쪽으로 읽습니다. 기록한 곳까지는
-          선명하게, 아직 안 뜬 곳은 흐리게 보입니다.
+          {crochet
+            ? '한 칸이 1코이고, 아래에서 위로 올라가며 뜹니다. 원형으로 뜨는 단과 겉면 단은 오른쪽에서 왼쪽으로, 안면 단은 왼쪽에서 오른쪽으로 읽습니다. 늘림으로 생긴 코는 그 단부터 칸이 생기고, 줄임으로 없어진 자리는 회색으로 남습니다. 기록한 곳까지는 선명하게, 아직 안 뜬 곳은 흐리게 보입니다.'
+            : '한 칸이 1코 1단이고, 겉면에서 보이는 모양으로 그렸습니다. 아래에서 위로 올라가며 뜨고, 겉면 단은 오른쪽에서 왼쪽으로, 안면 단은 왼쪽에서 오른쪽으로 읽습니다. 기록한 곳까지는 선명하게, 아직 안 뜬 곳은 흐리게 보입니다.'}
           {estimated > 0 && ` 노란 띠로 표시한 ${estimated}단은 길이로 적힌 구간을 게이지로 추정한 단수입니다. 실제로는 길이를 재며 맞춰 주세요.`}
         </p>
         <ul className={styles.legend} aria-label="기호 범례">
@@ -282,9 +291,16 @@ export function ChartPanel({ expanded, symbols, shown, saved, rings, pick, pickH
               {SYMBOLS[s].name}
             </li>
           ))}
+          {addedSymbol && (
+            <li>
+              <span className={styles.legendSym} aria-hidden="true" dangerouslySetInnerHTML={{ __html: symbolSvg(addedSymbol, 24, { bg: '#d9f2cf' }) }} />
+              늘림 (같은 코에 한 번 더 뜬 코)
+            </li>
+          )}
           {hasGaps && (
             <li>
-              <span className={styles.legendSwatch} data-kind="none" aria-hidden="true" />코 없음 (줄어든 자리)
+              <span className={styles.legendSwatch} data-kind="none" aria-hidden="true" />
+              {crochet ? '코 없음 (늘기 전이나 줄어든 자리)' : '코 없음 (줄어든 자리)'}
             </li>
           )}
           {estimated > 0 && (

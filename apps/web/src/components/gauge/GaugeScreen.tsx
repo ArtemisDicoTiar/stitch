@@ -189,7 +189,7 @@ export function GaugeScreen({ patternId, title, originalIr, ...saved }: Props) {
     <div className={styles.shell}>
       <div className={`wrap ${styles.page}`}>
         <div className={styles.top}>
-          {first ? <Steps /> : <CurrentState gaugeMode={gaugeMode} myGauge={myGauge} title={title} workHref={workHref} />}
+          {first ? <Steps /> : <CurrentState gaugeMode={gaugeMode} myGauge={myGauge} title={title} workHref={workHref} tool={originalIr.craft === 'crochet' ? '코바늘' : '바늘'} />}
           <div className={styles.intro}>
             <h1 className={styles.h1}>내 게이지에 맞추기</h1>
             <p className={styles.lead}>
@@ -319,13 +319,13 @@ function Steps() {
 }
 
 /** 작업 화면에서 다시 들어왔을 때: 지금 어떤 상태인지 먼저 알려 줍니다. */
-function CurrentState({ gaugeMode, myGauge, title, workHref }: { gaugeMode: PatternView['gaugeMode']; myGauge: GaugeSize | null; title: string; workHref: string }) {
+function CurrentState({ gaugeMode, myGauge, title, workHref, tool }: { gaugeMode: PatternView['gaugeMode']; myGauge: GaugeSize | null; title: string; workHref: string; tool: string }) {
   const measured = myGauge ? gaugeText(myGauge) : null
   const text =
     gaugeMode === 'recalc'
       ? `내 게이지${measured ? `(${measured})` : ''}에 맞춰 다시 계산한 숫자로 뜨고 있어요.`
       : gaugeMode === 'remeasure'
-        ? `바늘을 바꿔 스와치를 다시 뜨기로 했어요.${measured ? ` 지난번에 잰 게이지는 ${measured}이에요.` : ''} 새로 잰 숫자를 넣을 때까지는 도안 숫자 그대로예요.`
+        ? `${tool}을 바꿔 스와치를 다시 뜨기로 했어요.${measured ? ` 지난번에 잰 게이지는 ${measured}이에요.` : ''} 새로 잰 숫자를 넣을 때까지는 도안 숫자 그대로예요.`
         : measured
           ? `도안 숫자 그대로 뜨고 있어요. 잰 게이지는 ${measured}이에요.`
           : '재지 않고 도안 숫자 그대로 뜨고 있어요.'
@@ -380,8 +380,10 @@ function Measure({
   const canRecalc = fits.includes('recalc')
   const swatch = swatchSize(base)
   const stitchName = base.in_stitch.trim()
+  const tool = ir.craft === 'crochet' ? '코바늘' : '바늘'
   const firstSection = ir.sections[0]
-  const begin = firstSection?.start.kind === 'chain' ? '사슬을 떠' : '잡아'
+  // 코바늘 스와치는 늘 사슬에서 시작합니다.
+  const begin = ir.craft === 'crochet' || firstSection?.start.kind === 'chain' ? '사슬을 떠' : '잡아'
   const rowsTighter = mine.rows > base.rows
 
   const verdict = !touched
@@ -400,7 +402,7 @@ function Measure({
         }
 
   const mm = cmp.same ? null : needleSuggestion(base.tool_mm, cmp.stitchPct, cmp.tighter)
-  const needleAdvice = `코가 ${cmp.tighter ? '촘촘하니 더 굵은' : '느슨하니 더 가는'} 바늘${mm ? `(${fmt(mm)}mm쯤)` : ''}로 다시 떠 보세요. 원단 느낌이 도안과 비슷해져요. 새로 잰 숫자를 넣을 때까지는 도안 숫자로 보여 드려요.`
+  const needleAdvice = `코가 ${cmp.tighter ? '촘촘하니 더 굵은' : '느슨하니 더 가는'} ${tool}${mm ? `(${fmt(mm)}mm쯤)` : ''}로 다시 떠 보세요. 원단 느낌이 도안과 비슷해져요. 새로 잰 숫자를 넣을 때까지는 도안 숫자로 보여 드려요.`
 
   const note = heightNote(ir, mine)
   const bars: { key: string; label: string; value: number; tone: 'base' | 'asis' | 'new' }[] = []
@@ -414,16 +416,20 @@ function Measure({
 
   const options: { fit: Fit; title: string; sub: string }[] = fits.map((f) =>
     f === 'recalc'
-      ? { fit: f, title: '코 수를 내 게이지에 맞춰 다시 계산하기', sub: '지금 손땀과 바늘 그대로 떠도 완성 크기가 도안과 같아져요.' }
+      ? { fit: f, title: '코 수를 내 게이지에 맞춰 다시 계산하기', sub: `지금 손땀과 ${tool} 그대로 떠도 완성 크기가 도안과 같아져요.` }
       : f === 'needle'
-        ? { fit: f, title: '바늘을 바꿔서 스와치 다시 뜨기', sub: needleAdvice }
+        ? { fit: f, title: `${tool}을 바꿔서 스와치 다시 뜨기`, sub: needleAdvice }
         : {
             fit: f,
             title: '도안 숫자 그대로 뜨기',
             sub: !touched
               ? '숫자를 바꾸면 맞추는 방법을 여기서 골라요. 바꾸지 않고 넘어가면 재지 않은 것으로 하고 도안 숫자 그대로 떠요.'
-              : !cmp.same
-                ? '내 게이지로 다시 계산해도 숫자가 바뀌지 않아요. 도안 숫자 그대로 뜨면 돼요.'
+              : result.fixedShape && !cmp.same
+                ? width.pattern !== undefined && width.asIs !== undefined
+                  ? `모양은 그대로이고 크기만 달라져요. 가로 ${fmt(width.pattern)}cm가 ${fmt(width.asIs)}cm쯤으로 ${cmp.tighter ? '작게' : '크게'} 나와요.`
+                  : `모양은 그대로이고 크기만 ${cmp.tighter ? '조금 작게' : '조금 크게'} 나와요.`
+                : !cmp.same
+                  ? '내 게이지로 다시 계산해도 숫자가 바뀌지 않아요. 도안 숫자 그대로 뜨면 돼요.'
                 : !cmp.sameRows
                   ? '코 너비가 같아 가로 크기는 그대로예요. 세로는 단 수로 뜨는 구간만 조금 달라져요.'
                   : '게이지가 도안과 거의 같아요. 다시 계산하지 않아도 돼요.',
@@ -445,7 +451,7 @@ function Measure({
             </div>
             <ol className={styles.howtoSteps}>
               <li>
-                도안과 같은 바늘({fmt(base.tool_mm)}mm)로 {swatch.stitches}코쯤 {begin} {stitchName ? withRo(stitchName) : '도안에 적힌 무늬로'} {swatch.rows}단쯤 떠요.
+                도안과 같은 {tool}({fmt(base.tool_mm)}mm)로 {swatch.stitches}코쯤 {begin} {stitchName ? withRo(stitchName) : '도안에 적힌 무늬로'} {swatch.rows}단쯤 떠요.
               </li>
               <li>가볍게 펴 놓고, 가장자리를 뺀 가운데 10cm 안의 코와 단을 세요.</li>
               <li>센 숫자를 내 게이지 칸에 적어요.</li>
@@ -483,7 +489,7 @@ function Measure({
           />
           <p className={styles.small} data-testid="pattern-gauge">
             도안 게이지는 {gaugeText(base)}이에요. ({stitchName ? `${stitchName}, ` : ''}
-            {fmt(base.tool_mm)}mm 바늘, 10cm 기준)
+            {fmt(base.tool_mm)}mm {tool}, 10cm 기준)
           </p>
           <p id={`${id}-hint`} className={styles.small}>
             5cm만 쟀다면 센 숫자에 2를 곱해서 적어 주세요. 반 코는 0.5로 적어도 돼요. 스와치를 따로 뜨지 않았다면 뜨던 편물의 평평한 곳에서 10cm를 재서 넣어도 됩니다.
@@ -539,7 +545,9 @@ function Measure({
           </h2>
           {!result.ok ? (
             <p className="notice" data-testid="regauge-reason">
-              {result.reason ?? '이 게이지로는 다시 계산하지 못했습니다.'} 그래서 다시 계산은 권하지 않고, 바늘을 바꾸는 방법만 안내해요.
+              {result.fixedShape
+                ? `${result.reason} 크기가 조금 달라져도 괜찮다면 도안 숫자 그대로 뜨고, 크기를 맞추려면 ${tool} 호수를 바꿔 보세요.`
+                : `${result.reason ?? '이 게이지로는 다시 계산하지 못했습니다.'} 그래서 다시 계산은 권하지 않고, ${tool}을 바꾸는 방법만 안내해요.`}
             </p>
           ) : null}
           <div role="radiogroup" aria-labelledby={`${id}-fit`} className={styles.options}>

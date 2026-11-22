@@ -40,6 +40,8 @@ export type ChartColors = {
   accent: string
   /** 고른 칸 */
   selection: string
+  /** 코바늘에서 한 자리에 더 떠 넣어 늘어난 코의 칸 바탕 */
+  added: string
 }
 
 export const DEFAULT_COLORS: ChartColors = {
@@ -60,6 +62,7 @@ export const DEFAULT_COLORS: ChartColors = {
   veil: '#fffdf9',
   accent: '#e8590c',
   selection: '#1f6fd1',
+  added: '#d9f2cf',
 }
 
 /** 도안에 적히는 글. 모두 한국어가 기본입니다. */

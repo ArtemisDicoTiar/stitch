@@ -407,7 +407,7 @@ export function mountChart(container: HTMLElement, expanded: Expanded, opts: Mou
     const r = L.row(hit.g)
     const c = L.cellOf(hit.g, hit.x)
     if (!r || !c) return
-    live.textContent = ui.cell({ row: hit.g, stitch: hit.k + 1, x: hit.x, side: r.side, symbol: c.s, name: SYMBOLS[c.s].name, cells: r.cells.length })
+    live.textContent = ui.cell({ row: hit.g, stitch: hit.k + 1, x: hit.x, side: r.side, symbol: c.s, name: SYMBOLS[c.s].name + (c.a ? ' (늘림으로 생긴 코)' : ''), cells: r.cells.length })
   }
   /** 키보드로 처음 들어왔을 때 서 있을 칸: 고른 칸, 지금 뜰 자리, 첫 단의 첫 코 순서 */
   const startCell = (): ChartHit | null => {
