@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { practiceBall, practiceBallExpected, practiceHood } from '@stitch/fixtures'
+import { practiceBall, practiceBallExpected, practiceBear, practiceBearExpected, practiceHood } from '@stitch/fixtures'
 import { parsePattern, type Op, type Pattern, type Row, type Section } from '@stitch/pattern-ir'
 import { allRows, describeOp, expand, normalizeStarts, progressFraction, regauge, stitchesDone, verify } from '../src'
 
@@ -310,6 +310,18 @@ describe('같은 조각을 여러 개 만들기 (copies)', () => {
     expect(rows.slice(2).map((r) => r.label)).toEqual(['1단(원형) · 1/2번째', '2단(원형) · 1/2번째', '1단(원형) · 2/2번째', '2단(원형) · 2/2번째'])
   })
 
+  it('단마다 몇 번째 조각인지와, 조각의 첫 단에 시작 방법이 붙는다', () => {
+    expect(rows.map((r) => r.piece ?? 0)).toEqual([0, 0, 1, 1, 2, 2])
+    expect(rows.map((r) => r.opens ?? '-')).toEqual(['ring', '-', 'ring', '-', 'ring', '-'])
+    // 이어 뜨는 구간은 같은 조각입니다.
+    const body: Section = { id: 'body', name: '몸', shape: 'spiral', start: { kind: 'continue', count: 12 }, groups: [once(row('round', [{ repeat: [sc(1)], until: 'end' }], 12, '3단'))] }
+    const joined = allRows(verify(crochet([head, body])).expanded)
+    expect(joined.map((r) => r.piece ?? 0)).toEqual([0, 0, 0])
+    expect(joined.map((r) => r.opens ?? '-')).toEqual(['ring', '-', '-'])
+    // 대바늘 도안의 첫 단에도 시작 방법이 붙습니다.
+    expect(allRows(verify(practiceHood).expanded)[0].opens).toBe('cast_on')
+  })
+
   it('구간 요약은 구간마다 하나이고, 단수는 조각을 모두 더한 수다', () => {
     expect(v.expanded.sections.map((s) => ({ id: s.id, rows: s.rows, copies: s.copies, first: s.firstRow, last: s.lastRow, start: s.startCount, end: s.endCount }))).toEqual([
       { id: 'head', rows: 2, copies: undefined, first: 1, last: 2, start: 6, end: 12 },
@@ -324,5 +336,26 @@ describe('같은 조각을 여러 개 만들기 (copies)', () => {
     const e = verify(crochet([head, body]))
     expect(e.errors).toEqual([])
     expect(e.expanded.totalRows).toBe(3)
+  })
+})
+
+describe('연습용 코바늘 곰 인형 (직접 쓴 도안, 조각 여러 개)', () => {
+  const v = verify(parsePattern(practiceBear))
+  const rows = allRows(v.expanded)
+
+  it('검산을 통과하고 구간별 단수와 코 수가 기대와 같다', () => {
+    expect(v.errors).toEqual([])
+    expect(v.warnings).toEqual([])
+    expect(v.expanded.totalRows).toBe(practiceBearExpected.totalRows)
+    expect(v.expanded.sections.map((s) => ({ id: s.id, rows: s.rows, start: s.startCount, end: s.endCount, ...(s.copies ? { copies: s.copies } : {}) }))).toEqual(practiceBearExpected.sections)
+  })
+
+  it('조각은 여섯 개이고, 조각마다 매직링에서 새로 시작한다', () => {
+    expect(new Set(rows.map((r) => r.piece ?? 0)).size).toBe(practiceBearExpected.pieces)
+    expect(rows.filter((r) => r.opens === 'ring').length).toBe(practiceBearExpected.pieces)
+    expect(v.expanded.blocks.length).toBe(practiceBearExpected.pieces)
+    // 팔 두 개는 같은 단을 두 번 뜹니다.
+    const arms = rows.filter((r) => r.sectionId === 'arm')
+    expect(arms.filter((r) => r.copy === 1).map((r) => r.count)).toEqual(arms.filter((r) => r.copy === 2).map((r) => r.count))
   })
 })

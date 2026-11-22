@@ -20,3 +20,17 @@ export const practiceBallExpected = {
   counts: [6, 12, 18, 24, 30, 30, 30, 30, 30, 30, 24, 18, 12, 6],
   symbols: ['SC', 'SC2'],
 }
+
+export const practiceBearExpected = {
+  /** 머리 14 + 몸통 13 + 팔 8 × 2 + 귀 3 × 2 */
+  totalRows: 49,
+  sections: [
+    { id: 'head', rows: 14, start: 0, end: 12 },
+    { id: 'body', rows: 13, start: 0, end: 12 },
+    { id: 'arm', rows: 16, start: 0, end: 9, copies: 2 },
+    { id: 'ear', rows: 6, start: 0, end: 12, copies: 2 },
+  ],
+  /** 따로 뜨는 조각 수 */
+  pieces: 6,
+}
+

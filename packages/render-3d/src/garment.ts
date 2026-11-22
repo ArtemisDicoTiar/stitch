@@ -9,21 +9,22 @@
  *   코의 번호 = rowStart[g - 1] + k
  * 이고, 진행 위치 { row, stitch } 까지 뜬 편물은 앞에서부터 `knittedCount()`개의 사각형입니다.
  */
-import type { Expanded, GaugeSize, KnitSymbolId, Pattern, Progress, Side, SymbolId, Template } from '@stitch/pattern-ir'
+import type { Craft, CrochetSymbolId, Expanded, GaugeSize, KnitSymbolId, Pattern, Progress, Side, SymbolId, Template } from '@stitch/pattern-ir'
 import type { MannequinFit, Vec3 } from './mannequin-dims'
 import { planFlat } from './templates/flat'
 import { planHood } from './templates/hood'
+import { planPieces } from './templates/revolve'
 import type { GarmentDetails, GarmentOptions, RowInfo, TemplatePlan } from './templates/types'
 
 export type { MannequinFit, Vec3 } from './mannequin-dims'
-export type { FlatDetails, GarmentDetails, GarmentOptions, HoodDetails } from './templates/types'
+export type { FlatDetails, GarmentDetails, GarmentOptions, HoodDetails, PieceDetails, RoundDetails } from './templates/types'
 
 /** 지금 3D로 그릴 수 있는 템플릿 */
-export const SUPPORTED_TEMPLATES = ['hood', 'flat'] as const
+export const SUPPORTED_TEMPLATES = ['hood', 'flat', 'round'] as const
 export type SupportedTemplate = (typeof SUPPORTED_TEMPLATES)[number]
 
 export function supportsTemplate(template: Template | null | undefined): template is SupportedTemplate {
-  return template === 'hood' || template === 'flat'
+  return (SUPPORTED_TEMPLATES as readonly string[]).includes(template ?? '')
 }
 
 export class UnsupportedTemplateError extends Error {
@@ -41,6 +42,15 @@ export const DEFAULT_GAUGE: GaugeSize = { stitches: 18, rows: 24 }
 /** 기호의 번호. 실 질감 그림에서 칸의 순서이기도 합니다. */
 export const SYMBOL_INDEX: Record<KnitSymbolId, number> = { K: 0, P: 1, YO: 2, K2TOG: 3, SSK: 4, SK2P: 5, M1L: 6, M1R: 7, CO: 8, BO: 9 }
 export const SYMBOL_ORDER: readonly KnitSymbolId[] = (Object.keys(SYMBOL_INDEX) as KnitSymbolId[]).sort((a, b) => SYMBOL_INDEX[a] - SYMBOL_INDEX[b])
+
+/** 코바늘 기호의 번호. 코바늘 실 질감 그림의 칸 순서입니다. 대바늘과 따로 셉니다. */
+export const CROCHET_SYMBOL_INDEX: Record<CrochetSymbolId, number> = { CH: 0, SL: 1, SC: 2, HDC: 3, DC: 4, TR: 5, SC2: 6, DC2: 7, CL: 8 }
+export const CROCHET_SYMBOL_ORDER: readonly CrochetSymbolId[] = (Object.keys(CROCHET_SYMBOL_INDEX) as CrochetSymbolId[]).sort((a, b) => CROCHET_SYMBOL_INDEX[a] - CROCHET_SYMBOL_INDEX[b])
+
+/** 그 공예에서 번호 순서대로의 기호 */
+export function symbolOrderOf(craft: Craft): readonly SymbolId[] {
+  return craft === 'crochet' ? CROCHET_SYMBOL_ORDER : SYMBOL_ORDER
+}
 
 /** 실 질감 그림은 가로로 ATLAS_TILES 칸입니다. uvs가 이 배치를 따릅니다. */
 export const ATLAS_TILES = 16
@@ -61,6 +71,8 @@ export type GarmentRow = {
 
 export type Garment = {
   template: SupportedTemplate
+  /** 기호가 어느 공예의 것인지. 실 질감 그림과 기호 번호가 이 값에 따릅니다. */
+  craft: Craft
   gauge: GaugeSize
   /** 코(사각형) 수. expanded.totalStitches 와 같습니다. */
   stitchCount: number
@@ -86,7 +98,7 @@ export type Garment = {
   stitchK: Uint16Array
   /** 기호 도안의 기둥 위치 x */
   stitchX: Uint16Array
-  /** 기호 번호 (SYMBOL_ORDER) */
+  /** 기호 번호 (symbolOrderOf(craft)에서의 순서) */
   symbols: Uint8Array
 
   // ---- 단마다 ----
@@ -129,7 +141,10 @@ export function buildGarment(expanded: Expanded, template: Template, opts: Garme
   if (!supportsTemplate(template)) throw new UnsupportedTemplateError(String(template))
   const gauge = normGauge(opts.gauge)
   const rows = collectRows(expanded)
-  const plan: TemplatePlan = template === 'hood' ? planHood(rows, expanded, gauge, opts) : planFlat(rows, gauge)
+  const plan: TemplatePlan = template === 'hood' ? planHood(rows, expanded, gauge, opts) : template === 'round' ? planPieces(rows, gauge) : planFlat(rows, gauge)
+  // 도안은 한 공예로만 뜹니다. 코바늘 기호가 하나라도 있으면 코바늘입니다.
+  const craft: Craft = rows.some((r) => r.row.cells.some((c) => c.s in CROCHET_SYMBOL_INDEX)) ? 'crochet' : 'knit'
+  const tiles = (craft === 'crochet' ? CROCHET_SYMBOL_INDEX : SYMBOL_INDEX) as Partial<Record<SymbolId, number>>
 
   let total = 0
   for (const r of rows) total += r.n
@@ -259,8 +274,7 @@ export function buildGarment(expanded: Expanded, template: Template, opts: Garme
         normals[base + c * 3 + 2] = nz
       }
 
-      // 코바늘 기호의 질감은 아직 없어 겉뜨기 칸을 씁니다.
-      const tile = (SYMBOL_INDEX as Partial<Record<SymbolId, number>>)[cell.s] ?? 0
+      const tile = tiles[cell.s] ?? 0
       const u0 = (tile + UV_INSET) / ATLAS_TILES
       const u1 = (tile + 1 - UV_INSET) / ATLAS_TILES
       uvs.set([u1, 0.02, u0, 0.02, u0, 0.98, u1, 0.98], q * 8)
@@ -321,6 +335,7 @@ export function buildGarment(expanded: Expanded, template: Template, opts: Garme
 
   return {
     template,
+    craft,
     gauge,
     stitchCount: total,
     rowCount: rows.length,
@@ -394,7 +409,7 @@ export type StitchRef = {
 /** 코의 번호가 가리키는 칸 */
 export function stitchAt(garment: Garment, index: number): StitchRef | null {
   if (!Number.isInteger(index) || index < 0 || index >= garment.stitchCount) return null
-  return { row: garment.stitchRow[index], k: garment.stitchK[index], x: garment.stitchX[index], symbol: SYMBOL_ORDER[garment.symbols[index]] ?? 'K' }
+  return { row: garment.stitchRow[index], k: garment.stitchK[index], x: garment.stitchX[index], symbol: symbolOrderOf(garment.craft)[garment.symbols[index]] ?? (garment.craft === 'crochet' ? 'SC' : 'K') }
 }
 
 /** 진행 위치까지 뜬 코의 수. 앞에서부터 이만큼의 사각형이 뜬 부분입니다. null이면 전부 */
@@ -452,7 +467,10 @@ function countDecreases(ops: Pattern['sections'][number]['groups'][number]['rows
  */
 export function suggestTemplate(pattern: Pattern): Template {
   if (pattern.template) return pattern.template
-  if (pattern.craft !== 'knit' || pattern.sections.length === 0) return 'none'
+  if (pattern.sections.length === 0) return 'none'
+  // 코바늘: 둥글게 뜨는 구간이 있으면 조각별로 그립니다. 왕복으로만 뜨는 도안은 아직 그리지 않습니다.
+  if (pattern.craft === 'crochet') return pattern.sections.some((s) => s.shape !== 'flat') ? 'round' : 'none'
+  if (pattern.craft !== 'knit') return 'none'
 
   const shapes = pattern.sections.map((s) => s.shape)
   const allFlat = shapes.every((s) => s === 'flat')

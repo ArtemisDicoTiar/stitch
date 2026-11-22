@@ -14,7 +14,7 @@ import { DEFAULT_AVATAR, sanitizeAvatar, type Avatar } from './avatar'
 import { buildGarment, knittedCount, rowIndexOf, stitchAt, stitchIndexAtColumn, type Garment, type GarmentOptions } from './garment'
 import { createMannequin } from './mannequin'
 import { MANNEQUIN } from './mannequin-dims'
-import { createKnitAtlas, createLabelTexture, parseColor, shade, toHex } from './textures'
+import { createLabelTexture, createYarnAtlas, parseColor, shade, toHex } from './textures'
 
 /** WebGL을 쓸 수 없을 때. 앱은 이 오류를 받아 기호 도안만 보여 줍니다. */
 export class WebGLUnavailableError extends Error {
@@ -99,9 +99,11 @@ export const VIEWER_DEFAULTS = {
 const NOW_COLOR = 0xff7a2e
 const GHOST_COLOR = 0xf3e6d8
 const FOV = 32
-const VIEW_DIRS: Record<ViewPreset | 'home' | 'homeFlat', [number, number, number]> = {
+const VIEW_DIRS: Record<ViewPreset | 'home' | 'homeFlat' | 'homeRound', [number, number, number]> = {
   home: [64, 12, 92],
   homeFlat: [0.22, 0.06, 1],
+  // 둥근 조각은 조금 위에서 비스듬히 봐야 둥근 모양이 보입니다.
+  homeRound: [0.35, 0.42, 1],
   front: [0, 0.1, 1],
   side: [1, 0.1, 0],
   back: [0, 0.1, -1],
@@ -155,7 +157,9 @@ export function createViewer(canvas: HTMLCanvasElement, opts: ViewerOptions): Vi
 
   // ---- 편물 ----
   const yarn = parseColor(opts.yarnColor, VIEWER_DEFAULTS.yarnColor)
-  const atlas = createKnitAtlas(yarn, renderer.capabilities.getMaxAnisotropy())
+  // 실 질감 그림은 공예마다 다릅니다 (대바늘 코, 코바늘 코).
+  let atlasCraft = garment.craft
+  let atlas = createYarnAtlas(yarn, renderer.capabilities.getMaxAnisotropy(), atlasCraft)
   const frontMat = new THREE.MeshStandardMaterial({ map: atlas, roughness: 0.92, side: THREE.FrontSide })
   const backMat = new THREE.MeshStandardMaterial({ color: toHex(shade(yarn, 0.6)), roughness: 0.95, side: THREE.BackSide })
   const ghostMat = new THREE.MeshBasicMaterial({ color: GHOST_COLOR, transparent: true, opacity: 0.13, depthWrite: false, side: THREE.DoubleSide })
@@ -480,7 +484,8 @@ export function createViewer(canvas: HTMLCanvasElement, opts: ViewerOptions): Vi
       radius = Math.max(radius, ((top - bottom) / 2) * 1.15)
       homeTarget.set(0, (top + bottom) / 2, 0)
     }
-    homeDistance = (1.3 * radius) / Math.sin(THREE.MathUtils.degToRad(FOV / 2))
+    // 마네킹이 없으면 편물이 화면을 더 채우게 다가갑니다.
+    homeDistance = ((fit ? 1.3 : 1.0) * radius) / Math.sin(THREE.MathUtils.degToRad(FOV / 2))
     camera.near = Math.max(0.1, homeDistance / 200)
     camera.far = homeDistance * 12
     camera.updateProjectionMatrix()
@@ -638,6 +643,13 @@ export function createViewer(canvas: HTMLCanvasElement, opts: ViewerOptions): Vi
       const next: GarmentOptions = { ...garmentOptions, ...options }
       garment = buildGarment(expanded, template, next)
       garmentOptions = next
+      if (garment.craft !== atlasCraft) {
+        atlas.dispose()
+        atlasCraft = garment.craft
+        atlas = createYarnAtlas(yarn, renderer.capabilities.getMaxAnisotropy(), atlasCraft)
+        frontMat.map = atlas
+        frontMat.needsUpdate = true
+      }
       installGarment()
     },
     setProgress(p) {

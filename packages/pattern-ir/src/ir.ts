@@ -10,8 +10,11 @@ export const TermsSchema = z.enum(['kr', 'us', 'uk', 'jp'])
 export const SideSchema = z.enum(['RS', 'WS', 'round'])
 export const ShapeSchema = z.enum(['flat', 'round', 'spiral'])
 
-/** 3D 형태 템플릿. 맞는 것이 없으면 none (기호 도안과 진행 표시만). */
-export const TemplateSchema = z.enum(['hood', 'flat', 'tube', 'hat', 'none'])
+/**
+ * 3D 형태 템플릿. 맞는 것이 없으면 none (기호 도안과 진행 표시만).
+ * round는 둥글게 뜬 조각들입니다 (공, 인형, 원판, 바구니). 조각마다 따로 그려 나란히 놓습니다.
+ */
+export const TemplateSchema = z.enum(['hood', 'flat', 'tube', 'hat', 'round', 'none'])
 
 export const IntoSchema = z.enum(['next', 'one', 'same', 'space'])
 export type Into = z.infer<typeof IntoSchema>

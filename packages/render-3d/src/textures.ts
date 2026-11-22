@@ -3,8 +3,8 @@
  * 브라우저에서만 부릅니다 (2D 캔버스를 씁니다).
  */
 import * as THREE from 'three'
-import type { SymbolId } from '@stitch/pattern-ir'
-import { ATLAS_TILES, SYMBOL_ORDER } from './garment'
+import type { Craft, CrochetSymbolId, SymbolId } from '@stitch/pattern-ir'
+import { ATLAS_TILES, CROCHET_SYMBOL_ORDER, SYMBOL_ORDER } from './garment'
 
 const TS = 128
 
@@ -122,8 +122,83 @@ function drawKnitTile(g: CanvasRenderingContext2D, sym: SymbolId, x0: number, p:
   }
 }
 
-/** 실 색으로 실 질감 그림을 만듭니다. */
-export function createKnitAtlas(yarn: RGB, maxAnisotropy: number): THREE.CanvasTexture {
+/**
+ * 코바늘 코 한 칸. 위쪽에 코 머리(V자로 누운 고리)가 있고 그 아래로 기둥이 내려옵니다.
+ * 긴 코는 기둥에 실이 감긴 자국이 더 많습니다. 칸은 단 높이에 맞춰 늘어납니다.
+ */
+function drawCrochetTile(g: CanvasRenderingContext2D, sym: CrochetSymbolId, x0: number, p: Palette) {
+  const grd = g.createLinearGradient(x0, 0, x0, TS)
+  grd.addColorStop(0, p.bgTop)
+  grd.addColorStop(1, p.bgBottom)
+  g.fillStyle = grd
+  g.fillRect(x0, 0, TS, TS)
+  g.lineCap = 'round'
+
+  const stroke = (color: string, width: number, pts: [number, number][]) => {
+    g.strokeStyle = color
+    g.lineWidth = width
+    g.beginPath()
+    pts.forEach(([x, y], i) => (i === 0 ? g.moveTo(x0 + x, y) : g.lineTo(x0 + x, y)))
+    g.stroke()
+  }
+  const loop = (cx: number, cy: number, rx: number, ry: number, width: number) => {
+    g.strokeStyle = p.legLight
+    g.lineWidth = width
+    g.beginPath()
+    g.ellipse(x0 + cx, cy, rx, ry, 0, 0, Math.PI * 2)
+    g.stroke()
+    g.strokeStyle = p.shine
+    g.lineWidth = Math.max(3, width / 4)
+    g.beginPath()
+    g.ellipse(x0 + cx, cy, rx, ry, 0, Math.PI * 1.15, Math.PI * 1.65)
+    g.stroke()
+  }
+  /** 코 머리: 단 위쪽을 가로지르는 고리 */
+  const head = () => {
+    stroke(p.legDark, 30, [[6, 22], [122, 22]])
+    stroke(p.legLight, 20, [[6, 20], [122, 20]])
+    stroke(p.shine, 5, [[18, 14], [96, 14]])
+  }
+  /** 기둥: 머리 아래로 내려오는 V자 다리 둘. 긴 코는 실이 감긴 자국이 더 많습니다. */
+  const post = (x: number, top: number, wraps: number, lean = 0) => {
+    const half = 30
+    stroke(p.legDark, 30, [[x - half + lean, top], [x, 116]])
+    stroke(p.legLight, 30, [[x + half + lean, top], [x, 116]])
+    stroke(p.shine, 5, [[x - half + lean + 8, top + 8], [x - 6, 100]])
+    for (let i = 0; i < wraps; i++) {
+      const y = top + ((116 - top) * (i + 1)) / (wraps + 1)
+      stroke(p.cross, 10, [[x - 30, y + 8], [x + 30, y - 8]])
+    }
+  }
+
+  if (sym === 'CH') {
+    loop(64, 64, 46, 26, 22)
+  } else if (sym === 'SL') {
+    loop(64, 70, 44, 14, 18)
+  } else if (sym === 'SC2' || sym === 'DC2') {
+    // 두 기둥이 한 머리로 모입니다.
+    head()
+    stroke(p.legDark, 28, [[16, 116], [64, 46]])
+    stroke(p.legLight, 28, [[112, 116], [64, 46]])
+    if (sym === 'DC2') stroke(p.cross, 10, [[30, 86], [98, 74]])
+  } else if (sym === 'CL') {
+    head()
+    g.fillStyle = p.legLight
+    g.beginPath()
+    g.ellipse(x0 + 64, 78, 40, 36, 0, 0, Math.PI * 2)
+    g.fill()
+    g.fillStyle = p.shine
+    g.beginPath()
+    g.ellipse(x0 + 52, 66, 14, 9, -0.5, 0, Math.PI * 2)
+    g.fill()
+  } else {
+    head()
+    post(64, 46, sym === 'HDC' ? 1 : sym === 'DC' ? 2 : sym === 'TR' ? 3 : 0)
+  }
+}
+
+/** 실 색으로 실 질감 그림을 만듭니다. craft에 따라 대바늘 코나 코바늘 코를 그립니다. */
+export function createYarnAtlas(yarn: RGB, maxAnisotropy: number, craft: Craft = 'knit'): THREE.CanvasTexture {
   const canvas = document.createElement('canvas')
   canvas.width = TS * ATLAS_TILES
   canvas.height = TS
@@ -132,7 +207,8 @@ export function createKnitAtlas(yarn: RGB, maxAnisotropy: number): THREE.CanvasT
     const pal = paletteOf(yarn)
     g.fillStyle = pal.bgTop
     g.fillRect(0, 0, canvas.width, canvas.height)
-    SYMBOL_ORDER.forEach((sym, i) => drawKnitTile(g, sym, i * TS, pal))
+    if (craft === 'crochet') CROCHET_SYMBOL_ORDER.forEach((sym, i) => drawCrochetTile(g, sym, i * TS, pal))
+    else SYMBOL_ORDER.forEach((sym, i) => drawKnitTile(g, sym, i * TS, pal))
   }
   const t = new THREE.CanvasTexture(canvas)
   t.colorSpace = THREE.SRGBColorSpace
@@ -141,6 +217,9 @@ export function createKnitAtlas(yarn: RGB, maxAnisotropy: number): THREE.CanvasT
   t.minFilter = THREE.LinearMipmapLinearFilter
   return t
 }
+
+/** 대바늘 실 질감 그림 */
+export const createKnitAtlas = (yarn: RGB, maxAnisotropy: number): THREE.CanvasTexture => createYarnAtlas(yarn, maxAnisotropy, 'knit')
 
 const LABEL_FONT = '700 12px "IBM Plex Sans KR", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif'
 

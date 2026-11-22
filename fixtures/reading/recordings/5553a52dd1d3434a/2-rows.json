@@ -1,0 +1,878 @@
+{
+ "kind": "rows",
+ "note": "손으로 만든 대역입니다. 실제 LLM 응답을 녹화한 것이 아닙니다.",
+ "promptVersion": "2026-11-22.3",
+ "model": "hand-written",
+ "usage": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation_input_tokens": 0
+ },
+ "output": {
+  "sections": [
+   {
+    "id": "head",
+    "groups": [
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "1단: 매직링에 짧은뜨기 6코 (6코)",
+        "expect_count": 6,
+        "ops": [
+         {
+          "op": "st",
+          "st": "sc",
+          "n": 6,
+          "into": "space",
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "2단: 모든 코에 늘림 (12코)",
+        "expect_count": 12,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "inc",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "3단: (짧은뜨기 1, 늘림 1) 6번 (18코)",
+        "expect_count": 18,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "sc",
+            "n": 1,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "inc",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "times",
+           "n": 6
+          },
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "4단: (짧은뜨기 2, 늘림 1) 6번 (24코)",
+        "expect_count": 24,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "sc",
+            "n": 2,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "inc",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "times",
+           "n": 6
+          },
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "5단: (짧은뜨기 3, 늘림 1) 6번 (30코)",
+        "expect_count": 30,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "sc",
+            "n": 3,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "inc",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "times",
+           "n": 6
+          },
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "6~11단: 모든 코에 짧은뜨기 (30코)",
+        "expect_count": 30,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "sc",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 6,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "12단: (짧은뜨기 3, 줄임 1) 6번 (24코)",
+        "expect_count": 24,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "sc",
+            "n": 3,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "sc2tog",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "times",
+           "n": 6
+          },
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "13단: (짧은뜨기 2, 줄임 1) 6번 (18코)",
+        "expect_count": 18,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "sc",
+            "n": 2,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "sc2tog",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "times",
+           "n": 6
+          },
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "14단: (짧은뜨기 1, 줄임 1) 6번 (12코). 솜을 채웁니다.",
+        "expect_count": 12,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "sc",
+            "n": 1,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "sc2tog",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "times",
+           "n": 6
+          },
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     }
+    ]
+   },
+   {
+    "id": "body",
+    "groups": [
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "1단: 매직링에 짧은뜨기 6코 (6코)",
+        "expect_count": 6,
+        "ops": [
+         {
+          "op": "st",
+          "st": "sc",
+          "n": 6,
+          "into": "space",
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "2단: 모든 코에 늘림 (12코)",
+        "expect_count": 12,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "inc",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "3단: (짧은뜨기 1, 늘림 1) 6번 (18코)",
+        "expect_count": 18,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "sc",
+            "n": 1,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "inc",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "times",
+           "n": 6
+          },
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "4단: (짧은뜨기 2, 늘림 1) 6번 (24코)",
+        "expect_count": 24,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "sc",
+            "n": 2,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "inc",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "times",
+           "n": 6
+          },
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "5~9단: 모든 코에 짧은뜨기 (24코)",
+        "expect_count": 24,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "sc",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 5,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "10단: (짧은뜨기 2, 줄임 1) 6번 (18코)",
+        "expect_count": 18,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "sc",
+            "n": 2,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "sc2tog",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "times",
+           "n": 6
+          },
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "11~12단: 모든 코에 짧은뜨기 (18코)",
+        "expect_count": 18,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "sc",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 2,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "13단: (짧은뜨기 1, 줄임 1) 6번 (12코). 솜을 채웁니다.",
+        "expect_count": 12,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "sc",
+            "n": 1,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "sc2tog",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "times",
+           "n": 6
+          },
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     }
+    ]
+   },
+   {
+    "id": "arm",
+    "groups": [
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "1단: 매직링에 짧은뜨기 6코 (6코)",
+        "expect_count": 6,
+        "ops": [
+         {
+          "op": "st",
+          "st": "sc",
+          "n": 6,
+          "into": "space",
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "2단: (짧은뜨기 1, 늘림 1) 3번 (9코)",
+        "expect_count": 9,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "sc",
+            "n": 1,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "inc",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "times",
+           "n": 3
+          },
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "3~8단: 모든 코에 짧은뜨기 (9코)",
+        "expect_count": 9,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "sc",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 6,
+       "cm": 0,
+       "from": ""
+      }
+     }
+    ]
+   },
+   {
+    "id": "ear",
+    "groups": [
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "1단: 매직링에 짧은뜨기 6코 (6코)",
+        "expect_count": 6,
+        "ops": [
+         {
+          "op": "st",
+          "st": "sc",
+          "n": 6,
+          "into": "space",
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "2단: 모든 코에 늘림 (12코)",
+        "expect_count": 12,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "inc",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "3단: 모든 코에 짧은뜨기 (12코)",
+        "expect_count": 12,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "sc",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     }
+    ]
+   }
+  ]
+ }
+}

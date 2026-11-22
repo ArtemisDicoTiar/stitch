@@ -7,7 +7,7 @@ import { and, asc, desc, eq, gte, sql } from 'drizzle-orm'
 import { expand, mapMarker, mapProgress, progressFraction, regauge, verify, type RegaugeResult } from '@stitch/engine'
 import { parsePattern, type GaugeSize, type Pattern } from '@stitch/pattern-ir'
 import { sha256 } from '@stitch/reader'
-import { garterScarf, practiceBall, practiceHood } from '@stitch/fixtures'
+import { garterScarf, practiceBall, practiceBear, practiceHood } from '@stitch/fixtures'
 import { ensureUserId } from './auth'
 import { getDb, schema } from './db/client'
 import type { GaugeMode } from './db/schema'
@@ -21,7 +21,7 @@ const { patterns, patternVersions, conversionJobs, progressEntries, markers } = 
 export type PatternRow = typeof patterns.$inferSelect
 export type JobRow = typeof conversionJobs.$inferSelect
 
-export const SAMPLES: Record<string, Pattern> = { 'practice-hood': practiceHood, 'garter-scarf': garterScarf, 'practice-ball': practiceBall }
+export const SAMPLES: Record<string, Pattern> = { 'practice-hood': practiceHood, 'garter-scarf': garterScarf, 'practice-ball': practiceBall, 'practice-bear': practiceBear }
 
 
 export function summarize(v: ReturnType<typeof verify>): JobVerification {

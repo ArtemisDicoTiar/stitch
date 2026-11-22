@@ -60,7 +60,35 @@ export type FlatDetails = {
   height: number
 }
 
-export type GarmentDetails = HoodDetails | FlatDetails
+/** 따로 뜬 조각 하나 */
+export type PieceDetails = {
+  /** round: 둥글게 떠서 회전체로 그린 조각, flat: 왕복으로 떠서 펼쳐 놓은 조각 */
+  kind: 'round' | 'flat'
+  /** 이 조각의 첫 단과 마지막 단 (전체 단 번호) */
+  firstRow: number
+  lastRow: number
+  /** 구간 이름 */
+  section: string
+  /** 조각 가운데의 x (cm) */
+  x: number
+  width: number
+  height: number
+  /** 가장 넓은 곳의 반지름 (둥근 조각만) */
+  maxRadius?: number
+}
+
+export type RoundDetails = {
+  template: 'round'
+  stitchWidth: number
+  rowHeight: number
+  /** 왼쪽부터 놓인 순서 */
+  pieces: PieceDetails[]
+  /** 모든 조각을 나란히 놓았을 때의 폭과 가장 높은 조각의 높이 (cm) */
+  width: number
+  height: number
+}
+
+export type GarmentDetails = HoodDetails | FlatDetails | RoundDetails
 
 /** 템플릿이 돌려주는 것: 칸의 모서리를 놓는 방법과 마네킹 맞춤 */
 export type TemplatePlan = {

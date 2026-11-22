@@ -22,7 +22,7 @@ export const practiceBall: Pattern = {
   ],
   gauge: { stitches: 22, rows: 24, over_cm: 10, in_stitch: '짧은뜨기', tool_mm: 3 },
   finished: { width_cm: 4.5, height_cm: 5 },
-  template: 'none',
+  template: 'round',
   sections: [
     {
       id: 'ball',

@@ -101,7 +101,8 @@ export function WorkspaceScreen({ view, ir, initialEntries, initialRings, avatar
   const work = workingPos(expanded, form)
   const total = expanded.totalRows
   const endPos = useMemo<Pos>(() => ({ row: Math.max(1, total), stitch: cellsIn(expanded, total) }), [expanded, total])
-  const hasMannequin = supportsTemplate(ir.template) && ir.template !== 'flat'
+  // 마네킹에 입혀 보는 형태는 후드뿐입니다. 평면과 둥근 조각은 편물만 보여 줍니다.
+  const hasMannequin = ir.template === 'hood'
 
   const say = useCallback((text: string, undo?: () => void) => setNotice({ key: ++noticeSeq.current, text, undo }), [])
 

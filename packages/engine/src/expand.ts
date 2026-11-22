@@ -92,6 +92,15 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
   let block: Block | null = null
   let markers: Marker[] = []
   let lastSide: Side | null = null
+  /** 지금 뜨는 조각의 번호와, 그 조각의 첫 단에 붙일 시작 방법 */
+  let piece = -1
+  let opening: ExpandedRow['opens'] | null = null
+  /** 단에 붙이는 조각 표시. 조각의 첫 단에서 한 번만 시작 방법을 붙입니다. */
+  const pieceMark = (): Pick<ExpandedRow, 'piece' | 'opens'> => {
+    const mark = { ...(piece > 0 ? { piece } : {}), ...(opening ? { opens: opening } : {}) }
+    opening = null
+    return mark
+  }
 
   const crochet = pattern.craft === 'crochet'
   const sideKr = crochet ? SIDE_KR_CROCHET : SIDE_KR
@@ -215,6 +224,8 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
       return alive.length
     }
     // 새로 코를 잡는 구간. 첫 단이 기둥의 무늬를 정합니다.
+    piece += 1
+    opening = start.kind === 'continue' ? 'cast_on' : start.kind
     const cols: Col[] = []
     if (crochet && start.kind === 'ring') {
       // 매직링은 한 자리입니다. 첫 단이 그 안에 뜹니다.
@@ -261,6 +272,7 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
         h: 0,
         start: 'chain',
         ...(copy > 0 ? { copy } : {}),
+        ...pieceMark(),
         ref,
       })
       return 0
@@ -605,6 +617,7 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
       ...(rowH >= 0 ? { h: rowH } : {}),
       ...(start ? { start } : {}),
       ...(copy > 0 ? { copy } : {}),
+      ...pieceMark(),
       ref,
     })
   }

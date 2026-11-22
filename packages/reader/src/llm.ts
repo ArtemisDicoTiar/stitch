@@ -37,16 +37,23 @@ export interface Llm {
   call<T>(req: LlmRequest<T>): Promise<LlmResponse<T>>
 }
 
-/** 사람에게 그대로 보여 줄 수 있는 읽기 오류 */
+/**
+ * 읽기 오류. message는 방문자에게 그대로 보여 줄 수 있는 글입니다.
+ * detail은 운영하는 사람만 보는 까닭(API가 돌려준 글 등)으로, 화면에는 내보내지 않고 서버 기록에만 남깁니다.
+ */
 export class ReaderError extends Error {
   constructor(
     message: string,
-    public code: 'no_api_key' | 'auth' | 'rate_limit' | 'refused' | 'truncated' | 'bad_output' | 'no_recording' | 'api' | 'unsupported',
+    public code: 'no_api_key' | 'auth' | 'rate_limit' | 'refused' | 'truncated' | 'bad_output' | 'no_recording' | 'api' | 'no_credit' | 'unsupported',
+    public detail?: string,
   ) {
     super(message)
     this.name = 'ReaderError'
   }
 }
+
+/** 방문자에게는 까닭을 밝히지 않는 오류에 쓰는 글 */
+const UNAVAILABLE = '지금은 PDF 읽기를 쓸 수 없어요. 잠시 뒤 다시 시도해 주세요.'
 
 export const ZERO_USAGE: LlmUsage = { input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 }
 
@@ -128,9 +135,14 @@ export class AnthropicLlm implements Llm {
       }
     } catch (error) {
       if (error instanceof ReaderError) throw error
-      if (error instanceof Anthropic.AuthenticationError) throw new ReaderError('Claude API 키가 올바르지 않습니다. .env의 ANTHROPIC_API_KEY를 확인해 주세요.', 'auth')
-      if (error instanceof Anthropic.RateLimitError) throw new ReaderError('요청이 몰려 지금은 읽을 수 없습니다. 잠시 뒤 다시 시도해 주세요.', 'rate_limit')
-      if (error instanceof Anthropic.APIError) throw new ReaderError(`Claude API 오류 (${error.status ?? '연결 실패'}): ${error.message}`, 'api')
+      // 키와 결제에 관한 까닭은 방문자에게 보여 주지 않습니다. 운영하는 사람이 서버 기록에서 봅니다.
+      if (error instanceof Anthropic.AuthenticationError) throw new ReaderError(UNAVAILABLE, 'auth', 'Claude API 키가 올바르지 않습니다. ANTHROPIC_API_KEY를 확인해 주세요.')
+      if (error instanceof Anthropic.RateLimitError) throw new ReaderError('요청이 몰려 지금은 읽을 수 없습니다. 잠시 뒤 다시 시도해 주세요.', 'rate_limit', error.message)
+      if (error instanceof Anthropic.APIError) {
+        const detail = `Claude API 오류 (${error.status ?? '연결 실패'}): ${error.message}`
+        if (/credit balance/i.test(error.message)) throw new ReaderError(UNAVAILABLE, 'no_credit', `${detail} — Anthropic 콘솔에서 크레딧을 충전해야 합니다.`)
+        throw new ReaderError(UNAVAILABLE, 'api', detail)
+      }
       throw error
     }
   }

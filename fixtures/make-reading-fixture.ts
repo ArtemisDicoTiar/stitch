@@ -16,6 +16,7 @@ import { chromium } from '@playwright/test'
 import { PROMPT_VERSION, toWire } from '@stitch/reader'
 import type { Pattern } from '@stitch/pattern-ir'
 import { practiceBall } from './practice-ball'
+import { practiceBear } from './practice-bear'
 import { practiceHood } from './practice-hood'
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -54,7 +55,8 @@ function html(p: Pattern, intro: string): string {
           return p.craft === 'crochet' ? `<ul class="rows">${rows}</ul>${rep}` : `<ol>${rows}</ol>${rep}`
         })
         .join('')
-      return `<h2>${esc(s.name)}</h2><p>${startText(p, s.start)}</p>${groups}`
+      const copies = s.copies && s.copies > 1 ? ` (${s.copies}개 만들기)` : ''
+      return `<h2>${esc(s.name)}${copies}</h2><p>${startText(p, s.start)}</p>${groups}`
     })
     .join('')
   return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><style>
@@ -108,6 +110,11 @@ const FIXTURES: Fixture[] = [
     slug: 'practice-ball',
     pattern: practiceBall,
     intro: '매직링에서 시작해 짧은뜨기로 둥글게 뜨는 코바늘 연습 도안입니다. 단을 잇지 않고 나선으로 이어 뜹니다.',
+  },
+  {
+    slug: 'practice-bear',
+    pattern: practiceBear,
+    intro: '머리, 몸통, 팔, 귀를 따로 떠서 잇는 작은 곰 인형입니다. 모든 조각은 매직링에서 시작해 단을 잇지 않고 나선으로 뜹니다.',
   },
 ]
 

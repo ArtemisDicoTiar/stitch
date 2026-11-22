@@ -1,0 +1,124 @@
+{
+ "kind": "outline",
+ "note": "손으로 만든 대역입니다. 실제 LLM 응답을 녹화한 것이 아닙니다.",
+ "promptVersion": "2026-11-22.3",
+ "model": "hand-written",
+ "usage": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation_input_tokens": 0
+ },
+ "output": {
+  "craft": "crochet",
+  "terms": "kr",
+  "title": "연습용 코바늘 곰 인형",
+  "materials": [
+   {
+    "kind": "실",
+    "spec": "중간 굵기 면사",
+    "qty": "약 40g"
+   },
+   {
+    "kind": "바늘",
+    "spec": "3mm 코바늘",
+    "qty": null
+   },
+   {
+    "kind": "부자재",
+    "spec": "솜",
+    "qty": null
+   },
+   {
+    "kind": "부자재",
+    "spec": "돗바늘",
+    "qty": null
+   },
+   {
+    "kind": "부자재",
+    "spec": "검은 자수실 조금",
+    "qty": null
+   }
+  ],
+  "gauge": {
+   "stitches": 22,
+   "rows": 24,
+   "in_stitch": "짧은뜨기",
+   "tool_mm": 3
+  },
+  "finished": {
+   "width_cm": 7,
+   "height_cm": 9
+  },
+  "template": "round",
+  "sections": [
+   {
+    "id": "head",
+    "name": "머리",
+    "shape": "spiral",
+    "start": {
+     "kind": "ring",
+     "count": 0,
+     "from": null
+    },
+    "multiple": null,
+    "copies": 1
+   },
+   {
+    "id": "body",
+    "name": "몸통",
+    "shape": "spiral",
+    "start": {
+     "kind": "ring",
+     "count": 0,
+     "from": null
+    },
+    "multiple": null,
+    "copies": 1
+   },
+   {
+    "id": "arm",
+    "name": "팔",
+    "shape": "spiral",
+    "start": {
+     "kind": "ring",
+     "count": 0,
+     "from": null
+    },
+    "multiple": null,
+    "copies": 2
+   },
+   {
+    "id": "ear",
+    "name": "귀",
+    "shape": "spiral",
+    "start": {
+     "kind": "ring",
+     "count": 0,
+     "from": null
+    },
+    "multiple": null,
+    "copies": 2
+   }
+  ],
+  "finishing": [
+   {
+    "name": "머리와 몸통 잇기",
+    "text": "머리와 몸통의 열린 12코끼리 맞대고 돗바늘로 돌려 꿰맵니다."
+   },
+   {
+    "name": "팔 달기",
+    "text": "팔 끝을 납작하게 눌러 몸통 9단 양옆에 꿰맵니다."
+   },
+   {
+    "name": "귀 달기",
+    "text": "귀를 반으로 접어 머리 5단과 8단 사이 양쪽에 꿰맵니다."
+   },
+   {
+    "name": "얼굴",
+    "text": "검은 자수실로 머리 9단에 눈과 코를 수놓습니다."
+   }
+  ],
+  "unclear": []
+ }
+}

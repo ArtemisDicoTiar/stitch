@@ -78,7 +78,7 @@ try {
   process.exit(r.verification.ok ? 0 : 2)
 } catch (error) {
   if (error instanceof ReaderError) {
-    console.error(`읽지 못했습니다: ${error.message}`)
+    console.error(`읽지 못했습니다: ${error.message}${error.detail ? `\n  (${error.code}) ${error.detail}` : ''}`)
     process.exit(1)
   }
   throw error

@@ -3,7 +3,7 @@
  *   꺼내기 → LLM 구조화(개요, 구간별 단) → 엔진 검산 → 되먹임 → 사람 확인으로 넘기기
  * LLM은 PDF를 IR 초안으로 바꾸는 일만 하고, 그 결과는 엔진 검산과 사람 확인을 거쳐야 페이지가 됩니다.
  */
-import { normalizeStarts, verify, withTermNotes, type Verification } from '@stitch/engine'
+import { normalizeRead, verify, withTermNotes, type Verification } from '@stitch/engine'
 import { safeParsePattern, type Issue, type Pattern } from '@stitch/pattern-ir'
 import { extractPages, locateText, type SourceHit, type SourcePage } from './extract'
 import { addUsage, ReaderError, sha256, ZERO_USAGE, type Llm, type LlmUsage } from './llm'
@@ -83,7 +83,7 @@ export async function readPattern(pdf: Uint8Array, options: ReadOptions): Promis
   const parsed = safeParsePattern(toPattern(outline.output, rows.output))
   if (!parsed.success) throw new ReaderError('읽은 결과가 도안 형식에 맞지 않습니다.', 'bad_output')
   // 매직링의 첫 단이 시작 코 수와 단, 두 군데에 적혀 오면 되먹임으로는 고칠 수 없어 여기서 바로잡습니다.
-  let pattern = normalizeStarts(parsed.data)
+  let pattern = normalizeRead(parsed.data)
 
   await stage('verify')
   let verification = verify(pattern)
@@ -108,7 +108,7 @@ export async function readPattern(pdf: Uint8Array, options: ReadOptions): Promis
       const next: Pattern = { ...pattern, sections: pattern.sections.map((s) => (s.id === first.id ? { ...s, groups: toGroups(fixed.groups) } : s)) }
       const ok = safeParsePattern(next)
       if (!ok.success) break
-      pattern = normalizeStarts(ok.data)
+      pattern = normalizeRead(ok.data)
       changed = true
       verification = verify(pattern)
       if (verification.ok) break

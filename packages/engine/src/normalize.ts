@@ -58,3 +58,19 @@ function writesRingRound(pattern: Pattern, section: Section, first: Row): boolea
   const row = e.blocks[0]?.rows[0]
   return !!row && row.count === section.start.count && !e.issues.some((i) => i.level === 'error')
 }
+
+/**
+ * 코바늘 도안의 3D 형태를 정합니다.
+ * 둥글게 뜨는 구간이 있는 코바늘 도안은 조각별로 그리는 round만 맞습니다. LLM이 none이나 대바늘용 형태를 골랐어도 round로 둡니다.
+ * (확인 화면에서 사람이 "3D 없이 보기"를 고르는 것은 이 함수를 거치지 않습니다.)
+ */
+export function normalizeTemplate(pattern: Pattern): Pattern {
+  if (pattern.craft !== 'crochet' || pattern.template === 'round') return pattern
+  if (!pattern.sections.some((s) => s.shape !== 'flat')) return pattern
+  return { ...pattern, template: 'round' }
+}
+
+/** 읽은 직후에 한 번 거치는 바로잡기 */
+export function normalizeRead(pattern: Pattern): Pattern {
+  return normalizeTemplate(normalizeStarts(pattern))
+}

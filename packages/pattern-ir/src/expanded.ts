@@ -47,6 +47,13 @@ export type ExpandedRow = {
   start?: 'chain' | 'ring'
   /** 같은 조각을 여러 개 만드는 구간에서 몇 번째 조각인지 (1부터). 하나만 만드는 구간에는 없습니다. */
   copy?: number
+  /**
+   * 따로 떠서 만드는 조각의 번호 (0부터). 새로 코를 잡거나 사슬·매직링으로 시작할 때마다 새 조각입니다.
+   * 첫 조각(0)의 단에는 적지 않습니다.
+   */
+  piece?: number
+  /** 조각의 첫 단에만: 그 조각을 시작한 방법 */
+  opens?: 'cast_on' | 'chain' | 'ring'
   /** IR에서의 위치 */
   ref: { section: number; group: number; row: number; rep: number }
 }

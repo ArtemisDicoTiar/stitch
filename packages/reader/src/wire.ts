@@ -63,7 +63,7 @@ export const OutlineSchema = z.object({
     .nullable()
     .describe('10cm 기준 게이지. 도안에 없으면 null'),
   finished: z.object({ width_cm: z.number().nullable(), height_cm: z.number().nullable() }),
-  template: z.enum(['hood', 'flat', 'tube', 'hat', 'none']).describe('완성 형태에 가장 가까운 3D 템플릿. 맞는 것이 없으면 none'),
+  template: z.enum(['hood', 'flat', 'tube', 'hat', 'round', 'none']).describe('완성 형태에 가장 가까운 3D 템플릿. 맞는 것이 없으면 none'),
   sections: z.array(
     z.object({
       id: z.string().describe('영문 소문자와 숫자로 된 짧은 id'),

@@ -12,7 +12,7 @@ import styles from './SamplePreview.module.css'
  * 3D를 불러오지 못하거나 WebGL을 쓸 수 없으면 조용한 자리 표시만 남깁니다.
  */
 export type SamplePreviewProps = {
-  sample: 'practice-hood' | 'garter-scarf'
+  sample: 'practice-hood' | 'garter-scarf' | 'practice-ball'
   /** 뜬 만큼(0~1). 없으면 다 뜬 모습입니다. */
   progress?: number
   avatar?: 'default' | 'styled'
@@ -79,7 +79,7 @@ export function SamplePreview({ sample, progress, avatar = 'default', height, la
         const [r3d, engine, fixtures] = await Promise.all([import('@stitch/render-3d'), import('@stitch/engine'), import('@stitch/fixtures')])
         if (cancelled) return
         if (typeof r3d.createViewer !== 'function') throw new Error('3D 보기를 불러오지 못했습니다.')
-        const pattern: Pattern = sample === 'garter-scarf' ? fixtures.garterScarf : fixtures.practiceHood
+        const pattern: Pattern = sample === 'garter-scarf' ? fixtures.garterScarf : sample === 'practice-ball' ? fixtures.practiceBall : fixtures.practiceHood
         const expanded = engine.expand(pattern)
         viewer = r3d.createViewer(canvas, {
           expanded,

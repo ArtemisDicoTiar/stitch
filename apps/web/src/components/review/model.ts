@@ -137,6 +137,7 @@ export const TEMPLATES: { id: Template; name: string }[] = [
   { id: 'flat', name: '평면 (직사각형)' },
   { id: 'tube', name: '원통' },
   { id: 'hat', name: '모자' },
+  { id: 'round', name: '둥근 입체 (공, 인형, 바구니)' },
   { id: 'none', name: '3D 없이 보기' },
 ]
 

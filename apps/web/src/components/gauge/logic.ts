@@ -49,6 +49,7 @@ export function bump(raw: string, fallback: number, lim: Limit, delta: number): 
  * IR의 형태 템플릿(template)과 완성 크기(finished)만 봅니다.
  *  - hood, hat, tube: 머리나 몸에 끼우는 형태라 크기가 맞아야 합니다. 권합니다.
  *  - flat: 목도리나 담요 같은 평면 편물은 조금 크거나 작아도 쓰는 데 지장이 없습니다. 권하지 않습니다.
+ *  - round: 인형이나 소품은 크기가 조금 달라도 괜찮고, 코 수를 다시 계산하지도 않습니다. 권하지 않습니다.
  *  - none 이거나 템플릿이 없음: 맞는 3D 틀이 없는 도안입니다(스웨터일 수도, 소품일 수도 있음).
  *    완성 가로와 세로가 둘 다 적혀 있을 때만 권합니다. 두 치수를 다 밝힌 도안은 그 크기로 나오는 것이 중요하다고 봅니다.
  *  - 게이지가 없는 도안은 비교할 기준이 없어 권하지 않습니다.
@@ -57,7 +58,7 @@ export function isSizeSensitive(ir: Pattern): boolean {
   if (!ir.gauge) return false
   const template = ir.template ?? 'none'
   if (template === 'hood' || template === 'hat' || template === 'tube') return true
-  if (template === 'flat') return false
+  if (template === 'flat' || template === 'round') return false
   return ir.finished.width_cm !== undefined && ir.finished.height_cm !== undefined
 }
 

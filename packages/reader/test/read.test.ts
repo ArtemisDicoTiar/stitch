@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { garterScarf, practiceBall, practiceHood } from '@stitch/fixtures'
+import { garterScarf, practiceBall, practiceBear, practiceHood } from '@stitch/fixtures'
 import { parsePattern, type Op, type Pattern, type Section } from '@stitch/pattern-ir'
 import {
   AnthropicLlm,
@@ -217,6 +217,32 @@ describe('Claude API에 보내는 요청', () => {
   })
 })
 
+describe('API 오류', () => {
+  /** 정해 둔 오류로 끝나는 가짜 SDK */
+  const failing = (error: unknown) => ({ beta: { messages: { stream: () => ({ finalMessage: async () => Promise.reject(error) }) } } }) as never
+  const call = (error: unknown) => new AnthropicLlm({ client: failing(error) }).call({ kind: 'outline', pdfSha256: 'x', pdf: new Uint8Array([1]), prompt: 'p', schema: RowsSchema })
+
+  it('크레딧이 모자라다는 응답은 방문자에게 까닭을 밝히지 않고, 운영하는 사람이 볼 글을 따로 남긴다', async () => {
+    const { default: Anthropic } = await import('@anthropic-ai/sdk')
+    const raw = 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'
+    const err = Anthropic.APIError.generate(400, { type: 'error', error: { type: 'invalid_request_error', message: raw } }, raw, new Headers())
+    await expect(call(err)).rejects.toMatchObject({ name: 'ReaderError', code: 'no_credit', message: '지금은 PDF 읽기를 쓸 수 없어요. 잠시 뒤 다시 시도해 주세요.' })
+    const caught = await call(err).catch((e) => e)
+    expect(caught.message).not.toMatch(/credit|billing|크레딧/i)
+    expect(caught.detail).toContain('credit balance')
+    expect(caught.detail).toContain('크레딧을 충전')
+  })
+
+  it('키가 틀렸다는 응답도 방문자에게는 같은 글만 보여 준다', async () => {
+    const { default: Anthropic } = await import('@anthropic-ai/sdk')
+    const err = Anthropic.APIError.generate(401, { type: 'error', error: { type: 'authentication_error', message: 'invalid x-api-key' } }, 'invalid x-api-key', new Headers())
+    const caught = await call(err).catch((e) => e)
+    expect(caught).toMatchObject({ code: 'auth', message: '지금은 PDF 읽기를 쓸 수 없어요. 잠시 뒤 다시 시도해 주세요.' })
+    expect(caught.message).not.toMatch(/키|key/i)
+    expect(caught.detail).toContain('ANTHROPIC_API_KEY')
+  })
+})
+
 describe('사람이 원문을 봐야 하는 곳', () => {
   it('그림으로만 설명된 부분을 IR에 남긴다', () => {
     const w = toWire(practiceHood)
@@ -265,6 +291,19 @@ describe('코바늘 도안', () => {
     expect(r.pattern.craft).toBe('crochet')
     expect(r.verification.ok).toBe(true)
     expect(r.verification.expanded.totalRows).toBe(14)
+  })
+
+  it('연습용 코바늘 PDF 두 개를 준비해 둔 응답으로 읽으면 직접 쓴 도안과 같다', async () => {
+    for (const [file, want] of [['practice-ball.pdf', practiceBall], ['practice-bear.pdf', practiceBear]] as const) {
+      const bytes = new Uint8Array(readFileSync(join(root, 'fixtures/reading', file)))
+      const r = await readPattern(bytes, { llm: new ReplayLlm(recordings), crochet: 'rounds' })
+      expect(withoutSource(r.pattern), file).toEqual(want)
+      expect(r.verification.ok, file).toBe(true)
+      expect(r.feedbackRounds).toBe(0)
+      // 단마다 원문 위치가 붙습니다.
+      const rows = r.pattern.sections.flatMap((s) => s.groups.flatMap((g) => g.rows))
+      expect(rows.every((x) => x.source), file).toBe(true)
+    }
   })
 
   it('대바늘 도안은 그대로 읽는다', async () => {

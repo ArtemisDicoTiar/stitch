@@ -2,7 +2,7 @@ import { stitchesFor, type Issue, type Pattern } from '@stitch/pattern-ir'
 import type { Outline } from './wire'
 
 /** 프롬프트가 바뀌면 녹화해 둔 응답을 다시 만들어야 합니다. */
-export const PROMPT_VERSION = '2026-11-22.2'
+export const PROMPT_VERSION = '2026-11-22.3'
 
 const dictionary = (craft: 'knit' | 'crochet') =>
   stitchesFor(craft)
@@ -49,7 +49,7 @@ export const OUTLINE_PROMPT = `이 도안의 개요를 채워 주세요.
 - materials: 준비물 (실, 바늘, 부자재)
 - gauge: 10cm 기준 코 수와 단 수, 잰 무늬, 바늘 굵기. 도안에 없으면 null
 - finished: 완성 크기
-- template: 완성 형태에 가장 가까운 것. hood(목에서 시작해 머리를 감싸는 후드나 바라클라바), flat(목도리, 수세미처럼 평평한 것), tube(넥워머처럼 원통), hat(모자), 맞는 것이 없으면 none
+- template: 완성 형태에 가장 가까운 것. hood(목에서 시작해 머리를 감싸는 후드나 바라클라바), flat(목도리, 수세미처럼 평평한 것), tube(넥워머처럼 원통), hat(모자), round(코바늘로 둥글게 뜨는 공, 인형, 원판, 바구니. 조각이 여럿이어도 round), 맞는 것이 없으면 none
 - sections: 뜨는 순서대로의 구간. 각 구간의 시작 코 수와, 앞 구간에서 이어지는지(continue) 새로 코를 잡는지(대바늘은 cast_on, 코바늘은 chain이나 ring)를 적습니다. 같은 조각을 여러 개 만들면 copies에 개수를, 아니면 1을 적습니다
 - finishing: 다 뜬 뒤의 마무리 단계 (코막음, 잇기, 단추 달기 등). 이름과 원문
 - unclear: 사람이 원문을 직접 봐야 하는 곳. 기호 도안 그림이나 사진, 도식으로만 설명되어 글로 옮길 수 없는 부분은 picture_only, 읽었지만 뜻이 둘 이상으로 읽히는 부분은 unclear 로 적습니다. 없으면 빈 배열

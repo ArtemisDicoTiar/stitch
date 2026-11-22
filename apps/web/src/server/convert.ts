@@ -72,6 +72,8 @@ async function runConversion(jobId: string): Promise<void> {
   } catch (error) {
     const message = error instanceof ReaderError ? error.message : '읽는 중에 문제가 생겼습니다. 다시 시도해 주세요.'
     if (!(error instanceof ReaderError)) console.error(error)
+    // 방문자에게 보여 주지 않는 까닭(키, 결제, API 오류)은 서버 기록에 남깁니다.
+    else if (error.detail) console.error(`[reader] ${error.code}: ${error.detail}`)
     await set({ status: 'failed', error: message })
     await db.update(patterns).set({ status: 'failed', updatedAt: new Date() }).where(eq(patterns.id, pattern.id))
   }

@@ -24,10 +24,11 @@ export function patternHref(item: Pick<LibraryItem, 'id' | 'status'>, gaugeMode:
 }
 
 /** 직접 쓴 예시 도안으로 시작한 것만 3D 미리보기가 있습니다. 올린 도안은 목록에 모양 정보가 오지 않습니다. */
-function sampleOf(item: LibraryItem): 'practice-hood' | 'garter-scarf' | null {
+function sampleOf(item: LibraryItem): 'practice-hood' | 'garter-scarf' | 'practice-ball' | null {
   if (item.source !== 'sample') return null
   if (item.template === 'hood') return 'practice-hood'
   if (item.template === 'flat') return 'garter-scarf'
+  if (item.template === 'round') return 'practice-ball'
   return null
 }
 

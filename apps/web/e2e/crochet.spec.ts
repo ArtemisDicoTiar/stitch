@@ -36,6 +36,9 @@ test.describe.serial('코바늘 예시 도안', () => {
     await page.goto(`/patterns/${id}/review`)
     await page.getByRole('button', { name: /확인 완료/ }).click()
     await expect(page).toHaveURL(new RegExp(`/patterns/${id}/gauge$`))
+    // 인형이나 소품은 크기가 조금 달라도 괜찮아서 "재지 않고 뜨기"가 먼저 골라져 있습니다.
+    await expect(page.getByRole('radio', { name: /재지 않고/ })).toBeChecked()
+    await page.getByRole('radio', { name: /재서 맞출게요/ }).check()
     const sts = page.getByRole('spinbutton').first()
     await sts.fill('24')
     await sts.blur()
@@ -58,6 +61,9 @@ test.describe.serial('코바늘 예시 도안', () => {
 
     await expect(page.getByRole('heading', { level: 1, name: '연습용 코바늘 공' })).toBeVisible()
     await expect(page.getByText('매직링에서 시작해요.')).toBeVisible()
+    // 3D: 둥글게 뜬 조각으로 그려지고, 마네킹은 없습니다.
+    await expect(page.locator('[data-stage="3d"][data-ready="true"]')).toBeVisible({ timeout: 40_000 })
+    await expect(page.getByText('3D 없이 기호 도안과 진행 표시만')).toHaveCount(0)
     await expect(page.locator('#panel-chart .sc-base svg')).toBeVisible()
     const legend = page.getByRole('list', { name: '기호 범례' })
     await expect(legend).toContainText('짧은뜨기')
