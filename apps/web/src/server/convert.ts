@@ -8,7 +8,13 @@
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { eq } from 'drizzle-orm'
-import { AnthropicLlm, ReaderError, ReplayLlm, readPattern, type Llm, type ReadStage } from '@stitch/reader'
+import { AnthropicLlm, ReaderError, ReplayLlm, readPattern, type CrochetScope, type Llm, type ReadStage } from '@stitch/reader'
+
+/**
+ * 코바늘 도안을 어디까지 받는지. 화면(기호 도안, 3D, 뜨는 법)이 준비된 범위만 받습니다.
+ * 지금은 매직링에서 시작해 둥글게 뜨는 도안(인형, 소품)입니다. 올리기 화면의 안내문과 같이 고칩니다.
+ */
+export const CROCHET_SCOPE: CrochetScope = 'rounds'
 import { getDb, schema } from './db/client'
 import type { JobStage } from './db/schema'
 import { env, repoRoot } from './env'
@@ -54,6 +60,7 @@ async function runConversion(jobId: string): Promise<void> {
     const result = await readPattern(pdf, {
       llm: pickLlm(pattern.pdfSha256),
       maxFeedbackRounds: env().feedbackMaxRounds,
+      crochet: CROCHET_SCOPE,
       onStage: async (stage, d) => {
         await set({ stage: STAGE[stage], llmCalls: d?.llmCalls ?? 0, inputTokens: totalInput(d?.usage), outputTokens: d?.usage.output_tokens ?? 0, feedbackRounds: d?.round ?? 0 })
       },

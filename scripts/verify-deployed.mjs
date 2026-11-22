@@ -1,6 +1,6 @@
 // 배포 주소에서 실제 흐름을 확인합니다. 방문자 두 명(쿠키 통 두 개)으로 돕니다.
 // 사용: node scripts/verify-deployed.mjs <base-url> <대바늘 연습 PDF> [코바늘 연습 PDF]
-// PDF 읽기가 켜져 있으면 실제 변환을 하므로 LLM 비용이 듭니다 (대바늘 1건, 코바늘은 개요 호출 1번).
+// PDF 읽기가 켜져 있으면 실제 변환을 하므로 LLM 비용이 듭니다 (대바늘 1건, 코바늘 1건).
 import { readFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 
@@ -181,24 +181,27 @@ if (pid) {
   check('지운 뒤 PDF는 404', gone.status === 404, `${gone.status}`)
 }
 
-// 8-2. 코바늘 PDF: 아직 받지 않으므로 개요만 읽고 까닭을 알리며 멈춰야 합니다.
+// 8-2. 코바늘 PDF: 둥글게 뜨는 도안은 읽어서 확인 화면으로 갑니다.
 if (CROCHET_PDF && me.json?.pdfReading === 'on') {
   const fdc = new FormData()
-  fdc.append('file', new Blob([readFileSync(CROCHET_PDF)], { type: 'application/pdf' }), 'practice-ball.pdf')
+  fdc.append('file', new Blob([readFileSync(CROCHET_PDF)], { type: 'application/pdf' }), 'practice-crochet.pdf')
   const upc = await A.call('POST', '/api/patterns', fdc)
   check('A 코바늘 PDF 올리기', upc.status < 300 && !!upc.json?.id, brief(upc))
   const cid = upc.json?.id
   if (cid) {
     let job
     const t0 = Date.now()
-    while (Date.now() - t0 < 200_000) {
+    while (Date.now() - t0 < 330_000) {
       job = await A.call('GET', `/api/patterns/${cid}/job`)
       const st = job.json?.job?.status
       if (st && st !== 'queued' && st !== 'running') break
       await new Promise((r) => setTimeout(r, 3000))
     }
     const took = ((Date.now() - t0) / 1000).toFixed(0)
-    check(`A 코바늘 PDF는 준비 중이라고 알리고 멈춤 (${took}초)`, job.json?.job?.status === 'failed' && String(job.json?.job?.error ?? '').includes('코바늘 도안 읽기는 아직 준비 중'), `status=${job.json?.job?.status} llmCalls=${job.json?.job?.llmCalls} error=${job.json?.job?.error ?? ''}`)
+    check(`A 코바늘 PDF 변환이 끝남 (${took}초)`, ['done', 'needs_review'].includes(job.json?.job?.status), `status=${job.json?.job?.status} error=${job.json?.job?.error ?? ''}`)
+    const read = await A.call('GET', `/api/patterns/${cid}`)
+    const pat = read.json?.pattern ?? {}
+    check('A 읽어 낸 코바늘 도안: 코바늘, 둥근 조각, 검산 통과', pat.ir?.craft === 'crochet' && pat.ir?.template === 'round' && job.json?.job?.verification?.ok === true, `craft=${pat.ir?.craft} template=${pat.ir?.template} ok=${job.json?.job?.verification?.ok} sections=${pat.ir?.sections?.length}`)
     const dc = await A.call('DELETE', `/api/patterns/${cid}`)
     check('A 코바늘 도안 지우기', dc.status < 300, `${dc.status}`)
   }

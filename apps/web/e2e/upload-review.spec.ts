@@ -9,7 +9,7 @@ import { expect, test, type APIRequestContext, type Page } from '@playwright/tes
 
 const here = dirname(fileURLToPath(import.meta.url))
 const PDF = join(here, '../../../fixtures/reading/practice-hood.pdf')
-const CROCHET_PDF = join(here, '../../../fixtures/reading/practice-ball.pdf')
+const CROCHET_PDF = join(here, '../../../fixtures/reading/practice-bear.pdf')
 
 /** 같은 PDF는 다시 읽지 않으므로, 앞서 올린 것이 남아 있으면 지우고 시작합니다. */
 async function removeUploads(request: APIRequestContext) {
@@ -40,7 +40,7 @@ test.describe.serial('도안 올리기와 읽은 내용 확인', () => {
     await expect(page.getByText('PDF는 비공개 저장소에 보관하고, 올린 사람만 열 수 있어요.', { exact: false })).toBeVisible()
     await expect(page.getByText('PDF가 LLM 제공자(Claude API)에게 전송됩니다', { exact: false })).toBeVisible()
     await expect(page.getByText('대바늘 도안과 코바늘 도안')).toBeVisible()
-    await expect(page.getByText('코바늘 도안 읽기는 아직 준비 중이에요', { exact: false })).toBeVisible()
+    await expect(page.getByText('코바늘은 매직링에서 시작해 둥글게 뜨는 도안(인형, 소품)을 읽어요', { exact: false })).toBeVisible()
     await expect(page.getByRole('button', { name: '예시 도안으로 둘러보기' })).toBeVisible()
     await expect(page.getByText('20MB까지 올릴 수 있어요', { exact: false })).toBeVisible()
     // API 키가 없으면 새 PDF를 읽을 수 없다고 먼저 알려 줍니다.
@@ -283,15 +283,24 @@ test.describe.serial('도안 올리기와 읽은 내용 확인', () => {
     }
   })
 
-  test('코바늘 도안 PDF는 아직 준비 중이라고 알리고 돌려보낸다', async ({ page }) => {
+  test('둥글게 뜨는 코바늘 도안 PDF를 올리면 읽어서 확인 화면에 코바늘 도안으로 보여 준다', async ({ page, request }) => {
     await page.goto('/upload')
-    await expect(page.getByText('코바늘 도안 읽기는 아직 준비 중이에요', { exact: false })).toBeVisible()
     await page.locator('#pattern-pdf').setInputFiles(CROCHET_PDF)
-    await expect(page).toHaveURL(/\/patterns\/[^/]+\/reading$/)
-    made.push(idFromUrl(page))
-    await expect(page.getByRole('heading', { level: 1, name: '도안을 읽지 못했어요' })).toBeVisible()
-    await expect(page.getByRole('alert').filter({ hasText: '코바늘 도안 읽기는 아직 준비 중이에요' })).toBeVisible()
-    await expect(page.getByRole('link', { name: '도안 올리기로 돌아가기' })).toHaveAttribute('href', '/upload')
+    await page.waitForURL(/\/patterns\/[^/]+\/(reading|review)$/)
+    await expect(page).toHaveURL(/\/patterns\/[^/]+\/review$/, { timeout: 30_000 })
+    const id = idFromUrl(page)
+    made.push(id)
+    await expect(page.getByTestId('verdict')).toContainText('코 수 검산 통과')
+    await expect(page.getByText('코바늘 · 한국식 약어')).toBeVisible()
+    await expect(page.getByText('4개 구간 · 49단')).toBeVisible()
+    // 조각이 여럿이고, 팔과 귀는 2개씩 만듭니다.
+    await expect(page.getByTestId('start-2')).toHaveText('매직링에서 시작 · 2개 만들기')
+    // 원문 패널에 PDF의 글이 보입니다.
+    await expect(page.getByText('글의 위치를 꺼내지 못했어요')).toHaveCount(0)
+    const { pattern } = (await (await request.get(`/api/patterns/${id}`)).json()) as { pattern: { ir: { craft: string; template: string; sections: { id: string; copies?: number }[] } } }
+    expect(pattern.ir.craft).toBe('crochet')
+    expect(pattern.ir.template).toBe('round')
+    expect(pattern.ir.sections.map((s) => [s.id, s.copies ?? 1])).toEqual([['head', 1], ['body', 1], ['arm', 2], ['ear', 2]])
   })
 
   test('읽는 중 화면은 작업의 단계를 그대로 보여 주고, 읽지 못하면 까닭과 돌아갈 길을 준다', async ({ page, request }) => {

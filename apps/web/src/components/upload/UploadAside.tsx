@@ -28,7 +28,7 @@ export function UploadAside() {
             한글과 영문 약어 (k2tog, ssk, sc, dc 등)
           </li>
         </ul>
-        <p className={styles.soon}>코바늘 도안 읽기는 아직 준비 중이에요. 지금은 대바늘 도안만 읽습니다.</p>
+        <p className={styles.soon}>코바늘은 매직링에서 시작해 둥글게 뜨는 도안(인형, 소품)을 읽어요. 평면으로 뜨거나 사슬에서 시작하는 코바늘 도안은 준비 중이에요.</p>
         <h3 className={styles.hardTitle}>아직은 어려워요</h3>
         <ul className={styles.hardList}>
           <li>사진이나 손글씨로만 된 도안</li>
