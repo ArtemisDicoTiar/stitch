@@ -2,7 +2,7 @@ import { stitchesFor, type Issue, type Pattern } from '@stitch/pattern-ir'
 import type { Outline } from './wire'
 
 /** 프롬프트가 바뀌면 녹화해 둔 응답을 다시 만들어야 합니다. */
-export const PROMPT_VERSION = '2026-11-21.2'
+export const PROMPT_VERSION = '2026-11-22.1'
 
 const dictionary = (craft: 'knit' | 'crochet') =>
   stitchesFor(craft)
@@ -22,6 +22,7 @@ export const SYSTEM = `당신은 뜨개 도안 PDF를 읽어 정해진 JSON 형�
 - "마지막 n코 남을 때까지 ... 반복"은 repeat에 end.kind = remaining, "끝까지"는 end, "마커까지"는 marker, "마커 n코 전까지"는 before_marker, "가운데 n코 전까지"는 before_center, "n번 반복"은 times 입니다.
 - 같은 단들을 여러 번 되풀이하면 한 묶음(group)에 넣고 repeat.times에 횟수를 적습니다. "n cm가 될 때까지"처럼 길이로 적힌 구간은 repeat.kind = until_cm 으로 적고 단수를 계산하지 않습니다.
 - 평면뜨기에서 겉면은 RS, 안면은 WS, 원통뜨기는 round 입니다.
+- into는 코바늘에서 코를 넣는 자리입니다. 대바늘 도안에서는 늘 null 입니다.
 
 대바늘 코 사전:
 ${dictionary('knit')}

@@ -34,6 +34,7 @@ export type {
   ThumbState,
   Tutorial,
   TutorialColors,
+  TutorialId,
   TutorialContext2D,
   TutorialSize,
   TutorialStep,

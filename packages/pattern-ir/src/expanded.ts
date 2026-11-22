@@ -32,6 +32,16 @@ export type ExpandedRow = {
   markers: number[]
   /** 길이로 적힌 구간에서 게이지로 추정한 단 */
   estimated?: boolean
+  /**
+   * 코바늘 단의 높이. 그 단에서 가장 높은 코의 높이입니다 (짧은뜨기 1, 한길긴뜨기 3).
+   * 대바늘 단에는 없습니다.
+   */
+  h?: number
+  /**
+   * 엔진이 구간의 시작에서 만들어 넣은 단 (시작 사슬, 매직링에 뜨는 첫 단).
+   * IR에는 이 단이 없어서 ref.group과 ref.row가 -1입니다.
+   */
+  start?: 'chain' | 'ring'
   /** IR에서의 위치 */
   ref: { section: number; group: number; row: number; rep: number }
 }
@@ -55,6 +65,7 @@ export type Issue = {
     | 'estimated_rows'
     | 'start_mismatch'
     | 'multiple_mismatch'
+    | 'no_space'
     | 'empty'
   message: string
   g?: number

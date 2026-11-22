@@ -1,7 +1,7 @@
 {
  "kind": "rows",
  "note": "손으로 만든 대역입니다. 실제 LLM 응답을 녹화한 것이 아닙니다.",
- "promptVersion": "2026-11-21.2",
+ "promptVersion": "2026-11-22.1",
  "model": "hand-written",
  "usage": {
   "input_tokens": 0,
@@ -26,6 +26,7 @@
           "op": "st",
           "st": "k",
           "n": 2,
+          "into": null,
           "text": null
          },
          {
@@ -35,12 +36,14 @@
             "op": "st",
             "st": "p",
             "n": 1,
+            "into": null,
             "text": null
            },
            {
             "op": "st",
             "st": "k",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -54,12 +57,14 @@
           "op": "st",
           "st": "p",
           "n": 1,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "k",
           "n": 2,
+          "into": null,
           "text": null
          }
         ]
@@ -74,6 +79,7 @@
           "op": "st",
           "st": "p",
           "n": 2,
+          "into": null,
           "text": null
          },
          {
@@ -83,12 +89,14 @@
             "op": "st",
             "st": "k",
             "n": 1,
+            "into": null,
             "text": null
            },
            {
             "op": "st",
             "st": "p",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -102,12 +110,14 @@
           "op": "st",
           "st": "k",
           "n": 1,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "p",
           "n": 2,
+          "into": null,
           "text": null
          }
         ]
@@ -132,30 +142,35 @@
           "op": "st",
           "st": "pat",
           "n": 11,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "pat",
           "n": 17,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "sk2p",
           "n": 1,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "pat",
           "n": 17,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "sk2p",
           "n": 1,
+          "into": null,
           "text": null
          },
          {
@@ -165,6 +180,7 @@
             "op": "st",
             "st": "pat",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -181,12 +197,14 @@
             "op": "st",
             "st": "yo",
             "n": 1,
+            "into": null,
             "text": null
            },
            {
             "op": "st",
             "st": "k2tog",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -200,12 +218,14 @@
           "op": "st",
           "st": "p",
           "n": 1,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "k",
           "n": 2,
+          "into": null,
           "text": null
          }
         ]
@@ -233,6 +253,7 @@
             "op": "st",
             "st": "pat",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -269,18 +290,21 @@
           "op": "st",
           "st": "k",
           "n": 4,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "p",
           "n": 1,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "m1l",
           "n": 1,
+          "into": null,
           "text": "왼쪽 늘림"
          },
          {
@@ -290,6 +314,7 @@
             "op": "st",
             "st": "k",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -303,18 +328,21 @@
           "op": "st",
           "st": "p",
           "n": 1,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "k",
           "n": 4,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "co",
           "n": 4,
+          "into": null,
           "text": null
          }
         ]
@@ -339,12 +367,14 @@
           "op": "st",
           "st": "p",
           "n": 8,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "k",
           "n": 1,
+          "into": null,
           "text": null
          },
          {
@@ -354,6 +384,7 @@
             "op": "st",
             "st": "p",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -367,18 +398,21 @@
           "op": "st",
           "st": "k",
           "n": 1,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "p",
           "n": 4,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "co",
           "n": 4,
+          "into": null,
           "text": null
          }
         ]
@@ -403,12 +437,14 @@
           "op": "st",
           "st": "k",
           "n": 8,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "p",
           "n": 1,
+          "into": null,
           "text": null
          },
          {
@@ -418,6 +454,7 @@
             "op": "st",
             "st": "k",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -431,6 +468,7 @@
           "op": "st",
           "st": "m1r",
           "n": 1,
+          "into": null,
           "text": "오른쪽 늘림"
          },
          {
@@ -445,6 +483,7 @@
             "op": "st",
             "st": "k",
             "n": 2,
+            "into": null,
             "text": null
            },
            {
@@ -463,6 +502,7 @@
           "op": "st",
           "st": "m1l",
           "n": 1,
+          "into": null,
           "text": "왼쪽 늘림"
          },
          {
@@ -472,6 +512,7 @@
             "op": "st",
             "st": "k",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -485,12 +526,14 @@
           "op": "st",
           "st": "p",
           "n": 1,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "k",
           "n": 8,
+          "into": null,
           "text": null
          }
         ]
@@ -505,12 +548,14 @@
           "op": "st",
           "st": "p",
           "n": 8,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "k",
           "n": 1,
+          "into": null,
           "text": null
          },
          {
@@ -520,6 +565,7 @@
             "op": "st",
             "st": "p",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -533,12 +579,14 @@
           "op": "st",
           "st": "k",
           "n": 1,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "p",
           "n": 8,
+          "into": null,
           "text": null
          }
         ]
@@ -563,12 +611,14 @@
           "op": "st",
           "st": "k",
           "n": 8,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "p",
           "n": 1,
+          "into": null,
           "text": null
          },
          {
@@ -578,6 +628,7 @@
             "op": "st",
             "st": "k",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -591,6 +642,7 @@
           "op": "st",
           "st": "m1r",
           "n": 1,
+          "into": null,
           "text": "오른쪽 늘림"
          },
          {
@@ -605,6 +657,7 @@
             "op": "st",
             "st": "k",
             "n": 2,
+            "into": null,
             "text": null
            },
            {
@@ -623,6 +676,7 @@
           "op": "st",
           "st": "m1l",
           "n": 1,
+          "into": null,
           "text": "왼쪽 늘림"
          },
          {
@@ -632,6 +686,7 @@
             "op": "st",
             "st": "k",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -645,12 +700,14 @@
           "op": "st",
           "st": "p",
           "n": 1,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "k",
           "n": 8,
+          "into": null,
           "text": null
          }
         ]
@@ -678,6 +735,7 @@
             "op": "st",
             "st": "pat",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -702,6 +760,7 @@
             "op": "st",
             "st": "pat",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -738,12 +797,14 @@
           "op": "st",
           "st": "k",
           "n": 8,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "p",
           "n": 1,
+          "into": null,
           "text": null
          },
          {
@@ -753,6 +814,7 @@
             "op": "st",
             "st": "k",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -766,6 +828,7 @@
           "op": "st",
           "st": "ssk",
           "n": 1,
+          "into": null,
           "text": "오른코 겹치기"
          },
          {
@@ -777,6 +840,7 @@
           "op": "st",
           "st": "k2tog",
           "n": 1,
+          "into": null,
           "text": "왼코 겹치기"
          },
          {
@@ -786,6 +850,7 @@
             "op": "st",
             "st": "k",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -799,12 +864,14 @@
           "op": "st",
           "st": "p",
           "n": 1,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "k",
           "n": 8,
+          "into": null,
           "text": null
          }
         ]
@@ -822,6 +889,7 @@
             "op": "st",
             "st": "pat",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -846,6 +914,7 @@
             "op": "st",
             "st": "pat",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -870,6 +939,7 @@
             "op": "st",
             "st": "pat",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -901,12 +971,14 @@
           "op": "st",
           "st": "k",
           "n": 8,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "p",
           "n": 1,
+          "into": null,
           "text": null
          },
          {
@@ -916,6 +988,7 @@
             "op": "st",
             "st": "k",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -929,6 +1002,7 @@
           "op": "st",
           "st": "ssk",
           "n": 1,
+          "into": null,
           "text": "오른코 겹치기"
          },
          {
@@ -940,6 +1014,7 @@
           "op": "st",
           "st": "k2tog",
           "n": 1,
+          "into": null,
           "text": "왼코 겹치기"
          },
          {
@@ -949,6 +1024,7 @@
             "op": "st",
             "st": "k",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -962,12 +1038,14 @@
           "op": "st",
           "st": "p",
           "n": 1,
+          "into": null,
           "text": null
          },
          {
           "op": "st",
           "st": "k",
           "n": 8,
+          "into": null,
           "text": null
          }
         ]
@@ -985,6 +1063,7 @@
             "op": "st",
             "st": "pat",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],
@@ -1019,6 +1098,7 @@
             "op": "st",
             "st": "bo",
             "n": 1,
+            "into": null,
             "text": null
            }
           ],

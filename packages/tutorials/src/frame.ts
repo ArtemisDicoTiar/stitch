@@ -2,26 +2,25 @@
  * (기호, 단계, t, 크기)만으로 정해지는 한 장면.
  * 재생기(player)와 테스트가 같은 함수를 씁니다.
  */
-import type { SymbolId } from '@stitch/pattern-ir'
 import { TUTORIALS } from './data'
 import { STAGE, drawScene } from './draw'
 import { resolve, tween } from './scene'
-import type { SceneState, TutorialContext2D, TutorialSize, TutorialStyle } from './types'
+import type { SceneState, TutorialContext2D, TutorialId, TutorialSize, TutorialStyle } from './types'
 
-const cache = new Map<SymbolId, SceneState[]>()
+const cache = new Map<TutorialId, SceneState[]>()
 
 /**
  * 뜨는 법이 있는 기호들. 순서는 코 사전(KNIT_SYMBOLS)과 같습니다.
  * 코 사전을 값으로 들여오면 브라우저 묶음에 IR 검사기(zod)까지 따라오므로, 여기서는 자료의 키를 씁니다.
  */
-export const TUTORIAL_IDS: readonly SymbolId[] = Object.keys(TUTORIALS) as SymbolId[]
+export const TUTORIAL_IDS: readonly TutorialId[] = Object.keys(TUTORIALS) as TutorialId[]
 
-export function isSymbolId(v: unknown): v is SymbolId {
+export function isSymbolId(v: unknown): v is TutorialId {
   return typeof v === 'string' && Object.prototype.hasOwnProperty.call(TUTORIALS, v)
 }
 
 /** 그 기호의 단계별 끝 장면. 한 번 풀어 두고 다시 씁니다. 돌려받은 값은 고치지 마세요. */
-export function tutorialStates(id: SymbolId): readonly SceneState[] {
+export function tutorialStates(id: TutorialId): readonly SceneState[] {
   let states = cache.get(id)
   if (!states) {
     if (!isSymbolId(id)) throw new RangeError(`뜨는 법이 없는 기호입니다: ${String(id)}`)
@@ -44,7 +43,7 @@ export function wrapStep(step: number, count: number): number {
  * - from: 어느 단계에서 넘어오는지. 기본은 바로 앞 단계이고, 첫 단계는 마지막 단계에서 넘어옵니다
  *   (자동 재생이 한 바퀴 돌아 처음으로 올 때의 움직임).
  */
-export function sceneAt(id: SymbolId, step: number, t = 1, from?: number): SceneState {
+export function sceneAt(id: TutorialId, step: number, t = 1, from?: number): SceneState {
   const states = tutorialStates(id)
   const i = wrapStep(step, states.length)
   if (!(t < 1)) return states[i]
@@ -63,7 +62,7 @@ export type FrameOptions = TutorialStyle & {
  */
 export function drawTutorialFrame(
   ctx: TutorialContext2D,
-  id: SymbolId,
+  id: TutorialId,
   step: number,
   t = 1,
   size: TutorialSize = STAGE,

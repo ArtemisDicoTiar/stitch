@@ -5,8 +5,7 @@
  * 재생기는 올릴 때 콜백을 부르지 않으므로, 처음 상태는 손잡이에서 읽어 알려 줍니다.
  */
 import { useEffect, useImperativeHandle, useRef, type Ref } from 'react'
-import type { SymbolId } from '@stitch/pattern-ir'
-import { mountTutorial, type TutorialHandle } from '@stitch/tutorials'
+import { mountTutorial, type TutorialHandle, type TutorialId } from '@stitch/tutorials'
 
 export type TutorialPlayerHandle = {
   next(): void
@@ -19,7 +18,7 @@ export type TutorialPlayerHandle = {
 export type TutorialState = { step: number; count: number; playing: boolean }
 
 type Props = {
-  symbol: SymbolId
+  symbol: TutorialId
   /** 1이 보통, 0.55가 "천천히" */
   speed?: number
   onState?: (state: TutorialState) => void

@@ -2,9 +2,9 @@
 
 import { useId, useMemo, useRef, useState } from 'react'
 import { allRows } from '@stitch/engine'
-import type { Expanded, SymbolId } from '@stitch/pattern-ir'
+import type { Expanded } from '@stitch/pattern-ir'
 import { symbolSvg } from '@stitch/render-chart'
-import { TUTORIALS, TUTORIAL_LEGEND } from '@stitch/tutorials'
+import { TUTORIALS, TUTORIAL_LEGEND, type TutorialId } from '@stitch/tutorials'
 import { TutorialPlayer, type TutorialPlayerHandle, type TutorialState } from '@/components/knit/TutorialPlayer'
 import { onTabKey } from './tabs'
 import styles from './Workspace.module.css'
@@ -12,9 +12,9 @@ import styles from './Workspace.module.css'
 type Props = {
   expanded: Expanded
   /** 도안에 나온 기호 */
-  symbols: SymbolId[]
-  symbol: SymbolId
-  onSymbol: (symbol: SymbolId) => void
+  symbols: TutorialId[]
+  symbol: TutorialId
+  onSymbol: (symbol: TutorialId) => void
   /** 지금 뜰 단 */
   workRow: number
 }

@@ -2,11 +2,10 @@
  * 캔버스에 뜨는 법을 띄우고 단계를 넘기는 재생기.
  * 프레임워크에 기대지 않습니다. 브라우저 API는 mountTutorial 안에서만 씁니다.
  */
-import type { SymbolId } from '@stitch/pattern-ir'
 import { STAGE, drawScene } from './draw'
 import { isSymbolId, tutorialStates, wrapStep } from './frame'
 import { tween } from './scene'
-import type { SceneState, TutorialColors, TutorialSize, TutorialStyle } from './types'
+import type { SceneState, TutorialColors, TutorialId, TutorialSize, TutorialStyle } from './types'
 
 /** 한 단계로 넘어가는 움직임의 길이 (ms) */
 export const TRANSITION_MS = 1000
@@ -40,8 +39,8 @@ export type MountOptions = {
 
 export type TutorialHandle = {
   /** 다른 기호로 바꾸고 첫 단계를 움직임 없이 보여 줍니다. */
-  setSymbol(id: SymbolId): void
-  getSymbol(): SymbolId
+  setSymbol(id: TutorialId): void
+  getSymbol(): TutorialId
   /** 그 단계로 갑니다. 범위를 벗어나면 돌아서 이어집니다. animate가 false면 바로 바꿉니다. */
   setStep(step: number, animate?: boolean): void
   getStep(): number
@@ -73,7 +72,7 @@ function prefersReducedMotion(): boolean {
  * 그림은 그 상자 안에 비율을 지켜 가운데에 맞춰 들어가고,
  * 픽셀 수는 상자 크기 × devicePixelRatio로 맞춥니다.
  */
-export function mountTutorial(canvas: HTMLCanvasElement, id: SymbolId, opts: MountOptions = {}): TutorialHandle {
+export function mountTutorial(canvas: HTMLCanvasElement, id: TutorialId, opts: MountOptions = {}): TutorialHandle {
   const ctx = canvas.getContext('2d')
   if (!ctx) throw new Error('캔버스에서 2D 컨텍스트를 얻지 못했습니다.')
   const g: CanvasRenderingContext2D = ctx

@@ -9,6 +9,7 @@ import { expect, test, type APIRequestContext, type Page } from '@playwright/tes
 
 const here = dirname(fileURLToPath(import.meta.url))
 const PDF = join(here, '../../../fixtures/reading/practice-hood.pdf')
+const CROCHET_PDF = join(here, '../../../fixtures/reading/practice-ball.pdf')
 
 /** 같은 PDF는 다시 읽지 않으므로, 앞서 올린 것이 남아 있으면 지우고 시작합니다. */
 async function removeUploads(request: APIRequestContext) {
@@ -280,6 +281,17 @@ test.describe.serial('도안 올리기와 읽은 내용 확인', () => {
       await expect(row.getByLabel('1번 조각 코 종류', { exact: true })).toBeVisible()
       expect(await noSideScroll(page)).toBe(true)
     }
+  })
+
+  test('코바늘 도안 PDF는 아직 준비 중이라고 알리고 돌려보낸다', async ({ page }) => {
+    await page.goto('/upload')
+    await expect(page.getByText('코바늘 도안 읽기는 아직 준비 중이에요', { exact: false })).toBeVisible()
+    await page.locator('#pattern-pdf').setInputFiles(CROCHET_PDF)
+    await expect(page).toHaveURL(/\/patterns\/[^/]+\/reading$/)
+    made.push(idFromUrl(page))
+    await expect(page.getByRole('heading', { level: 1, name: '도안을 읽지 못했어요' })).toBeVisible()
+    await expect(page.getByRole('alert').filter({ hasText: '코바늘 도안 읽기는 아직 준비 중이에요' })).toBeVisible()
+    await expect(page.getByRole('link', { name: '도안 올리기로 돌아가기' })).toHaveAttribute('href', '/upload')
   })
 
   test('읽는 중 화면은 작업의 단계를 그대로 보여 주고, 읽지 못하면 까닭과 돌아갈 길을 준다', async ({ page, request }) => {

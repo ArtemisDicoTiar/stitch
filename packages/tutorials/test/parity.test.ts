@@ -3,7 +3,7 @@
  * 그 파일은 git에서 제외되어 있으므로, 없으면 이 테스트는 건너뜁니다.
  */
 import { describe, expect, it } from 'vitest'
-import { KNIT_SYMBOLS, type SymbolId } from '@stitch/pattern-ir'
+import { KNIT_SYMBOLS, type KnitSymbolId } from '@stitch/pattern-ir'
 import { STAGE, TUTORIALS, drawScene, drawTutorialFrame, tutorialStates, tween } from '../src'
 import { lines, recordingContext } from './fake-context'
 import { loadPrototype, plain } from './prototype'
@@ -11,7 +11,7 @@ import { loadPrototype, plain } from './prototype'
 const proto = loadPrototype()
 
 describe.skipIf(!proto)('원래 자료와 같은지 (prototype/site/tut.js)', () => {
-  const each = (fn: (id: SymbolId) => void): void => KNIT_SYMBOLS.forEach(fn)
+  const each = (fn: (id: KnitSymbolId) => void): void => KNIT_SYMBOLS.forEach(fn)
 
   it('기호 목록이 같다', () => {
     expect([...proto!.list].sort()).toEqual([...KNIT_SYMBOLS].sort())

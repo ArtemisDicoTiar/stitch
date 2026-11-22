@@ -16,6 +16,11 @@ export type ReadOptions = {
   llm: Llm
   /** 검산에서 어긋난 구간을 LLM에 되돌리는 최대 횟수. 넘기면 "확인 필요"로 사람에게 넘깁니다. */
   maxFeedbackRounds?: number
+  /**
+   * 코바늘 도안도 읽을지. 기본은 읽지 않습니다.
+   * 코바늘은 아직 기호 도안과 3D가 준비되지 않아, 개요에서 코바늘로 판별되면 단을 읽기 전에 멈춥니다.
+   */
+  allowCrochet?: boolean
   onStage?: (stage: ReadStage, detail?: { round?: number; llmCalls: number; usage: LlmUsage }) => void | Promise<void>
 }
 
@@ -55,6 +60,10 @@ export async function readPattern(pdf: Uint8Array, options: ReadOptions): Promis
   usage = addUsage(usage, outline.usage)
   llmCalls += 1
   if (outline.output.sections.length === 0) throw new ReaderError('이 PDF에서 뜨개 도안의 구간을 찾지 못했습니다.', 'bad_output')
+  // 단을 읽는 호출이 가장 비쌉니다. 받지 않는 도안은 그 전에 돌려보냅니다.
+  if (outline.output.craft === 'crochet' && !options.allowCrochet) {
+    throw new ReaderError('코바늘 도안 읽기는 아직 준비 중이에요. 지금은 대바늘 도안만 읽습니다.', 'unsupported')
+  }
 
   const rows = await llm.call({ kind: 'rows', pdfSha256, pdf, prompt: rowsPrompt(outline.output), schema: RowsSchema })
   usage = addUsage(usage, rows.usage)

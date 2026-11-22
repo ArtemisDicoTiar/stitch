@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { garterScarf, practiceHood } from '@stitch/fixtures'
+import { garterScarf, practiceBall, practiceHood } from '@stitch/fixtures'
 import type { Pattern } from '@stitch/pattern-ir'
 import {
   AnthropicLlm,
@@ -32,10 +32,21 @@ const withoutSource = (p: Pattern): Pattern => JSON.parse(JSON.stringify(p, (k, 
 
 describe('LLM 형식과 IR 사이 변환', () => {
   it('IR → LLM 형식 → IR이 같다', () => {
-    for (const p of [practiceHood, garterScarf]) {
+    for (const p of [practiceHood, garterScarf, practiceBall]) {
       const w = toWire(p)
       expect(toPattern(w.outline, w.rows)).toEqual(withoutSource(p))
     }
+  })
+
+  it('코를 넣는 자리(into)를 오가며 지킨다. 대바늘과 보통의 경우는 null이다', () => {
+    const w = toWire(practiceBall)
+    const first = w.rows.sections[0].groups[0].rows[0].ops[0]
+    expect(first).toMatchObject({ op: 'st', st: 'sc', n: 6, into: 'space' })
+    const knitOp = toWire(garterScarf).rows.sections[0].groups[0].rows[0].ops[0]
+    expect(knitOp.op === 'repeat' && knitOp.body[0]).toMatchObject({ op: 'st', st: 'k', into: null })
+    // "다음 코에 하나씩"은 따로 적지 않습니다.
+    const back = toPattern(w.outline, { sections: [{ id: 'ball', groups: [{ rows: [{ side: 'round', label: null, text: 't', expect_count: null, ops: [{ op: 'st', st: 'SC', n: 2, into: 'next', text: null }, { op: 'st', st: 'dc', n: 5, into: 'one', text: null }] }], repeat: { kind: 'times', times: 1, cm: 0, from: '' } }] }] })
+    expect(back.sections[0].groups[0].rows[0].ops).toEqual([{ st: 'sc', n: 2 }, { st: 'dc', n: 5, into: 'one' }])
   })
 
   it('세 겹을 넘는 반복은 거절한다', () => {
@@ -221,5 +232,40 @@ describe('사람이 원문을 봐야 하는 곳', () => {
     expect(pos(first(where[1]))).toBeGreaterThan(pos(last(where[0])) - 1e-6)
     expect(pos(first(where[2]))).toBeGreaterThan(pos(last(where[1])) - 1e-6)
     for (const section of where) for (let i = 1; i < section.length; i++) expect(pos(section[i])).toBeGreaterThanOrEqual(pos(section[i - 1]) - 1e-6)
+  })
+})
+
+describe('코바늘 도안', () => {
+  /** 개요와 단을 직접 쓴 도안에서 만들어 돌려주는 대역 */
+  class FromPattern implements Llm {
+    kinds: string[] = []
+    constructor(private pattern: Pattern) {}
+    async call<T>(req: LlmRequest<T>): Promise<LlmResponse<T>> {
+      this.kinds.push(req.kind)
+      const w = toWire(this.pattern)
+      const output = req.kind === 'outline' ? w.outline : w.rows
+      return { output: req.schema.parse(output) as T, model: 'stub', usage: ZERO_USAGE }
+    }
+  }
+
+  it('받지 않을 때는 개요만 읽고, 단을 읽기 전에 까닭을 알리며 멈춘다', async () => {
+    const llm = new FromPattern(practiceBall)
+    await expect(readPattern(pdf, { llm })).rejects.toMatchObject({ name: 'ReaderError', code: 'unsupported', message: expect.stringContaining('코바늘 도안 읽기는 아직 준비 중') })
+    expect(llm.kinds).toEqual(['outline'])
+  })
+
+  it('받기로 하면 끝까지 읽고 검산한다', async () => {
+    const llm = new FromPattern(practiceBall)
+    const r = await readPattern(pdf, { llm, allowCrochet: true })
+    expect(llm.kinds).toEqual(['outline', 'rows'])
+    expect(r.pattern.craft).toBe('crochet')
+    expect(r.verification.ok).toBe(true)
+    expect(r.verification.expanded.totalRows).toBe(14)
+  })
+
+  it('대바늘 도안은 그대로 읽는다', async () => {
+    const llm = new FromPattern(garterScarf)
+    const r = await readPattern(pdf, { llm })
+    expect(r.pattern.craft).toBe('knit')
   })
 })

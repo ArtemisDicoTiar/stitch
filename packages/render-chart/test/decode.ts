@@ -3,7 +3,7 @@
  * 그리는 코드를 거치지 않고 도형의 좌표만 보고 판단합니다. 점선은 화면에 그려지는 대로
  * 점 하나하나로 풀고, 기호는 SYMBOLS의 모양과 맞춰 봐서 알아냅니다.
  */
-import { KNIT_SYMBOLS, type SymbolId } from '@stitch/pattern-ir'
+import { CROCHET_SYMBOLS, KNIT_SYMBOLS, type SymbolId } from '@stitch/pattern-ir'
 import { SYMBOLS, type SymbolPrim } from '../src'
 
 export type Shape =
@@ -24,9 +24,11 @@ function samePrim(a: Shape, b: SymbolPrim): boolean {
   return near(a.c[0], b.c[0]) && near(a.c[1], b.c[1]) && near(a.r, b.r)
 }
 
+const ALL_SYMBOLS: readonly SymbolId[] = [...KNIT_SYMBOLS, ...CROCHET_SYMBOLS]
+
 /** 한 칸(0~1 좌표) 안의 도형들이 어떤 기호인지 */
 export function classify(shapes: Shape[]): SymbolId | null {
-  for (const id of KNIT_SYMBOLS) {
+  for (const id of ALL_SYMBOLS) {
     const prims = SYMBOLS[id].prims
     if (prims.length === shapes.length && prims.every((p, i) => samePrim(shapes[i], p))) return id
   }
@@ -148,7 +150,7 @@ export function decodeChartSvg(svg: string, cell: number): Decoded {
         const ey = dir === 'v' ? sy + on : sy
         // 선이 놓인 칸의 왼쪽 위를 0으로 본 좌표로 바꿔 기호를 알아냅니다.
         let found: Glyph | null = null
-        for (const id of KNIT_SYMBOLS) {
+        for (const id of ALL_SYMBOLS) {
           const prims = SYMBOLS[id].prims
           if (prims.length !== 1 || prims[0].t !== 'poly' || prims[0].p.length !== 2) continue
           const [a, b] = prims[0].p

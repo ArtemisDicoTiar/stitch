@@ -41,7 +41,7 @@ export interface Llm {
 export class ReaderError extends Error {
   constructor(
     message: string,
-    public code: 'no_api_key' | 'auth' | 'rate_limit' | 'refused' | 'truncated' | 'bad_output' | 'no_recording' | 'api',
+    public code: 'no_api_key' | 'auth' | 'rate_limit' | 'refused' | 'truncated' | 'bad_output' | 'no_recording' | 'api' | 'unsupported',
   ) {
     super(message)
     this.name = 'ReaderError'

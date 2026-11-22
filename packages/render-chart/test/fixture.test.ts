@@ -4,9 +4,9 @@
  */
 import { describe, expect, it } from 'vitest'
 import { expand } from '@stitch/engine'
-import { garterScarf, practiceHood } from '@stitch/fixtures'
-import { KNIT_SYMBOLS, type Expanded } from '@stitch/pattern-ir'
-import { SYMBOLS, chartLayout, renderChartSvg, symbolSvg } from '../src'
+import { garterScarf, practiceBall, practiceHood } from '@stitch/fixtures'
+import { CROCHET_SYMBOLS, KNIT_SYMBOLS, type Expanded } from '@stitch/pattern-ir'
+import { SYMBOLS, SYMBOL_ORDER, chartLayout, renderChartSvg, symbolOrder, symbolSvg } from '../src'
 import { at, attr, decodeChartSvg, type Glyph } from './decode'
 
 function index<T extends { x: number; y: number }>(items: T[]): Map<string, T[]> {
@@ -238,9 +238,37 @@ describe('빈 도안', () => {
   })
 })
 
+describe('연습용 코바늘 공: 기호 도안 SVG', () => {
+  const expanded = expand(practiceBall)
+  const svg = renderChartSvg(expanded)
+
+  it('파일 스냅샷과 같다', async () => {
+    await expect(svg).toMatchFileSnapshot('./__snapshots__/practice-ball.svg')
+  })
+
+  it('모든 코가 rectOf 자리에 한 번씩, 코바늘 기호로 그려진다', () => {
+    const r = checkStructure(expanded)
+    expect(r.wrong).toEqual([])
+    expect(r.cells).toBe(expanded.totalStitches)
+    expect(r.decoded.glyphs.length).toBe(expanded.totalStitches)
+    const seen = new Set(r.decoded.glyphs.map((g) => g.s))
+    expect([...seen].sort()).toEqual(['SC', 'SC2'])
+  })
+
+  it('늘어나기 전과 줄어든 뒤의 자리는 코 없음 칸이다', () => {
+    const r = checkStructure(expanded)
+    const slots = expanded.blocks.reduce((a, b) => a + b.W * b.rows.length, 0)
+    expect(expanded.blocks.map((b) => b.W)).toEqual([30])
+    expect(r.empty).toBe(slots - expanded.totalStitches)
+  })
+})
+
 describe('기호', () => {
-  it('10가지 기호에 이름, 바탕색, 모양이 있다', () => {
-    for (const id of KNIT_SYMBOLS) {
+  it('대바늘 10가지와 코바늘 9가지 기호에 이름, 바탕색, 모양이 있다', () => {
+    expect([...SYMBOL_ORDER].sort()).toEqual([...KNIT_SYMBOLS, ...CROCHET_SYMBOLS].sort())
+    expect([...symbolOrder('knit')].sort()).toEqual([...KNIT_SYMBOLS].sort())
+    expect([...symbolOrder('crochet')].sort()).toEqual([...CROCHET_SYMBOLS].sort())
+    for (const id of SYMBOL_ORDER) {
       const def = SYMBOLS[id]
       expect(def.name.length).toBeGreaterThan(0)
       expect(def.en.length).toBeGreaterThan(0)
@@ -256,6 +284,19 @@ describe('기호', () => {
         }
       }
     }
+  })
+
+  it('코바늘 기호는 서로 다른 모양이고, 이어진 칸을 점선으로 묶지 않는다', () => {
+    const shapes = CROCHET_SYMBOLS.map((id) => JSON.stringify(SYMBOLS[id].prims))
+    expect(new Set(shapes).size).toBe(CROCHET_SYMBOLS.length)
+    // 한 줄짜리 기호만 점선으로 묶입니다. 짧은뜨기(×)가 묶이면 줄로 뭉개집니다.
+    for (const id of CROCHET_SYMBOLS) {
+      const p = SYMBOLS[id].prims
+      expect(p.length === 1 && p[0].t === 'poly' && p[0].p.length === 2, id).toBe(false)
+    }
+    // 긴 코는 실을 감은 횟수만큼 빗금이 늘어납니다.
+    expect(SYMBOLS.DC.prims.length).toBe(SYMBOLS.HDC.prims.length + 1)
+    expect(SYMBOLS.TR.prims.length).toBe(SYMBOLS.HDC.prims.length + 2)
   })
 
   it('모양: 겉뜨기는 세로선, 안뜨기는 가로선, 줄임과 늘림은 좌우가 서로 거울상', () => {

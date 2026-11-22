@@ -3,7 +3,7 @@
  * 장면(Scene)은 두 겹입니다. 사람이 쓰기 쉬운 "적는 꼴"(…Spec)과
  * 그것을 좌표로 풀어 그리기와 보간에 쓰는 "그리는 꼴"(…State).
  */
-import type { SymbolId } from '@stitch/pattern-ir'
+import type { KnitSymbolId } from '@stitch/pattern-ir'
 
 // ---------- 적는 꼴 ----------
 
@@ -125,8 +125,14 @@ export type TutorialStep = {
   scene: SceneSpec
 }
 
+/**
+ * 뜨는 법의 열쇠. 지금은 대바늘 기호와 같습니다.
+ * 코바늘에는 기호가 아닌 동작(매직링, 기둥코)도 있어서 기호 목록과 따로 둡니다.
+ */
+export type TutorialId = KnitSymbolId
+
 export type Tutorial = {
-  id: SymbolId
+  id: TutorialId
   /** 제목. 예: 'k2tog (왼코 겹치기)' */
   title: string
   /** 탭에 쓰는 짧은 이름. 예: 'k2tog' */

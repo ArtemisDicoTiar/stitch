@@ -9,7 +9,7 @@ import type { PickPosition } from '@stitch/render-3d'
 import type { Avatar } from '@stitch/render-3d/avatar'
 import { supportsTemplate } from '@stitch/render-3d/garment'
 import type { ChartPick } from '@stitch/render-chart'
-import { symbolsIn } from '@stitch/tutorials'
+import { symbolsIn, type TutorialId } from '@stitch/tutorials'
 import type { PatternView, ProgressEntry, RingMarker } from '@/server/patterns'
 import { ChartPanel } from './ChartPanel'
 import { InfoPanel, gaugeText } from './InfoPanel'
@@ -76,7 +76,7 @@ export function WorkspaceScreen({ view, ir, initialEntries, initialRings, avatar
   const [tab, setTab] = useState<TabKey>('chart')
   const [howtoSeen, setHowtoSeen] = useState(false)
   const [pick, setPick] = useState<ChartPick | null>(null)
-  const [tutorial, setTutorial] = useState<SymbolId>(symbols[0] ?? 'K')
+  const [tutorial, setTutorial] = useState<TutorialId>(symbols[0] ?? 'K')
   const [mode, setMode] = useState<ClickMode>('view')
   const [notice, setNotice] = useState<Notice | null>(null)
   const [ringColors, setRingColors] = useState(RING_COLORS_FALLBACK)
@@ -315,7 +315,9 @@ export function WorkspaceScreen({ view, ir, initialEntries, initialRings, avatar
     if (key !== 'chart') setPick(null)
   })
   const onHowTo = useStable((s: SymbolId) => {
-    if (symbols.includes(s)) setTutorial(s)
+    // 뜨는 법이 있는 기호만 탭을 바꿉니다.
+    const id = symbols.find((t) => t === s)
+    if (id) setTutorial(id)
     setPick(null)
     selectTab('howto')
     scrollTo('tabs')

@@ -1,0 +1,70 @@
+{
+ "kind": "outline",
+ "note": "손으로 만든 대역입니다. 실제 LLM 응답을 녹화한 것이 아닙니다.",
+ "promptVersion": "2026-11-22.1",
+ "model": "hand-written",
+ "usage": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation_input_tokens": 0
+ },
+ "output": {
+  "craft": "crochet",
+  "terms": "kr",
+  "title": "연습용 코바늘 공",
+  "materials": [
+   {
+    "kind": "실",
+    "spec": "중간 굵기 면사",
+    "qty": "약 20g"
+   },
+   {
+    "kind": "바늘",
+    "spec": "3mm 코바늘",
+    "qty": null
+   },
+   {
+    "kind": "부자재",
+    "spec": "솜",
+    "qty": null
+   },
+   {
+    "kind": "부자재",
+    "spec": "돗바늘",
+    "qty": null
+   }
+  ],
+  "gauge": {
+   "stitches": 22,
+   "rows": 24,
+   "in_stitch": "짧은뜨기",
+   "tool_mm": 3
+  },
+  "finished": {
+   "width_cm": 4.5,
+   "height_cm": 5
+  },
+  "template": "none",
+  "sections": [
+   {
+    "id": "ball",
+    "name": "공",
+    "shape": "spiral",
+    "start": {
+     "kind": "ring",
+     "count": 0,
+     "from": null
+    },
+    "multiple": null
+   }
+  ],
+  "finishing": [
+   {
+    "name": "닫기",
+    "text": "실을 20cm 남기고 자른 뒤, 남은 6코의 앞고리에 돗바늘로 실을 통과시켜 조이고 실을 숨깁니다."
+   }
+  ],
+  "unclear": []
+ }
+}

@@ -9,7 +9,7 @@
  *   코의 번호 = rowStart[g - 1] + k
  * 이고, 진행 위치 { row, stitch } 까지 뜬 편물은 앞에서부터 `knittedCount()`개의 사각형입니다.
  */
-import type { Expanded, GaugeSize, Pattern, Progress, Side, SymbolId, Template } from '@stitch/pattern-ir'
+import type { Expanded, GaugeSize, KnitSymbolId, Pattern, Progress, Side, SymbolId, Template } from '@stitch/pattern-ir'
 import type { MannequinFit, Vec3 } from './mannequin-dims'
 import { planFlat } from './templates/flat'
 import { planHood } from './templates/hood'
@@ -39,8 +39,8 @@ export class UnsupportedTemplateError extends Error {
 export const DEFAULT_GAUGE: GaugeSize = { stitches: 18, rows: 24 }
 
 /** 기호의 번호. 실 질감 그림에서 칸의 순서이기도 합니다. */
-export const SYMBOL_INDEX: Record<SymbolId, number> = { K: 0, P: 1, YO: 2, K2TOG: 3, SSK: 4, SK2P: 5, M1L: 6, M1R: 7, CO: 8, BO: 9 }
-export const SYMBOL_ORDER: readonly SymbolId[] = (Object.keys(SYMBOL_INDEX) as SymbolId[]).sort((a, b) => SYMBOL_INDEX[a] - SYMBOL_INDEX[b])
+export const SYMBOL_INDEX: Record<KnitSymbolId, number> = { K: 0, P: 1, YO: 2, K2TOG: 3, SSK: 4, SK2P: 5, M1L: 6, M1R: 7, CO: 8, BO: 9 }
+export const SYMBOL_ORDER: readonly KnitSymbolId[] = (Object.keys(SYMBOL_INDEX) as KnitSymbolId[]).sort((a, b) => SYMBOL_INDEX[a] - SYMBOL_INDEX[b])
 
 /** 실 질감 그림은 가로로 ATLAS_TILES 칸입니다. uvs가 이 배치를 따릅니다. */
 export const ATLAS_TILES = 16
@@ -259,7 +259,8 @@ export function buildGarment(expanded: Expanded, template: Template, opts: Garme
         normals[base + c * 3 + 2] = nz
       }
 
-      const tile = SYMBOL_INDEX[cell.s] ?? 0
+      // 코바늘 기호의 질감은 아직 없어 겉뜨기 칸을 씁니다.
+      const tile = (SYMBOL_INDEX as Partial<Record<SymbolId, number>>)[cell.s] ?? 0
       const u0 = (tile + UV_INSET) / ATLAS_TILES
       const u1 = (tile + 1 - UV_INSET) / ATLAS_TILES
       uvs.set([u1, 0.02, u0, 0.02, u0, 0.98, u1, 0.98], q * 8)

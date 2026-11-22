@@ -13,12 +13,21 @@ export const ShapeSchema = z.enum(['flat', 'round', 'spiral'])
 /** 3D 형태 템플릿. 맞는 것이 없으면 none (기호 도안과 진행 표시만). */
 export const TemplateSchema = z.enum(['hood', 'flat', 'tube', 'hat', 'none'])
 
+export const IntoSchema = z.enum(['next', 'one', 'same', 'space'])
+export type Into = z.infer<typeof IntoSchema>
+
 const StitchOp = z.object({
   /** 코 사전의 id. 예: k, p, pat, k2tog */
   st: z.string().min(1),
   n: z.number().int().min(1),
-  /** 코바늘에서 코를 넣는 자리 */
-  into: z.enum(['next', 'same', 'space']).optional(),
+  /**
+   * 코바늘에서 코를 넣는 자리.
+   * - next (기본): n코를 다음 코들에 하나씩
+   * - one: n코를 다음 한 코에 모두 ("다음 코에 한길긴뜨기 5")
+   * - same: 방금 뜬 코와 같은 자리에 n코 더
+   * - space: 다음 사슬 공간(또는 매직링)에 n코
+   */
+  into: IntoSchema.optional(),
   /** 이 조각의 원문 표현. 단계별 안내에 씁니다. */
   text: z.string().optional(),
 })
@@ -39,7 +48,7 @@ const MarkerOp = z.object({
 export type Until = 'end' | 'marker' | { remaining: number } | { before_marker: number } | { before_center: number }
 
 export type Op =
-  | { st: string; n: number; into?: 'next' | 'same' | 'space'; text?: string }
+  | { st: string; n: number; into?: 'next' | 'one' | 'same' | 'space'; text?: string }
   | { repeat: Op[]; times: number; text?: string }
   | { repeat: Op[]; until: Until; text?: string }
   | { marker: 'place' | 'slip' | 'remove'; text?: string }

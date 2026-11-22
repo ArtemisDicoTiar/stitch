@@ -1,8 +1,8 @@
 /**
- * 뜨개 기호 10가지 (한국·JIS 방식).
+ * 뜨개 기호 (한국·JIS 방식). 대바늘 10가지와 코바늘 9가지.
  * 한 칸을 0~1 좌표로 본 선과 원으로 적어 두고, 도안과 범례가 같은 모양을 씁니다.
  */
-import type { SymbolId } from '@stitch/pattern-ir'
+import type { Craft, CrochetSymbolId, KnitSymbolId, SymbolId } from '@stitch/pattern-ir'
 import { esc, num } from './util'
 
 export type Pt = readonly [number, number]
@@ -49,7 +49,28 @@ function eLoop(): SymbolPrim[] {
   return [{ t: 'poly', p: pts }]
 }
 
-export const SYMBOLS: Record<SymbolId, SymbolDef> = {
+/** 닫힌 타원을 꺾은선으로 */
+function oval(cx: number, cy: number, rx: number, ry: number, n = 28): Pt[] {
+  const out: Pt[] = []
+  for (let i = 0; i <= n; i++) {
+    const a = (2 * Math.PI * i) / n
+    out.push([cx + rx * Math.cos(a), cy + ry * Math.sin(a)])
+  }
+  return out
+}
+
+/** 긴 코의 기둥: 세로 기둥과 머리 가로줄, 그리고 실을 감은 횟수만큼의 빗금 */
+function post(slashes: number): SymbolPrim[] {
+  const prims: SymbolPrim[] = [
+    { t: 'poly', p: [[0.5, 0.2], [0.5, 0.86]] },
+    { t: 'poly', p: [[0.28, 0.2], [0.72, 0.2]] },
+  ]
+  const ys = slashes === 1 ? [0.52] : [0.44, 0.62]
+  for (let i = 0; i < slashes; i++) prims.push({ t: 'poly', p: [[0.37, ys[i] + 0.07], [0.63, ys[i] - 0.07]] })
+  return prims
+}
+
+const KNIT: Record<KnitSymbolId, SymbolDef> = {
   K: { name: '겉뜨기', en: 'knit', bg: '#ffffff', prims: [{ t: 'poly', p: [[0.5, 0.2], [0.5, 0.8]] }] },
   P: { name: '안뜨기', en: 'purl', bg: '#ffffff', prims: [{ t: 'poly', p: [[0.2, 0.5], [0.8, 0.5]] }] },
   YO: { name: '바늘비우기', en: 'yo', bg: '#d7ebff', prims: [{ t: 'circle', c: [0.5, 0.5], r: 0.26 }] },
@@ -87,8 +108,64 @@ export const SYMBOLS: Record<SymbolId, SymbolDef> = {
   BO: { name: '코막음', en: 'bind off', bg: '#e8e0ff', prims: [{ t: 'dot', c: [0.5, 0.5], r: 0.2 }] },
 }
 
-/** 기호를 그리는 순서. 범례도 이 순서를 씁니다. */
-export const SYMBOL_ORDER: readonly SymbolId[] = ['K', 'P', 'YO', 'K2TOG', 'SSK', 'SK2P', 'M1L', 'M1R', 'CO', 'BO']
+const CROCHET: Record<CrochetSymbolId, SymbolDef> = {
+  CH: { name: '사슬뜨기', en: 'chain', bg: '#fff6cc', prims: [{ t: 'poly', p: oval(0.5, 0.5, 0.3, 0.16) }] },
+  SL: { name: '빼뜨기', en: 'slip stitch', bg: '#e8e0ff', prims: [{ t: 'dot', c: [0.5, 0.5], r: 0.14 }] },
+  SC: {
+    name: '짧은뜨기',
+    en: 'single crochet',
+    bg: '#ffffff',
+    prims: [
+      { t: 'poly', p: [[0.26, 0.26], [0.74, 0.74]] },
+      { t: 'poly', p: [[0.74, 0.26], [0.26, 0.74]] },
+    ],
+  },
+  HDC: { name: '긴뜨기', en: 'half double crochet', bg: '#eaf4ff', prims: post(0) },
+  DC: { name: '한길긴뜨기', en: 'double crochet', bg: '#d7ebff', prims: post(1) },
+  TR: { name: '두길긴뜨기', en: 'treble crochet', bg: '#c2dcff', prims: post(2) },
+  SC2: {
+    name: '짧은뜨기 모아뜨기 (줄임)',
+    en: 'sc2tog',
+    bg: '#ffdcdc',
+    prims: [
+      { t: 'poly', p: [[0.2, 0.84], [0.5, 0.18], [0.8, 0.84]] },
+      { t: 'poly', p: [[0.34, 0.56], [0.66, 0.56]] },
+    ],
+  },
+  DC2: {
+    name: '긴 코 모아뜨기 (줄임)',
+    en: 'dc2tog',
+    bg: '#ffc2c2',
+    prims: [
+      { t: 'poly', p: [[0.24, 0.86], [0.5, 0.2], [0.76, 0.86]] },
+      { t: 'poly', p: [[0.3, 0.2], [0.7, 0.2]] },
+      { t: 'poly', p: [[0.27, 0.6], [0.47, 0.5]] },
+      { t: 'poly', p: [[0.53, 0.5], [0.73, 0.6]] },
+    ],
+  },
+  CL: {
+    name: '구슬뜨기',
+    en: 'cluster',
+    bg: '#d9f2cf',
+    prims: [
+      { t: 'poly', p: oval(0.5, 0.44, 0.18, 0.27) },
+      { t: 'poly', p: [[0.5, 0.71], [0.5, 0.88]] },
+    ],
+  },
+}
+
+export const SYMBOLS: Record<SymbolId, SymbolDef> = { ...KNIT, ...CROCHET }
+
+const KNIT_ORDER: readonly KnitSymbolId[] = ['K', 'P', 'YO', 'K2TOG', 'SSK', 'SK2P', 'M1L', 'M1R', 'CO', 'BO']
+const CROCHET_ORDER: readonly CrochetSymbolId[] = ['CH', 'SL', 'SC', 'HDC', 'DC', 'TR', 'SC2', 'DC2', 'CL']
+
+/** 기호를 그리는 순서. 범례도 이 순서를 씁니다. 대바늘 다음에 코바늘입니다. */
+export const SYMBOL_ORDER: readonly SymbolId[] = [...KNIT_ORDER, ...CROCHET_ORDER]
+
+/** 한 공예의 기호만, 그리는 순서로 */
+export function symbolOrder(craft: Craft): readonly SymbolId[] {
+  return craft === 'crochet' ? CROCHET_ORDER : KNIT_ORDER
+}
 
 /** 기호의 기본 선 색과, 12px 칸에서의 선 굵기 */
 export const SYMBOL_INK = '#262626'

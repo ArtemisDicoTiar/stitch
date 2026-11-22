@@ -12,3 +12,11 @@ export const practiceHoodExpected = {
 }
 
 export const garterScarfExpected = { totalRows: 91, castOn: 24 }
+
+export const practiceBallExpected = {
+  totalRows: 14,
+  totalStitches: 300,
+  /** 단 번호 순서대로, 그 단을 뜬 뒤의 코 수 */
+  counts: [6, 12, 18, 24, 30, 30, 30, 30, 30, 30, 24, 18, 12, 6],
+  symbols: ['SC', 'SC2'],
+}

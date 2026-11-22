@@ -6,6 +6,7 @@
 - LLM은 도안 글을 구조화하는 데만 씁니다. 코 수 검산, 기호 도안, 3D, 게이지 계산은 코드가 합니다.
 - 올린 도안은 올린 사람만 봅니다. 공유 링크를 만들지 않습니다.
 - 유료 기능은 마네킹 꾸미기 저장 하나입니다.
+- 지금은 대바늘 도안을 읽습니다. 코바늘은 엔진과 코 사전까지 들어가 있고, 화면은 단계별로 붙이는 중입니다 (코바늘 PDF를 올리면 준비 중이라고 알립니다).
 
 ## 시작하기
 
@@ -27,6 +28,10 @@ API 키가 없어도 앱은 뜹니다. 그때는 **예시 도안**(직접 쓴 �
 | `pnpm test:e2e` | 브라우저 자동 테스트 (Playwright). 처음에는 `pnpm exec playwright install chromium` |
 | `pnpm typecheck` | 타입 검사 |
 | `pnpm reader <도안.pdf>` | PDF 한 개를 읽어 IR과 검산 결과, 토큰 사용량을 출력. `--record` 로 응답을 남기고 `--replay <폴더>` 로 재생 |
+| `pnpm fixtures:reading` | 연습 도안의 PDF와 LLM 응답 대역을 다시 만듦 |
+| `pnpm exec tsx scripts/compare-read.ts <IR.json> <도안 이름>` | 실제로 읽은 결과를 직접 쓴 도안과 단별로 비교 |
+| `node scripts/verify-deployed.mjs <주소> <대바늘 PDF> [코바늘 PDF]` | 배포 주소에서 방문자 둘로 API 흐름 확인. 읽기가 켜져 있으면 실제 변환 비용이 듭니다 |
+| `node scripts/live-browser.mjs <주소> <캡처 폴더> <대바늘 PDF>` | 배포 주소를 실제 브라우저로 처음부터 끝까지 따라가기 |
 
 환경 변수의 기본값과 설명은 `.env.example`에 있습니다. 로컬에서 꼭 필요한 것은 PDF를 읽을 때의 `ANTHROPIC_API_KEY` 하나입니다.
 로컬 데이터(DB, 올린 PDF)는 `data/`에 쌓이고 git에서 빠져 있습니다.
@@ -66,6 +71,7 @@ packages/render-chart/  기호 도안 (SVG)
 packages/render-3d/     3D 형태 템플릿과 three.js 뷰어, 마네킹
 packages/tutorials/     기호별 뜨는 법
 fixtures/               직접 쓴 테스트 도안과 기대 결과
+scripts/                읽기 결과 비교, 배포 주소 확인 스크립트
 docs/PLAN.md            구현 계획서 사본
 private/                실제 도안에서 나온 자료 (git 제외)
 prototype/              프로토타입 소스와 화면 설계 (참고용, git 제외)

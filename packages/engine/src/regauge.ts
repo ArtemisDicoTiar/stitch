@@ -76,6 +76,11 @@ export function regauge(pattern: Pattern, mine: GaugeSize): RegaugeResult {
     const startOf = new Map(orig.sections.map((s) => [s.firstRow, s.startCount]))
     for (const r of allRows(orig)) {
       if (startOf.has(r.g)) prev = startOf.get(r.g)!
+      // 엔진이 만든 시작 단(시작 사슬, 매직링의 첫 단)은 IR의 묶음에 속하지 않습니다.
+      if (r.start) {
+        prev = r.count
+        continue
+      }
       const gi = info[r.ref.section][r.ref.group]
       if (gi.before < 0) gi.before = prev
       gi.rows += 1

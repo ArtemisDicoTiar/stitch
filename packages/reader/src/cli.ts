@@ -5,6 +5,7 @@
  *   pnpm reader private/도안.pdf --record        읽으면서 응답을 data/recordings 에 남기기
  *   pnpm reader fixtures/reading/practice-hood.pdf --replay fixtures/reading/recordings
  *   pnpm reader <pdf> --out private/도안.ir.json  IR을 파일로 저장
+ *   pnpm reader <pdf> --crochet                   코바늘 도안도 끝까지 읽기 (앱에서는 아직 받지 않습니다)
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
@@ -20,7 +21,7 @@ const valueFlags = new Set(['--out', '--model', '--max-feedback', '--replay'])
 const file = args.find((a, i) => !a.startsWith('--') && !valueFlags.has(args[i - 1]))
 
 if (!file || flag('--help')) {
-  console.log('사용법: pnpm reader <도안.pdf> [--record] [--replay <폴더>] [--out <파일.json>] [--model <모델>] [--max-feedback <횟수>]')
+  console.log('사용법: pnpm reader <도안.pdf> [--record] [--replay <폴더>] [--out <파일.json>] [--model <모델>] [--max-feedback <횟수>] [--crochet]')
   process.exit(file ? 0 : 1)
 }
 
@@ -52,6 +53,7 @@ try {
   const r = await readPattern(pdf, {
     llm,
     maxFeedbackRounds: Number(value('--max-feedback') ?? process.env.READER_MAX_FEEDBACK ?? 2),
+    allowCrochet: flag('--crochet'),
     onStage: (s, d) => console.error(`· ${s}${d?.round ? ` (${d.round}회)` : ''}`),
   })
   const e = r.verification.expanded

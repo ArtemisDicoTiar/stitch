@@ -10,8 +10,12 @@ const text = z.string().nullable().describe('이 조각의 원문 표현. 없으
 
 const StitchW = z.object({
   op: z.literal('st'),
-  st: z.string().describe('코 사전의 id (k, p, pat, yo, k2tog, ssk, sk2p, m1l, m1r, co, bo)'),
+  st: z.string().describe('코 사전의 id. 대바늘 예: k, p, pat, yo, k2tog, ssk. 코바늘 예: ch, sc, dc, inc, sc2tog, skip, tch'),
   n: z.number().int().describe('이 코를 몇 번 뜨는지'),
+  into: z
+    .enum(['next', 'one', 'same', 'space'])
+    .nullable()
+    .describe('코바늘에서 코를 넣는 자리. next: 다음 코들에 하나씩, one: n코를 다음 한 코에 모두, same: 방금 뜬 자리에 n코 더, space: 다음 사슬 공간이나 매직링에 n코. 대바늘과, 다음 코에 하나씩 뜨는 보통의 경우는 null'),
   text,
 })
 const MarkerW = z.object({ op: z.literal('marker'), action: z.enum(['place', 'slip', 'remove']), text })
@@ -113,7 +117,7 @@ function toUntil(end: WireEnd): Until | null {
 
 function toOp(w: WireOp | z.infer<typeof Level2> | z.infer<typeof Leaf>): Op {
   const t = w.text ? { text: w.text } : {}
-  if (w.op === 'st') return { st: w.st.trim().toLowerCase(), n: Math.max(1, w.n), ...t }
+  if (w.op === 'st') return { st: w.st.trim().toLowerCase(), n: Math.max(1, w.n), ...(w.into && w.into !== 'next' ? { into: w.into } : {}), ...t }
   if (w.op === 'marker') return { marker: w.action, ...t }
   const body = (w.body as (WireOp | z.infer<typeof Leaf>)[]).map(toOp)
   const until = toUntil(w.end)
@@ -181,7 +185,7 @@ function fromUntil(u: Until): WireEnd {
 
 function fromOp(op: Op, depth: number): WireOp {
   const text = op.text ?? null
-  if ('st' in op) return { op: 'st', st: op.st, n: op.n, text }
+  if ('st' in op) return { op: 'st', st: op.st, n: op.n, into: op.into && op.into !== 'next' ? op.into : null, text }
   if ('marker' in op) return { op: 'marker', action: op.marker, text }
   if (depth >= 3) throw new Error('반복이 세 겹을 넘는 단은 LLM 형식으로 옮길 수 없습니다.')
   const body = op.repeat.map((o) => fromOp(o, depth + 1))

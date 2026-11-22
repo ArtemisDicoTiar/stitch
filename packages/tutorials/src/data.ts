@@ -3,9 +3,8 @@
  * 단계마다 앞 단계의 장면을 복사해 달라진 것만 고쳐 적습니다.
  * 좌표는 720×430 그림 기준입니다.
  */
-import type { SymbolId } from '@stitch/pattern-ir'
 import { npt } from './scene'
-import type { Layer, NeedlePose, SceneSpec, TagSpec, Tutorial, TutorialStep } from './types'
+import type { Layer, NeedlePose, SceneSpec, TagSpec, Tutorial, TutorialId, TutorialStep } from './types'
 
 const clone = <T>(o: T): T => JSON.parse(JSON.stringify(o)) as T
 
@@ -96,7 +95,7 @@ function st(s: SceneSpec, text: string): TutorialStep {
   return { text, left: h.L || SAME, right: h.R || SAME, scene: c }
 }
 
-function tut(id: SymbolId, title: string, summary: string, steps: TutorialStep[]): Tutorial {
+function tut(id: TutorialId, title: string, summary: string, steps: TutorialStep[]): Tutorial {
   return { id, title, label: title.split(' (')[0], summary, steps }
 }
 
@@ -553,7 +552,7 @@ function bindOff(): Tutorial {
 }
 
 /** 기호별 뜨는 법. 순서는 코 사전(KNIT_SYMBOLS)과 같습니다. */
-export const TUTORIALS: Record<SymbolId, Tutorial> = {
+export const TUTORIALS: Record<TutorialId, Tutorial> = {
   K: knit(),
   P: purl(),
   YO: yarnOver(),
