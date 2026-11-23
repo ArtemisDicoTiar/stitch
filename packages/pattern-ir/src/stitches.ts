@@ -83,6 +83,7 @@ export const STITCHES: Record<string, StitchDef> = Object.fromEntries(
     crochet({ id: 'hdc2tog', consumes: 2, produces: 1, keep: 1, height: 2, name: { kr: '긴뜨기 2코 모아뜨기', en: 'hdc2tog' }, abbr: ['hdc2tog'], symbol: 'DC2', face: null }),
     crochet({ id: 'dc2tog', consumes: 2, produces: 1, keep: 1, height: 3, name: { kr: '한길긴뜨기 2코 모아뜨기', en: 'dc2tog' }, abbr: ['dc2tog'], symbol: 'DC2', face: null }),
     crochet({ id: 'dc3tog', consumes: 3, produces: 1, keep: 1, height: 3, name: { kr: '한길긴뜨기 3코 모아뜨기', en: 'dc3tog' }, abbr: ['dc3tog'], symbol: 'DC2', face: null }),
+    crochet({ id: 'scblo', consumes: 1, produces: 1, height: 1, name: { kr: '짧은뜨기 이랑뜨기 (뒤쪽 반코)', en: 'sc in back loop only' }, abbr: ['이랑뜨기', '뒤쪽 반코', 'sc blo', 'blo'], symbol: 'SC', face: null, note: '코 머리의 뒤쪽 가닥에만 뜸. 바닥에서 옆면으로 꺾을 때' }),
     crochet({ id: 'skip', consumes: 1, produces: 0, height: 0, name: { kr: '건너뛰기', en: 'skip' }, abbr: ['건너뛰기', '건너뛰고', 'sk', 'skip', 'miss'], symbol: null, face: null, note: '뜨지 않고 지나가는 코' }),
     crochet({ id: 'tch', consumes: 1, produces: 1, height: 0, name: { kr: '기둥코 (1코로 셈)', en: 'turning chain, counts as a stitch' }, abbr: ['기둥코', '세워뜨기', 'turning chain', 'tch'], symbol: 'CH', face: null, note: '사슬 수와 상관없이 n은 1. 단의 첫 코 자리를 차지합니다' }),
     crochet({ id: 'tch0', consumes: 0, produces: 0, height: 0, name: { kr: '기둥코 (코로 세지 않음)', en: 'turning chain, does not count' }, abbr: ['기둥코', '세워뜨기', 'turning chain'], symbol: null, face: null, note: '사슬 수와 상관없이 n은 1' }),

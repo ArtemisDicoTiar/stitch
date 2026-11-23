@@ -20,7 +20,8 @@ export type { MannequinFit, Vec3 } from './mannequin-dims'
 export type { FlatDetails, GarmentDetails, GarmentOptions, HoodDetails, PieceDetails, RoundDetails } from './templates/types'
 
 /** 지금 3D로 그릴 수 있는 템플릿 */
-export const SUPPORTED_TEMPLATES = ['hood', 'flat', 'round'] as const
+/** tube와 hat은 대바늘로 둘러 뜬 원통과 모자입니다. round와 같은 방법(회전체)으로 그리고, 마네킹에는 아직 입히지 않습니다. */
+export const SUPPORTED_TEMPLATES = ['hood', 'flat', 'round', 'tube', 'hat'] as const
 export type SupportedTemplate = (typeof SUPPORTED_TEMPLATES)[number]
 
 export function supportsTemplate(template: Template | null | undefined): template is SupportedTemplate {
@@ -141,7 +142,7 @@ export function buildGarment(expanded: Expanded, template: Template, opts: Garme
   if (!supportsTemplate(template)) throw new UnsupportedTemplateError(String(template))
   const gauge = normGauge(opts.gauge)
   const rows = collectRows(expanded)
-  const plan: TemplatePlan = template === 'hood' ? planHood(rows, expanded, gauge, opts) : template === 'round' ? planPieces(rows, gauge) : planFlat(rows, gauge)
+  const plan: TemplatePlan = template === 'hood' ? planHood(rows, expanded, gauge, opts) : template === 'flat' ? planFlat(rows, gauge) : planPieces(rows, gauge)
   // 도안은 한 공예로만 뜹니다. 코바늘 기호가 하나라도 있으면 코바늘입니다.
   const craft: Craft = rows.some((r) => r.row.cells.some((c) => c.s in CROCHET_SYMBOL_INDEX)) ? 'crochet' : 'knit'
   const tiles = (craft === 'crochet' ? CROCHET_SYMBOL_INDEX : SYMBOL_INDEX) as Partial<Record<SymbolId, number>>

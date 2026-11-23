@@ -3,7 +3,7 @@
  */
 import { describe, expect, it } from 'vitest'
 import { expand } from '@stitch/engine'
-import { garterScarf, practiceBall, practiceBear, practiceHood, practiceScarf } from '@stitch/fixtures'
+import { garterScarf, practiceBall, practiceBear, practiceHood, practicePouch, practiceScarf } from '@stitch/fixtures'
 import { parsePattern, type Op, type Pattern, type Row, type Section } from '@stitch/pattern-ir'
 import { buildGarment, knittedCount, stitchAt, suggestTemplate, supportsTemplate, symbolOrderOf, type Garment, type RoundDetails } from '../src/garment'
 
@@ -211,6 +211,49 @@ describe('연습용 코바늘 목도리 (평면)', () => {
     const k = buildGarment(expand(garterScarf), 'flat', { gauge: garterScarf.gauge })
     expect(k.craft).toBe('knit')
     expect(k.bbox.size[1]).toBeCloseTo(k.rowCount * (10 / garterScarf.gauge!.rows), 4)
+  })
+})
+
+describe('연습용 코바늘 파우치 (타원 바닥, 닫는 원형단)', () => {
+  const e = expand(practicePouch)
+  const g = build(practicePouch)
+  const d = round(g)
+  const sw = 10 / practicePouch.gauge!.stitches
+
+  it('한 조각이고, 가로가 세로(앞뒤)보다 긴 타원 통이다', () => {
+    expect(g.stitchCount).toBe(e.totalStitches)
+    expect(d.pieces.length).toBe(1)
+    // 곧은 변은 시작 사슬 길이(11코 폭), 그 양 끝에 반원이 붙습니다.
+    expect(g.bbox.size[0] - g.bbox.size[2]).toBeCloseTo(11 * sw, 1)
+    expect(g.bbox.size[0]).toBeGreaterThan(g.bbox.size[2] * 2)
+    // 맨 윗단의 둘레는 코 수 × 코 폭입니다.
+    const last = g.rowCount - 1
+    let perimeter = 0
+    for (let i = g.rowStart[last]; i < g.rowStart[last + 1]; i++) {
+      const q = quad(g, i)
+      perimeter += Math.hypot(q[2][0] - q[3][0], q[2][2] - q[3][2])
+    }
+    expect(perimeter).toBeGreaterThan(32 * sw * 0.97)
+    expect(perimeter).toBeLessThanOrEqual(32 * sw + 1e-6)
+  })
+
+  it('바닥은 평평하고 옆면은 곧게 올라간다', () => {
+    const y = (ri: number) => quad(g, g.rowStart[ri])[2][1]
+    // 옆면 14단이 단 높이(0.5cm)쯤씩 올라갑니다.
+    expect(g.bbox.size[1]).toBeGreaterThan(14 * 0.5 * 0.85)
+    expect(y(2)).toBeLessThan(1.2)
+    for (let ri = 4; ri < g.rowCount; ri++) expect(y(ri) - y(ri - 1)).toBeGreaterThan(0.4)
+  })
+})
+
+describe('대바늘 원통', () => {
+  it('둘러 뜬 대바늘 통도 같은 방법으로 그린다', () => {
+    const tube = parsePattern({ craft: 'knit', terms: 'kr', title: '넥워머', materials: [], gauge: { stitches: 20, rows: 20, over_cm: 10, in_stitch: '메리야스뜨기', tool_mm: 4 }, finished: {}, template: 'tube', finishing: [], sections: [{ id: 'a', name: '통', shape: 'round', start: { kind: 'cast_on', count: 40 }, groups: [{ rows: [{ side: 'round', ops: [{ repeat: [{ st: 'k', n: 1 }], until: 'end' }], text: '' }], repeat: { times: 10 } }] }] })
+    const g = buildGarment(expand(tube), 'tube', { gauge: tube.gauge })
+    expect(g.craft).toBe('knit')
+    expect(g.mannequin).toBeNull()
+    expect(g.bbox.size[0]).toBeCloseTo((40 * 0.5) / Math.PI, 1)
+    expect(g.bbox.size[1]).toBeCloseTo(10 * 0.5, 3)
   })
 })
 

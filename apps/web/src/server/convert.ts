@@ -12,9 +12,9 @@ import { AnthropicLlm, ReaderError, ReplayLlm, readPattern, type CrochetScope, t
 
 /**
  * 코바늘 도안을 어디까지 받는지. 화면(기호 도안, 3D, 뜨는 법)이 준비된 범위만 받습니다.
- * 지금은 매직링에서 시작해 둥글게 뜨는 도안(인형, 소품)과 사슬에서 시작해 왕복으로 뜨는 도안(목도리, 블랭킷)입니다. 올리기 화면의 안내문과 같이 고칩니다.
+ * 지금은 모두 받습니다. 아직 그리지 못하는 기법(구멍 무늬 등)은 확인 화면에서 사람이 보도록 표시됩니다. 올리기 화면의 안내문과 같이 고칩니다.
  */
-export const CROCHET_SCOPE: CrochetScope = 'flat'
+export const CROCHET_SCOPE: CrochetScope = 'all'
 import { getDb, schema } from './db/client'
 import type { JobStage } from './db/schema'
 import { env, repoRoot } from './env'

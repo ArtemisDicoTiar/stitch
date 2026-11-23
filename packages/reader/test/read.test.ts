@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { garterScarf, practiceBall, practiceBear, practiceHood, practiceScarf } from '@stitch/fixtures'
+import { garterScarf, practiceBall, practiceBear, practiceHood, practicePouch, practiceScarf } from '@stitch/fixtures'
 import { parsePattern, type Op, type Pattern, type Section } from '@stitch/pattern-ir'
 import {
   AnthropicLlm,
@@ -293,10 +293,10 @@ describe('코바늘 도안', () => {
     expect(r.verification.expanded.totalRows).toBe(14)
   })
 
-  it('연습용 코바늘 PDF 세 개를 준비해 둔 응답으로 읽으면 직접 쓴 도안과 같다', async () => {
-    for (const [file, want] of [['practice-ball.pdf', practiceBall], ['practice-bear.pdf', practiceBear], ['practice-scarf.pdf', practiceScarf]] as const) {
+  it('연습용 코바늘 PDF 네 개를 준비해 둔 응답으로 읽으면 직접 쓴 도안과 같다', async () => {
+    for (const [file, want] of [['practice-ball.pdf', practiceBall], ['practice-bear.pdf', practiceBear], ['practice-scarf.pdf', practiceScarf], ['practice-pouch.pdf', practicePouch]] as const) {
       const bytes = new Uint8Array(readFileSync(join(root, 'fixtures/reading', file)))
-      const r = await readPattern(bytes, { llm: new ReplayLlm(recordings), crochet: 'flat' })
+      const r = await readPattern(bytes, { llm: new ReplayLlm(recordings), crochet: 'all' })
       expect(withoutSource(r.pattern), file).toEqual(want)
       expect(r.verification.ok, file).toBe(true)
       expect(r.feedbackRounds).toBe(0)

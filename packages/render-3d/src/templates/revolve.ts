@@ -47,15 +47,26 @@ export function planRevolve(rows: RowInfo[], sw: number, rh: number): PiecePlan 
   // 단 경계 0..m 에서의 반지름과 높이
   const R = new Float64Array(m + 1)
   const Y = new Float64Array(m + 1)
-  const radiusOf = (count: number) => (Math.max(1, count) * sw) / TAU
+  // 타원 바닥: 사슬을 둘러 뜨면 단면이 원이 아니라 긴 원(곧은 변 둘과 반원 둘)입니다.
+  // 곧은 변의 길이는 시작 사슬의 길이이고, 둘레에서 곧은 변을 뺀 나머지가 반원이 됩니다.
+  const chain = m > 0 && rows[0].row.start === 'chain' ? rows[0].row.count : 0
+  const straight = chain > 1 ? (chain - 1) * sw : 0
+  /** 경계 j에서의 곧은 변 길이. 둘레가 짧으면 그만큼 줄입니다. */
+  const S = new Float64Array(m + 1)
+  const radiusOf = (count: number, j: number) => {
+    const perimeter = Math.max(1, count) * sw
+    S[j] = Math.min(straight, perimeter * 0.48)
+    return Math.max(sw * 0.02, (perimeter - 2 * S[j]) / TAU)
+  }
   if (m > 0) {
-    const first = radiusOf(rows[0].row.count)
+    // 시작 사슬 단은 위아래 양쪽으로 뜨이므로 둘레가 사슬 길이의 두 배입니다.
+    const first = radiusOf(chain > 1 ? chain * 2 - 2 : rows[0].row.count, 0)
     // 매직링은 한 점에서 시작합니다. 그 밖에는 처음부터 그 둘레의 원통입니다.
     R[0] = rows[0].row.opens === 'ring' ? Math.min(first, sw * 0.12) : first
   }
   /** 단마다 옆선을 따라 나아가는 길이 */
   const along = Float64Array.from(factor, (f) => rh * f)
-  for (let i = 0; i < m; i++) R[i + 1] = radiusOf(rows[i].row.count)
+  for (let i = 0; i < m; i++) R[i + 1] = radiusOf(i === 0 && chain > 1 ? chain * 2 - 2 : rows[i].row.count, i + 1)
   // 매직링에 뜬 첫 단은 링을 조이면 납작하게 눕습니다. 단 높이만큼 서 있다고 보면 끝이 뾰족해집니다.
   if (m > 0 && rows[0].row.opens === 'ring') along[0] = Math.min(along[0], Math.max(sw * 0.05, R[1] - R[0]))
   for (let i = 0; i < m; i++) {
@@ -128,18 +139,60 @@ export function planRevolve(rows: RowInfo[], sw: number, rh: number): PiecePlan 
     corner(local, c, top, pos, nrm) {
       const n = Math.max(1, rows[local].n)
       const j = local + (top ? 1 : 0)
-      // 단의 시작(이음 자리)을 뒤쪽에 둡니다. 겉이 바깥을 보도록 각이 커지는 쪽으로 돕니다.
-      const a = -Math.PI / 2 + (TAU * c) / n
-      const cos = Math.cos(a)
-      const sin = Math.sin(a)
-      pos[0] = R[j] * cos
+      // 단의 시작(이음 자리)을 뒤쪽 가운데에 둡니다. 겉이 바깥을 보도록 각이 커지는 쪽으로 돕니다.
+      const r = R[j]
+      const st = S[j]
+      let x: number
+      let z: number
+      let ox: number
+      let oz: number
+      if (st <= 1e-9) {
+        const a = -Math.PI / 2 + (TAU * c) / n
+        ox = Math.cos(a)
+        oz = Math.sin(a)
+        x = r * ox
+        z = r * oz
+      } else {
+        // 긴 원의 둘레를 따라 걷습니다: 뒤쪽 곧은 변 절반 → 오른쪽 반원 → 앞쪽 곧은 변 → 왼쪽 반원 → 뒤쪽 곧은 변 절반
+        const cap = Math.PI * r
+        let d = ((c / n) % 1) * (2 * st + 2 * cap)
+        if (d < st / 2) {
+          x = d
+          z = -r
+          ox = 0
+          oz = -1
+        } else if ((d -= st / 2) < cap) {
+          const a = -Math.PI / 2 + d / r
+          ox = Math.cos(a)
+          oz = Math.sin(a)
+          x = st / 2 + r * ox
+          z = r * oz
+        } else if ((d -= cap) < st) {
+          x = st / 2 - d
+          z = r
+          ox = 0
+          oz = 1
+        } else if ((d -= st) < cap) {
+          const a = Math.PI / 2 + d / r
+          ox = Math.cos(a)
+          oz = Math.sin(a)
+          x = -st / 2 + r * ox
+          z = r * oz
+        } else {
+          x = -st / 2 + (d - cap)
+          z = -r
+          ox = 0
+          oz = -1
+        }
+      }
+      pos[0] = x
       pos[1] = Y[j]
-      pos[2] = R[j] * sin
-      nrm[0] = bnr[j] * cos
+      pos[2] = z
+      nrm[0] = bnr[j] * ox
       nrm[1] = bny[j]
-      nrm[2] = bnr[j] * sin
+      nrm[2] = bnr[j] * oz
     },
-    width: maxR * 2,
+    width: Math.max(...Array.from(R, (r, j) => r * 2 + S[j])),
     height: Math.max(0, ...Y),
     kind: 'round',
     maxRadius: maxR,

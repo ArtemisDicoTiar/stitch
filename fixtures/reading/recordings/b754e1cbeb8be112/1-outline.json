@@ -1,0 +1,78 @@
+{
+ "kind": "outline",
+ "note": "손으로 만든 대역입니다. 실제 LLM 응답을 녹화한 것이 아닙니다.",
+ "promptVersion": "2026-11-22.3",
+ "model": "hand-written",
+ "usage": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation_input_tokens": 0
+ },
+ "output": {
+  "craft": "crochet",
+  "terms": "kr",
+  "title": "연습용 코바늘 파우치",
+  "materials": [
+   {
+    "kind": "실",
+    "spec": "굵은 면사",
+    "qty": "약 60g"
+   },
+   {
+    "kind": "바늘",
+    "spec": "4mm 코바늘",
+    "qty": null
+   },
+   {
+    "kind": "부자재",
+    "spec": "돗바늘",
+    "qty": null
+   }
+  ],
+  "gauge": {
+   "stitches": 18,
+   "rows": 20,
+   "in_stitch": "짧은뜨기",
+   "tool_mm": 4
+  },
+  "finished": {
+   "width_cm": 12,
+   "height_cm": 8
+  },
+  "template": "round",
+  "sections": [
+   {
+    "id": "base",
+    "name": "바닥",
+    "shape": "round",
+    "start": {
+     "kind": "chain",
+     "count": 12,
+     "from": null
+    },
+    "multiple": null,
+    "copies": 1
+   },
+   {
+    "id": "side",
+    "name": "옆면",
+    "shape": "round",
+    "start": {
+     "kind": "continue",
+     "count": 32,
+     "from": "base"
+    },
+    "multiple": null,
+    "copies": 1
+   }
+  ],
+  "finishing": [
+   {
+    "name": "실 정리",
+    "text": "실을 잘라 마지막 고리로 빼내고 돗바늘로 숨깁니다."
+   }
+  ],
+  "unclear": []
+ }
+}

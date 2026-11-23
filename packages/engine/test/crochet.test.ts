@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { practiceBall, practiceBallExpected, practiceBear, practiceBearExpected, practiceHood, practiceScarf, practiceScarfExpected } from '@stitch/fixtures'
+import { practiceBall, practiceBallExpected, practiceBear, practiceBearExpected, practiceHood, practicePouch, practiceScarf, practiceScarfExpected } from '@stitch/fixtures'
 import { parsePattern, type Op, type Pattern, type Row, type Section } from '@stitch/pattern-ir'
 import { allRows, describeOp, expand, normalizeStarts, progressFraction, regauge, setTurningChains, stitchesDone, turningChains, verify } from '../src'
 
@@ -413,6 +413,31 @@ describe('기둥코를 코로 세는지 바꾸기', () => {
     const wrong = setTurningChains(p, 0, false)
     expect(verify(wrong).errors.map((e) => e.code)).toContain('leftover')
     expect(verify(setTurningChains(wrong, 0, true)).ok).toBe(true)
+  })
+})
+
+describe('연습용 코바늘 파우치 (직접 쓴 도안: 타원 바닥, 닫는 원형단)', () => {
+  const v = verify(parsePattern(practicePouch))
+  const rows = allRows(v.expanded)
+
+  it('사슬을 둘러 떠서 12코 사슬에서 26코가 되고, 옆면은 32코로 올라간다', () => {
+    expect(v.errors).toEqual([])
+    expect(v.warnings).toEqual([])
+    expect(rows.map((r) => r.count)).toEqual([12, 26, 32, ...Array(14).fill(32)])
+    expect(rows[0]).toMatchObject({ start: 'chain', opens: 'chain', side: 'round' })
+    expect(rows[0].cells.length).toBe(12)
+    // 이어 뜨는 옆면은 바닥과 같은 조각입니다.
+    expect(new Set(rows.map((r) => r.piece ?? 0)).size).toBe(1)
+  })
+
+  it('사슬 수가 틀리면 첫 단에서 드러난다', () => {
+    const wrong: Pattern = structuredClone(practicePouch)
+    wrong.sections[0].start.count = 13
+    expect(verify(wrong).errors.map((e) => e.code)).toContain('leftover')
+  })
+
+  it('왕복으로 뜨는 시작 사슬은 둘러 뜨지 않는다 (뜰 자리가 사슬 수와 같다)', () => {
+    expect(allRows(verify(practiceScarf).expanded)[1].cells.length).toBe(24)
   })
 })
 

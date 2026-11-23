@@ -232,7 +232,11 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
       cols.push(new Col('K', g, 'ring'))
     } else {
       const kind: ColKind = crochet && start.kind === 'chain' ? 'ch' : 'st'
-      for (let i = 0; i < start.count; i++) cols.push(new Col('K', g, kind))
+      // 사슬에서 시작해 둥글게 뜨면(타원 바닥) 사슬의 위쪽을 따라간 뒤 돌아서 아래쪽도 뜹니다.
+      // 양 끝의 사슬은 한 번씩만 쓰이므로 뜰 자리는 2n - 1 곳입니다.
+      const around = crochet && start.kind === 'chain' && section.shape !== 'flat' && start.count > 1
+      const n = around ? start.count * 2 - 1 : start.count
+      for (let i = 0; i < n; i++) cols.push(new Col('K', g, kind))
     }
     block = { name: section.id, cols, rows: [] }
     blocks.push(block)
@@ -256,7 +260,8 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
       // 평면에서는 사슬을 뜨고 돌려서 첫 단을 뜹니다. 그래서 사슬 단은 첫 단의 반대쪽 면입니다.
       const firstSide = section.groups[0]?.rows[0]?.side
       const side: Side = !flat ? 'round' : firstSide === 'WS' ? 'RS' : 'WS'
-      const cols = side === 'WS' ? [...b.cols].reverse() : [...b.cols]
+      // 둘러 뜨는 시작 사슬은 뜰 자리가 사슬 수보다 많습니다. 사슬 단에는 사슬 수만큼만 그립니다.
+      const cols = (side === 'WS' ? [...b.cols].reverse() : [...b.cols]).slice(0, start.count)
       g += 1
       b.rows.push({
         g,

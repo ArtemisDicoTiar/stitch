@@ -18,6 +18,7 @@ import type { Pattern } from '@stitch/pattern-ir'
 import { practiceBall } from './practice-ball'
 import { practiceBear } from './practice-bear'
 import { practiceHood } from './practice-hood'
+import { practicePouch } from './practice-pouch'
 import { practiceScarf } from './practice-scarf'
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -116,6 +117,11 @@ const FIXTURES: Fixture[] = [
     slug: 'practice-bear',
     pattern: practiceBear,
     intro: '머리, 몸통, 팔, 귀를 따로 떠서 잇는 작은 곰 인형입니다. 모든 조각은 매직링에서 시작해 단을 잇지 않고 나선으로 뜹니다.',
+  },
+  {
+    slug: 'practice-pouch',
+    pattern: practicePouch,
+    intro: '사슬의 양쪽을 돌며 타원 바닥을 뜨고, 단마다 첫 코에 빼뜨기로 닫으며 옆면을 올리는 작은 파우치입니다. 단을 시작하는 사슬 1코는 코로 세지 않습니다.',
   },
   {
     slug: 'practice-scarf',

@@ -1,0 +1,251 @@
+{
+ "kind": "rows",
+ "note": "손으로 만든 대역입니다. 실제 LLM 응답을 녹화한 것이 아닙니다.",
+ "promptVersion": "2026-11-22.3",
+ "model": "hand-written",
+ "usage": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation_input_tokens": 0
+ },
+ "output": {
+  "sections": [
+   {
+    "id": "base",
+    "groups": [
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "1단: 사슬 13코. 바늘에서 2번째 사슬부터 짧은뜨기 11코, 마지막 사슬에 3코, 반대쪽으로 돌아 짧은뜨기 10코, 마지막 사슬에 2코, 첫 코에 빼뜨기 (26코)",
+        "expect_count": 26,
+        "ops": [
+         {
+          "op": "st",
+          "st": "tch0",
+          "n": 1,
+          "into": null,
+          "text": "사슬 1코 (기둥코, 세지 않음)"
+         },
+         {
+          "op": "st",
+          "st": "sc",
+          "n": 11,
+          "into": null,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "sc",
+          "n": 3,
+          "into": "one",
+          "text": "한 코에 짧은뜨기 3코"
+         },
+         {
+          "op": "st",
+          "st": "sc",
+          "n": 10,
+          "into": null,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "sc",
+          "n": 2,
+          "into": "one",
+          "text": "한 코에 짧은뜨기 2코"
+         },
+         {
+          "op": "st",
+          "st": "join",
+          "n": 1,
+          "into": null,
+          "text": "첫 코에 빼뜨기"
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "2단: 사슬 1코, 늘림 1, 짧은뜨기 10, 늘림 3, 짧은뜨기 10, 늘림 2, 빼뜨기 (32코)",
+        "expect_count": 32,
+        "ops": [
+         {
+          "op": "st",
+          "st": "tch0",
+          "n": 1,
+          "into": null,
+          "text": "사슬 1코 (기둥코, 세지 않음)"
+         },
+         {
+          "op": "st",
+          "st": "inc",
+          "n": 1,
+          "into": null,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "sc",
+          "n": 10,
+          "into": null,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "inc",
+          "n": 3,
+          "into": null,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "sc",
+          "n": 10,
+          "into": null,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "inc",
+          "n": 2,
+          "into": null,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "join",
+          "n": 1,
+          "into": null,
+          "text": "첫 코에 빼뜨기"
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     }
+    ]
+   },
+   {
+    "id": "side",
+    "groups": [
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "3단: 사슬 1코, 모든 코의 뒤쪽 반코에 짧은뜨기 (이랑뜨기), 빼뜨기 (32코)",
+        "expect_count": 32,
+        "ops": [
+         {
+          "op": "st",
+          "st": "tch0",
+          "n": 1,
+          "into": null,
+          "text": "사슬 1코 (기둥코, 세지 않음)"
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "scblo",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": "끝까지 이랑뜨기"
+         },
+         {
+          "op": "st",
+          "st": "join",
+          "n": 1,
+          "into": null,
+          "text": "첫 코에 빼뜨기"
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "4~16단: 사슬 1코, 모든 코에 짧은뜨기, 빼뜨기 (32코)",
+        "expect_count": 32,
+        "ops": [
+         {
+          "op": "st",
+          "st": "tch0",
+          "n": 1,
+          "into": null,
+          "text": "사슬 1코 (기둥코, 세지 않음)"
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "sc",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": "끝까지 짧은뜨기"
+         },
+         {
+          "op": "st",
+          "st": "join",
+          "n": 1,
+          "into": null,
+          "text": "첫 코에 빼뜨기"
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 13,
+       "cm": 0,
+       "from": ""
+      }
+     }
+    ]
+   }
+  ]
+ }
+}

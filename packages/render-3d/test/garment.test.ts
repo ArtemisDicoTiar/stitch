@@ -345,8 +345,10 @@ describe('템플릿 고르기', () => {
   it('supportsTemplate은 실제로 그릴 수 있는 것만 참이다', () => {
     expect(supportsTemplate('hood')).toBe(true)
     expect(supportsTemplate('flat')).toBe(true)
-    expect(supportsTemplate('tube')).toBe(false)
-    expect(supportsTemplate('hat')).toBe(false)
+    // 원통과 모자는 둥근 조각과 같은 방법으로 그립니다.
+    expect(supportsTemplate('tube')).toBe(true)
+    expect(supportsTemplate('hat')).toBe(true)
+    expect(supportsTemplate('round')).toBe(true)
     expect(supportsTemplate('none')).toBe(false)
     expect(supportsTemplate(undefined)).toBe(false)
     const e = expand(garterScarf)

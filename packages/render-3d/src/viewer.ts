@@ -484,8 +484,8 @@ export function createViewer(canvas: HTMLCanvasElement, opts: ViewerOptions): Vi
       radius = Math.max(radius, ((top - bottom) / 2) * 1.15)
       homeTarget.set(0, (top + bottom) / 2, 0)
     }
-    // 마네킹이 없으면 편물이 화면을 더 채우게 다가갑니다.
-    homeDistance = ((fit ? 1.3 : 1.0) * radius) / Math.sin(THREE.MathUtils.degToRad(FOV / 2))
+    // 마네킹 없이 보는 둥근 조각은 편물이 화면을 더 채우게 조금 다가갑니다.
+    homeDistance = ((fit || garment.template === 'flat' ? 1.3 : 1.12) * radius) / Math.sin(THREE.MathUtils.degToRad(FOV / 2))
     camera.near = Math.max(0.1, homeDistance / 200)
     camera.far = homeDistance * 12
     camera.updateProjectionMatrix()
