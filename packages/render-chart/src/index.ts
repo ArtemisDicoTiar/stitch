@@ -28,6 +28,8 @@ export type {
 } from './layout'
 
 export { renderChartSvg, renderLayoutSvg } from './render'
+export { hasPolarPieces, polarLayout, renderPolarSvg } from './polar'
+export type { PolarColors, PolarLayout, PolarOptions, PolarPiece } from './polar'
 
 export { cellOutlineSvg, moveCursor, progressOverlaySvg, ringsOverlaySvg, selectionCell, workingPosition } from './overlay'
 export type { ChartRing, ChartSelection, CursorMove } from './overlay'

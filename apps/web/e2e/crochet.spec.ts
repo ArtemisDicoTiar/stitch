@@ -106,6 +106,22 @@ test.describe.serial('코바늘 예시 도안', () => {
     await expect(badge).toHaveAttribute('data-row', '5')
     await page.unroute('**/api/patterns/*/progress')
 
+    // 원형 도안으로 바꿔 볼 수 있습니다. 뜬 곳까지 선명하고, 격자로 돌아오면 다시 칸을 누를 수 있습니다.
+    await page.getByRole('button', { name: '원형 도안' }).click()
+    const polar = page.getByTestId('polar-chart')
+    await expect(polar.locator('svg')).toBeVisible()
+    await expect(polar.locator('.pc-done use')).toHaveCount(6 + 12 + 18 + 24)
+    await expect(polar.locator('.pc-todo use')).toHaveCount(300 - 60)
+    await expect(page.locator('#panel-chart .sc-base svg')).toBeHidden()
+    await expect(page.getByText('원형 도안은 보기 전용이라')).toBeVisible()
+    await page.getByRole('button', { name: '격자 도안' }).click()
+    await expect(page.locator('#panel-chart .sc-base svg')).toBeVisible()
+    await expect(polar).toHaveCount(0)
+
+    // 뜨는 법: 이 도안에 필요한 코바늘 동작만, 배우는 순서로
+    await page.getByRole('tab', { name: '기호별 뜨는 법' }).click()
+    await expect(page.locator('#panel-howto').getByRole('tab')).toHaveText(['매직링', '짧은뜨기', '늘림', '줄임'])
+
     // 단계별 안내
     await page.getByRole('tab', { name: '단계별 안내' }).click()
     await expect(page.getByTestId('step-row')).toContainText('5단')

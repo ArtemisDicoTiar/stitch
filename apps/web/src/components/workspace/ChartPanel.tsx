@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { rowAt } from '@stitch/engine'
 import type { Craft, Expanded, SymbolId } from '@stitch/pattern-ir'
-import { SYMBOLS, symbolSvg, type ChartPick, type ChartRing } from '@stitch/render-chart'
+import { SYMBOLS, hasPolarPieces, renderPolarSvg, symbolSvg, type ChartPick, type ChartRing } from '@stitch/render-chart'
 import { tutorialFor } from '@stitch/tutorials'
 import { ChartView, type ChartViewHandle, type ChartViewOptions } from '@/components/knit/ChartView'
 import { sectionText, sideFrom, sideName, workingPos, type Pos } from './position'
@@ -40,6 +40,11 @@ export function ChartPanel({ expanded, craft, symbols, shown, saved, rings, pick
   const card = useRef<HTMLDivElement>(null)
   const [zoom, setZoom] = useState(1)
   const [full, setFull] = useState(false)
+  /** 둘러 뜬 조각이 있으면 원형 도안으로도 볼 수 있습니다. 원형 도안은 보기 전용입니다. */
+  const canPolar = useMemo(() => hasPolarPieces(expanded), [expanded])
+  const [view, setView] = useState<'grid' | 'polar'>('grid')
+  const polar = canPolar && view === 'polar'
+  const polarSvg = useMemo(() => (polar ? renderPolarSvg(expanded, { progress: workingPos(expanded, shown), cell: 16, title: '원형 기호 도안' }) : ''), [polar, expanded, shown])
   const jumped = useRef(false)
   // 휴대폰에서는 칸이 손가락으로 누를 만한 크기로 시작합니다. 넓은 화면은 가로에 맞춥니다.
   const options = useMemo<ChartViewOptions>(() => ({ controls: false, height: 'fill', ...(typeof window !== 'undefined' && window.innerWidth < 700 ? { zoom: 1 } : {}) }), [])
@@ -188,7 +193,31 @@ export function ChartPanel({ expanded, craft, symbols, shown, saved, rings, pick
 
   return (
     <div className={styles.chartPane} data-full={full || undefined}>
-      <div className={styles.toolbar} role="toolbar" aria-label="도안 확대와 축소">
+      {canPolar && (
+        <div className={styles.toolbar} role="group" aria-label="도안 모양">
+          <button type="button" className={styles.toolBtn} aria-pressed={!polar} onClick={() => setView('grid')}>
+            격자 도안
+          </button>
+          <button
+            type="button"
+            className={styles.toolBtn}
+            aria-pressed={polar}
+            onClick={() => {
+              onPick(null)
+              setView('polar')
+            }}
+          >
+            원형 도안
+          </button>
+        </div>
+      )}
+      {polar && (
+        <>
+          <div className={styles.polarBox} data-testid="polar-chart" dangerouslySetInnerHTML={{ __html: polarSvg }} />
+          <p className={styles.note}>가운데가 1단이고 바깥으로 갈수록 뒤의 단이에요. 아래쪽에서 시작해 시계 반대 방향으로 읽습니다. 원형 도안은 보기 전용이라, 칸을 눌러 기록하려면 격자 도안으로 바꿔 주세요.</p>
+        </>
+      )}
+      <div className={styles.toolbar} role="toolbar" aria-label="도안 확대와 축소" hidden={polar}>
         <button type="button" className={styles.toolBtn} aria-label="축소" onClick={() => chart.current?.setZoom((chart.current?.getZoom() ?? 1) / 1.5)}>
           −
         </button>
@@ -219,7 +248,7 @@ export function ChartPanel({ expanded, craft, symbols, shown, saved, rings, pick
         </button>
       </div>
 
-      <div className={styles.chartBox} ref={box}>
+      <div className={styles.chartBox} ref={box} hidden={polar}>
         <ChartView
           ref={chart}
           className={styles.chartHost}
@@ -274,7 +303,7 @@ export function ChartPanel({ expanded, craft, symbols, shown, saved, rings, pick
         )}
       </div>
 
-      <p className={styles.note}>칸을 누르면 그 코까지 뜬 것으로 기록하거나 단수링을 달 수 있어요. 두 손가락이나 Ctrl + 휠로 확대하고 축소합니다. 끌어서 옮겨 볼 수 있어요.</p>
+      <p className={styles.note} hidden={polar}>칸을 누르면 그 코까지 뜬 것으로 기록하거나 단수링을 달 수 있어요. 두 손가락이나 Ctrl + 휠로 확대하고 축소합니다. 끌어서 옮겨 볼 수 있어요.</p>
 
       <div className={styles.readNote}>
         <h3 className={styles.h3}>도안 읽는 법</h3>

@@ -398,3 +398,9 @@
   .countPill { margin-left: 0; }
   .sectionTitle { font-size: 20px; }
 }
+
+/* 원형 기호 도안: 넓으면 옆으로 밀어 봅니다. */
+.polarBox { overflow: auto; max-height: 78vh; border: 1px solid var(--line); border-radius: var(--r-lg); background: #fffdf9; padding: 8px; }
+.polarBox svg { display: block; margin: 0 auto; max-width: none; }
+.toolbar[hidden], .chartBox[hidden], .note[hidden] { display: none; }
+
