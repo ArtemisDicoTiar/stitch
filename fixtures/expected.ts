@@ -21,6 +21,13 @@ export const practiceBallExpected = {
   symbols: ['SC', 'SC2'],
 }
 
+export const practiceScarfExpected = {
+  /** 시작 사슬 단 1 + 뜨는 단 80 */
+  totalRows: 81,
+  chain: 26,
+  stitches: 24,
+}
+
 export const practiceBearExpected = {
   /** 머리 14 + 몸통 13 + 팔 8 × 2 + 귀 3 × 2 */
   totalRows: 49,

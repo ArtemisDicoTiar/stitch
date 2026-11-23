@@ -468,8 +468,8 @@ function countDecreases(ops: Pattern['sections'][number]['groups'][number]['rows
 export function suggestTemplate(pattern: Pattern): Template {
   if (pattern.template) return pattern.template
   if (pattern.sections.length === 0) return 'none'
-  // 코바늘: 둥글게 뜨는 구간이 있으면 조각별로 그립니다. 왕복으로만 뜨는 도안은 아직 그리지 않습니다.
-  if (pattern.craft === 'crochet') return pattern.sections.some((s) => s.shape !== 'flat') ? 'round' : 'none'
+  // 코바늘: 둥글게 뜨는 구간이 있으면 조각별로, 왕복으로만 뜨면 평면으로 그립니다.
+  if (pattern.craft === 'crochet') return pattern.sections.some((s) => s.shape !== 'flat') ? 'round' : 'flat'
   if (pattern.craft !== 'knit') return 'none'
 
   const shapes = pattern.sections.map((s) => s.shape)

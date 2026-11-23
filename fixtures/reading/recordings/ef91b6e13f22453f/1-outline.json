@@ -1,0 +1,69 @@
+{
+ "kind": "outline",
+ "note": "손으로 만든 대역입니다. 실제 LLM 응답을 녹화한 것이 아닙니다.",
+ "promptVersion": "2026-11-22.3",
+ "model": "hand-written",
+ "usage": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation_input_tokens": 0
+ },
+ "output": {
+  "craft": "crochet",
+  "terms": "kr",
+  "title": "연습용 코바늘 목도리",
+  "materials": [
+   {
+    "kind": "실",
+    "spec": "굵은 울 혼방사",
+    "qty": "약 120g"
+   },
+   {
+    "kind": "바늘",
+    "spec": "5mm 코바늘",
+    "qty": null
+   },
+   {
+    "kind": "부자재",
+    "spec": "돗바늘",
+    "qty": null
+   }
+  ],
+  "gauge": {
+   "stitches": 16,
+   "rows": 8,
+   "in_stitch": "한길긴뜨기",
+   "tool_mm": 5
+  },
+  "finished": {
+   "width_cm": 15,
+   "height_cm": 100
+  },
+  "template": "flat",
+  "sections": [
+   {
+    "id": "body",
+    "name": "목도리",
+    "shape": "flat",
+    "start": {
+     "kind": "chain",
+     "count": 26,
+     "from": null
+    },
+    "multiple": {
+     "of": 1,
+     "plus": 2
+    },
+    "copies": 1
+   }
+  ],
+  "finishing": [
+   {
+    "name": "실 정리",
+    "text": "실을 15cm 남기고 잘라 마지막 고리로 빼낸 뒤, 돗바늘로 편물 속에 숨깁니다."
+   }
+  ],
+  "unclear": []
+ }
+}

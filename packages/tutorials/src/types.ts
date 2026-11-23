@@ -137,9 +137,9 @@ export type TutorialStep = {
 }
 
 /**
- * 코바늘 뜨는 법의 열쇠. 기호(CH, SL, SC, SC2)와, 기호가 아닌 동작(RING 매직링, INC 늘림)이 섞여 있습니다.
+ * 코바늘 뜨는 법의 열쇠. 기호(CH, SL, SC, SC2, HDC, DC, TR)와, 기호가 아닌 동작(RING 매직링, INC 늘림, TURN 기둥코 세우고 돌리기)이 섞여 있습니다.
  */
-export type CrochetTutorialId = 'RING' | 'CH' | 'SC' | 'INC' | 'SC2' | 'SL'
+export type CrochetTutorialId = 'RING' | 'CH' | 'SC' | 'INC' | 'SC2' | 'SL' | 'HDC' | 'DC' | 'TR' | 'TURN'
 
 /** 뜨는 법의 열쇠. 대바늘은 기호와 같고, 코바늘은 기호가 아닌 동작도 있어 기호 목록과 따로 둡니다. */
 export type TutorialId = KnitSymbolId | CrochetTutorialId

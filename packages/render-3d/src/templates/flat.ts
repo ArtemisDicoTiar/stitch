@@ -6,7 +6,7 @@
  * 마네킹에는 입히지 않습니다.
  */
 import type { GaugeSize } from '@stitch/pattern-ir'
-import type { RowInfo, TemplatePlan } from './types'
+import { rowFactors, type RowInfo, type TemplatePlan } from './types'
 
 export function planFlat(rows: RowInfo[], gauge: GaugeSize): TemplatePlan {
   const sw = 10 / gauge.stitches
@@ -45,18 +45,24 @@ export function planFlat(rows: RowInfo[], gauge: GaugeSize): TemplatePlan {
   })
   const recentre = seen ? (lo + hi) / 2 : 0
 
+  // 단마다의 높이. 코바늘은 코에 따라 단 높이가 다릅니다 (사슬 단은 낮고, 한길긴뜨기 단은 짧은뜨기 단보다 높습니다).
+  // 게이지의 단 수는 그 편물에서 가장 흔한 코로 잰 것으로 봅니다. 대바늘 단에는 높이가 없어 모두 같습니다.
+  const factor = rowFactors(rows)
+  const y = new Float64Array(rows.length + 1)
+  for (let i = 0; i < rows.length; i++) y[i + 1] = y[i] + rh * factor[i]
+
   return {
     corner(ri, c, top, pos, nrm) {
       const n = rows[ri].n
       // c = 0이 도안의 오른쪽 끝
       pos[0] = (mid[ri] - recentre + n / 2 - c) * sw
-      pos[1] = (ri + (top ? 1 : 0)) * rh
+      pos[1] = y[ri + (top ? 1 : 0)]
       pos[2] = 0
       nrm[0] = 0
       nrm[1] = 0
       nrm[2] = 1
     },
     mannequin: null,
-    details: { template: 'flat', stitchWidth: sw, rowHeight: rh, width: widest * sw, height: rows.length * rh },
+    details: { template: 'flat', stitchWidth: sw, rowHeight: rh, width: widest * sw, height: y[rows.length] },
   }
 }

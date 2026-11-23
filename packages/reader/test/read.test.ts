@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { garterScarf, practiceBall, practiceBear, practiceHood } from '@stitch/fixtures'
+import { garterScarf, practiceBall, practiceBear, practiceHood, practiceScarf } from '@stitch/fixtures'
 import { parsePattern, type Op, type Pattern, type Section } from '@stitch/pattern-ir'
 import {
   AnthropicLlm,
@@ -293,10 +293,10 @@ describe('코바늘 도안', () => {
     expect(r.verification.expanded.totalRows).toBe(14)
   })
 
-  it('연습용 코바늘 PDF 두 개를 준비해 둔 응답으로 읽으면 직접 쓴 도안과 같다', async () => {
-    for (const [file, want] of [['practice-ball.pdf', practiceBall], ['practice-bear.pdf', practiceBear]] as const) {
+  it('연습용 코바늘 PDF 세 개를 준비해 둔 응답으로 읽으면 직접 쓴 도안과 같다', async () => {
+    for (const [file, want] of [['practice-ball.pdf', practiceBall], ['practice-bear.pdf', practiceBear], ['practice-scarf.pdf', practiceScarf]] as const) {
       const bytes = new Uint8Array(readFileSync(join(root, 'fixtures/reading', file)))
-      const r = await readPattern(bytes, { llm: new ReplayLlm(recordings), crochet: 'rounds' })
+      const r = await readPattern(bytes, { llm: new ReplayLlm(recordings), crochet: 'flat' })
       expect(withoutSource(r.pattern), file).toEqual(want)
       expect(r.verification.ok, file).toBe(true)
       expect(r.feedbackRounds).toBe(0)
@@ -327,6 +327,9 @@ describe('코바늘: 받는 범위', () => {
     expect(outOfScope(outline('crochet', sec('spiral', 'ring'), sec('flat', 'chain')), 'rounds')).not.toBeNull()
     expect(outOfScope(outline('crochet', sec('round', 'chain')), 'rounds')).not.toBeNull()
     expect(outOfScope(outline('crochet', sec('flat', 'chain')), 'all')).toBeNull()
+    // flat은 사슬에서 시작해 왕복으로 뜨는 구간까지 받고, 사슬에서 시작해 둥글게 뜨는 구간은 아직 받지 않습니다.
+    expect(outOfScope(outline('crochet', sec('flat', 'chain'), sec('spiral', 'ring')), 'flat')).toBeNull()
+    expect(outOfScope(outline('crochet', sec('round', 'chain')), 'flat')).toContain('타원 바닥')
     expect(outOfScope(outline('crochet', sec('spiral', 'ring')), 'none')).toContain('아직 준비 중')
   })
 })

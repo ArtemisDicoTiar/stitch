@@ -107,3 +107,26 @@ export const smooth = (a: number, b: number, x: number): number => {
   const t = clamp((x - a) / (b - a), 0, 1)
   return t * t * (3 - 2 * t)
 }
+
+/** 사슬만 뜬 단처럼 높이가 없는 단이 차지하는 높이 (단 높이에 대한 비율) */
+const THIN_ROW = 0.4
+
+/**
+ * 단마다의 높이 비율. 그 편물에서 가장 흔한 코의 높이를 1로 봅니다 (게이지의 단 수를 그 코로 쟀다고 봅니다).
+ * 대바늘 단에는 높이가 없어 모두 1입니다.
+ */
+export function rowFactors(rows: RowInfo[]): number[] {
+  const hs = rows.map((r) => r.row.h)
+  const seen = new Map<number, number>()
+  for (const h of hs) if (h !== undefined && h > 0) seen.set(h, (seen.get(h) ?? 0) + 1)
+  let base = 1
+  let most = 0
+  for (const [h, n] of seen) {
+    if (n > most) {
+      most = n
+      base = h
+    }
+  }
+  return hs.map((h) => (h === undefined ? 1 : h <= 0 ? THIN_ROW : h / base))
+}
+

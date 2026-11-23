@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { reinterpretTerms, verify } from '@stitch/engine'
+import { reinterpretTerms, setTurningChains, turningChains, verify } from '@stitch/engine'
 import type { Pattern, Row, Template } from '@stitch/pattern-ir'
 import { ApiError, apiFetch } from '@/lib/api'
 import type { JobView } from '@/server/job-view'
@@ -456,6 +456,19 @@ export function ReviewClient({ pattern, job }: { pattern: PatternView; job: JobV
                   <span className={styles.sectionMeta}>
                     {sec.summary && sec.summary.rows > 0 ? `${sec.summary.firstRow}단부터 ${sec.summary.lastRow}단 · 끝나면 ${sec.summary.endCount}코` : '단 없음'}
                   </span>
+                  {ir.craft === 'crochet' && turningChains(sec.section) !== null && (
+                    <label className={styles.startField} data-testid={`tch-${sec.s}`}>
+                      <input
+                        type="checkbox"
+                        checked={turningChains(sec.section) === 'counted'}
+                        onChange={(e) => {
+                          const next = setTurningChains(ir, sec.s, e.target.checked)
+                          update((d) => void (d.sections[sec.s].groups = structuredClone(next.sections[sec.s].groups)))
+                        }}
+                      />
+                      기둥코를 1코로 셈
+                    </label>
+                  )}
                   {ir.craft === 'crochet' && sec.section.start.kind === 'ring' && sec.section.start.count === 0 ? (
                     <span className={styles.startField} data-testid={`start-${sec.s}`}>
                       매직링에서 시작{sec.section.copies && sec.section.copies > 1 ? ` · ${sec.section.copies}개 만들기` : ''}

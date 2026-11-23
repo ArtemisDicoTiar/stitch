@@ -19,7 +19,7 @@
 import type { GaugeSize } from '@stitch/pattern-ir'
 import type { Vec3 } from '../mannequin-dims'
 import { planFlat } from './flat'
-import type { PieceDetails, RowInfo, TemplatePlan } from './types'
+import { rowFactors, type PieceDetails, type RowInfo, type TemplatePlan } from './types'
 
 type PiecePlan = {
   corner(local: number, c: number, top: boolean, pos: Vec3, nrm: Vec3): void
@@ -40,24 +40,6 @@ const CLOSES_BELOW = 0.6
 const INFLATE_STEPS = 260
 const INFLATE_PUSH = 0.03
 const INFLATE_RELAX = 6
-/** 사슬만 뜬 단처럼 높이가 없는 단이 차지하는 높이 (단 높이에 대한 비율) */
-const THIN_ROW = 0.4
-
-/** 단의 높이 (그 조각에서 가장 흔한 코의 높이를 1로 본 비율) */
-function rowFactors(rows: RowInfo[]): number[] {
-  const hs = rows.map((r) => r.row.h)
-  const seen = new Map<number, number>()
-  for (const h of hs) if (h !== undefined && h > 0) seen.set(h, (seen.get(h) ?? 0) + 1)
-  let base = 1
-  let most = 0
-  for (const [h, n] of seen) {
-    if (n > most) {
-      most = n
-      base = h
-    }
-  }
-  return hs.map((h) => (h === undefined ? 1 : h <= 0 ? THIN_ROW : h / base))
-}
 
 export function planRevolve(rows: RowInfo[], sw: number, rh: number): PiecePlan {
   const m = rows.length

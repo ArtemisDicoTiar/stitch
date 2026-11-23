@@ -65,9 +65,10 @@ function writesRingRound(pattern: Pattern, section: Section, first: Row): boolea
  * (확인 화면에서 사람이 "3D 없이 보기"를 고르는 것은 이 함수를 거치지 않습니다.)
  */
 export function normalizeTemplate(pattern: Pattern): Pattern {
-  if (pattern.craft !== 'crochet' || pattern.template === 'round') return pattern
-  if (!pattern.sections.some((s) => s.shape !== 'flat')) return pattern
-  return { ...pattern, template: 'round' }
+  if (pattern.craft !== 'crochet') return pattern
+  // 왕복으로만 뜨는 도안은 평면, 둥글게 뜨는 구간이 하나라도 있으면 조각별로 그립니다.
+  const want = pattern.sections.some((s) => s.shape !== 'flat') ? 'round' : 'flat'
+  return pattern.template === want ? pattern : { ...pattern, template: want }
 }
 
 /** 읽은 직후에 한 번 거치는 바로잡기 */

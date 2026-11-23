@@ -16,6 +16,8 @@ export function symbolsIn(expanded: Expanded): TutorialId[] {
     for (const r of b.rows) {
       if (r.opens === 'ring') seen.add('RING')
       if (r.opens === 'chain') seen.add('CH')
+      // 코바늘을 왕복으로 뜨면 단마다 기둥코를 세우고 편물을 돌립니다.
+      if (r.side === 'WS' && r.h !== undefined) seen.add('TURN')
       for (const c of r.cells) {
         seen.add(c.s)
         if (c.a) seen.add('INC')

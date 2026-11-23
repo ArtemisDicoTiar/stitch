@@ -119,3 +119,48 @@ test.describe.serial('코바늘 예시 도안', () => {
     await expect(card).toContainText('코바늘')
   })
 })
+
+test.describe.serial('코바늘 평면 도안 (목도리)', () => {
+  let id = ''
+  test.afterAll(async ({ request }) => {
+    if (id) await request.delete(`/api/patterns/${id}`)
+  })
+
+  test('확인 화면: 시작 사슬과 기둥코 세는 방식을 보여 주고, 바꾸면 검산이 달라진다', async ({ page, request }) => {
+    id = ((await (await request.post('/api/patterns', { data: { sample: 'practice-scarf' } })).json()) as { id: string }).id
+    await page.goto(`/patterns/${id}/review`)
+    await expect(page.getByTestId('verdict')).toContainText('코 수 검산 통과')
+    await expect(page.getByTestId('start-0')).toContainText('시작 사슬 · 시작 코 수')
+    const tch = page.getByTestId('tch-0').getByRole('checkbox')
+    await expect(tch).toBeChecked()
+    const firstOp = async () => ((await (await request.get(`/api/patterns/${id}`)).json()) as { pattern: { ir: { sections: { groups: { rows: { ops: { st?: string }[] }[] }[] }[] } } }).pattern.ir.sections[0].groups[1].rows[0].ops[0].st
+    await tch.uncheck()
+    await expect(page.getByTestId('save-state')).toHaveText('저장됨')
+    await expect.poll(firstOp).toBe('tch0')
+    await tch.check()
+    await expect(page.getByTestId('save-state')).toHaveText('저장됨')
+    await expect.poll(firstOp).toBe('tch')
+  })
+
+  test('게이지를 재면 코 수와 단 수를 다시 계산하고, 작업 화면에 평면 3D와 뜨는 법이 나온다', async ({ page, request }) => {
+    await request.post(`/api/patterns/${id}/confirm`)
+    await page.goto(`/patterns/${id}/gauge`)
+    await page.getByRole('radio', { name: /재서 맞출게요/ }).check()
+    const sts = page.getByRole('spinbutton').first()
+    await sts.fill('18')
+    await sts.blur()
+    await expect(page.getByRole('radiogroup').last()).toContainText('코 수를 내 게이지에 맞춰 다시 계산하기')
+    await expect(page.getByTestId('regauge-reason')).toHaveCount(0)
+
+    await request.post(`/api/patterns/${id}/gauge`, { data: { mode: 'as_is' } })
+    await page.goto(`/patterns/${id}`)
+    await expect(page.locator('[data-stage="3d"][data-ready="true"]')).toBeVisible({ timeout: 40_000 })
+    await expect(page.getByText('사슬 26코로 시작해요.')).toBeVisible()
+    const legend = page.getByRole('list', { name: '기호 범례' })
+    await expect(legend).toContainText('사슬뜨기')
+    await expect(legend).toContainText('한길긴뜨기')
+    await page.getByRole('tab', { name: '기호별 뜨는 법' }).click()
+    await expect(page.locator('#panel-howto').getByRole('tab')).toHaveText(['사슬뜨기', '한길긴뜨기', '기둥코 세우고 돌리기'])
+  })
+})
+

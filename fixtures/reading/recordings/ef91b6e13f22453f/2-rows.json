@@ -1,0 +1,186 @@
+{
+ "kind": "rows",
+ "note": "손으로 만든 대역입니다. 실제 LLM 응답을 녹화한 것이 아닙니다.",
+ "promptVersion": "2026-11-22.3",
+ "model": "hand-written",
+ "usage": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation_input_tokens": 0
+ },
+ "output": {
+  "sections": [
+   {
+    "id": "body",
+    "groups": [
+     {
+      "rows": [
+       {
+        "side": "RS",
+        "label": null,
+        "text": "1단: 사슬 3코를 기둥코로 보고(1코로 셈), 바늘에서 4번째 사슬부터 사슬마다 한길긴뜨기 23코 (24코)",
+        "expect_count": 24,
+        "ops": [
+         {
+          "op": "st",
+          "st": "skip",
+          "n": 2,
+          "into": null,
+          "text": "사슬 2코 건너뛰기"
+         },
+         {
+          "op": "st",
+          "st": "tch",
+          "n": 1,
+          "into": null,
+          "text": "사슬 3코 (기둥코, 1코로 셈)"
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "dc",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": "끝까지 한길긴뜨기"
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "WS",
+        "label": null,
+        "text": "2단: 편물을 돌려 기둥코 사슬 3코(1코로 셈), 한길긴뜨기 23코. 마지막 코는 아랫단 기둥코의 머리에 뜹니다 (24코)",
+        "expect_count": 24,
+        "ops": [
+         {
+          "op": "st",
+          "st": "tch",
+          "n": 1,
+          "into": null,
+          "text": "사슬 3코 (기둥코, 1코로 셈)"
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "dc",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": "끝까지 한길긴뜨기"
+         }
+        ]
+       },
+       {
+        "side": "RS",
+        "label": null,
+        "text": "3단: 2단과 같이 뜹니다 (24코)",
+        "expect_count": 24,
+        "ops": [
+         {
+          "op": "st",
+          "st": "tch",
+          "n": 1,
+          "into": null,
+          "text": "사슬 3코 (기둥코, 1코로 셈)"
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "dc",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": "끝까지 한길긴뜨기"
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 39,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "WS",
+        "label": null,
+        "text": "80단: 2단과 같이 뜹니다 (24코)",
+        "expect_count": 24,
+        "ops": [
+         {
+          "op": "st",
+          "st": "tch",
+          "n": 1,
+          "into": null,
+          "text": "사슬 3코 (기둥코, 1코로 셈)"
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "dc",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "end",
+           "n": 0
+          },
+          "text": "끝까지 한길긴뜨기"
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     }
+    ]
+   }
+  ]
+ }
+}

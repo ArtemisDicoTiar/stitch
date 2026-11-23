@@ -270,7 +270,8 @@ function widths(pattern: Pattern, mine: GaugeSize, orig: ReturnType<typeof expan
   const w = pattern.finished.width_cm
   const base = pattern.gauge
   if (!w || !base) return {}
-  const widest = (e: ReturnType<typeof expand>) => Math.max(1, ...allRows(e).map((r) => r.count))
+  // 시작 사슬에는 기둥코 몫이 들어 있어 편물의 폭보다 깁니다. 폭은 뜬 단으로 잽니다.
+  const widest = (e: ReturnType<typeof expand>) => Math.max(1, ...allRows(e).filter((r) => !r.start).map((r) => r.count))
   const a = widest(orig)
   const b = widest(next)
   return {

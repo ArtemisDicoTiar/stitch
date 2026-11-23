@@ -3,7 +3,7 @@
  */
 import { describe, expect, it } from 'vitest'
 import { expand } from '@stitch/engine'
-import { garterScarf, practiceBall, practiceBear, practiceHood } from '@stitch/fixtures'
+import { garterScarf, practiceBall, practiceBear, practiceHood, practiceScarf } from '@stitch/fixtures'
 import { parsePattern, type Op, type Pattern, type Row, type Section } from '@stitch/pattern-ir'
 import { buildGarment, knittedCount, stitchAt, suggestTemplate, supportsTemplate, symbolOrderOf, type Garment, type RoundDetails } from '../src/garment'
 
@@ -189,14 +189,39 @@ describe('연습용 코바늘 곰 인형', () => {
   })
 })
 
+describe('연습용 코바늘 목도리 (평면)', () => {
+  const e = expand(practiceScarf)
+  const g = buildGarment(e, 'flat', { gauge: practiceScarf.gauge })
+
+  it('코바늘 기호로 만들어지고, 폭은 시작 사슬 폭이다', () => {
+    expect(g.craft).toBe('crochet')
+    expect(g.stitchCount).toBe(e.totalStitches)
+    expect(g.bbox.size[0]).toBeCloseTo(26 * (10 / 16), 3)
+  })
+
+  it('단 높이는 코를 따른다: 사슬 단은 낮고, 한길긴뜨기 80단이 게이지대로 100cm다', () => {
+    const rh = 10 / 8
+    const height = (ri: number) => quad(g, g.rowStart[ri])[2][1] - quad(g, g.rowStart[ri])[0][1]
+    expect(height(0)).toBeCloseTo(rh * 0.4, 5)
+    expect(height(1)).toBeCloseTo(rh, 5)
+    expect(g.bbox.size[1]).toBeCloseTo(rh * 80 + rh * 0.4, 3)
+  })
+
+  it('대바늘 평면은 그대로다: 단마다 같은 높이', () => {
+    const k = buildGarment(expand(garterScarf), 'flat', { gauge: garterScarf.gauge })
+    expect(k.craft).toBe('knit')
+    expect(k.bbox.size[1]).toBeCloseTo(k.rowCount * (10 / garterScarf.gauge!.rows), 4)
+  })
+})
+
 describe('형태 고르기', () => {
   const bare = (p: Pattern, over: Partial<Pattern> = {}): Pattern => {
     const { template: _t, ...rest } = p
     return { ...rest, ...over }
   }
-  it('둥글게 뜨는 코바늘은 round, 왕복으로만 뜨는 코바늘은 아직 none', () => {
+  it('둥글게 뜨는 코바늘은 round, 왕복으로만 뜨는 코바늘은 flat', () => {
     expect(suggestTemplate(bare(practiceBall))).toBe('round')
-    expect(suggestTemplate(bare(garterScarf, { craft: 'crochet' }))).toBe('none')
+    expect(suggestTemplate(bare(garterScarf, { craft: 'crochet' }))).toBe('flat')
     expect(suggestTemplate(practiceBall)).toBe('round')
   })
   it('대바늘 도안의 짐작은 그대로다', () => {

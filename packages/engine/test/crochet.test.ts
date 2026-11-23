@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { practiceBall, practiceBallExpected, practiceBear, practiceBearExpected, practiceHood } from '@stitch/fixtures'
+import { practiceBall, practiceBallExpected, practiceBear, practiceBearExpected, practiceHood, practiceScarf, practiceScarfExpected } from '@stitch/fixtures'
 import { parsePattern, type Op, type Pattern, type Row, type Section } from '@stitch/pattern-ir'
-import { allRows, describeOp, expand, normalizeStarts, progressFraction, regauge, stitchesDone, verify } from '../src'
+import { allRows, describeOp, expand, normalizeStarts, progressFraction, regauge, setTurningChains, stitchesDone, turningChains, verify } from '../src'
 
 /** 테스트용 작은 코바늘 도안 */
 function crochet(sections: Section[]): Pattern {
@@ -359,3 +359,60 @@ describe('연습용 코바늘 곰 인형 (직접 쓴 도안, 조각 여러 개)'
     expect(arms.filter((r) => r.copy === 1).map((r) => r.count)).toEqual(arms.filter((r) => r.copy === 2).map((r) => r.count))
   })
 })
+
+describe('연습용 코바늘 목도리 (직접 쓴 도안, 평면 왕복)', () => {
+  const v = verify(parsePattern(practiceScarf))
+  const rows = allRows(v.expanded)
+
+  it('검산을 통과한다: 시작 사슬 26코, 그 위로 24코씩 80단', () => {
+    expect(v.errors).toEqual([])
+    expect(v.warnings).toEqual([])
+    expect(v.expanded.totalRows).toBe(practiceScarfExpected.totalRows)
+    expect(rows[0]).toMatchObject({ start: 'chain', count: practiceScarfExpected.chain, h: 0 })
+    expect(new Set(rows.slice(1).map((r) => r.count))).toEqual(new Set([practiceScarfExpected.stitches]))
+    expect(rows.slice(1).every((r) => r.h === 3)).toBe(true)
+    expect(rows[1].label).toBe('1단(겉면)')
+    expect(rows[80].label).toBe('80단(안면)')
+    // 겉면과 안면이 번갈아 나옵니다.
+    rows.slice(1).forEach((r, i) => expect(r.side, r.label).toBe(i % 2 === 0 ? 'RS' : 'WS'))
+    // 단마다 기둥코 한 칸과 한길긴뜨기 23칸
+    expect(rows[2].cells.map((c) => c.s).join('')).toBe('CH' + 'DC'.repeat(23))
+  })
+
+  it('내 게이지에 맞춰 코 수와 단 수를 다시 계산한다', () => {
+    for (const mine of [{ stitches: 18, rows: 9 }, { stitches: 14, rows: 7 }, { stitches: 20, rows: 8.5 }]) {
+      const r = regauge(practiceScarf, mine)
+      expect(r.ok, JSON.stringify(mine)).toBe(true)
+      expect(r.fixedShape).toBeUndefined()
+      const again = verify(r.pattern!)
+      expect(again.errors).toEqual([])
+      // 시작 사슬은 뜨는 코 수보다 기둥코 몫 2코가 많습니다.
+      const got = allRows(again.expanded)
+      expect(got[0].count - got[1].count).toBe(2)
+      // 다시 계산한 폭은 도안의 폭과 한 코 안쪽으로 같습니다.
+      expect(Math.abs(r.width.recalculated! - r.width.pattern!)).toBeLessThanOrEqual(10 / mine.stitches)
+      // 평면이라 겉면에서 시작해 안면으로 끝나는 것이 그대로입니다.
+      expect(got.at(-1)!.side).toBe('WS')
+    }
+    // 게이지가 같으면 그대로입니다.
+    const same = regauge(practiceScarf, { stitches: 16, rows: 8 })
+    expect(same.sections[0]).toMatchObject({ start: { from: 26, to: 26 }, rows: { from: 81, to: 81 } })
+  })
+})
+
+describe('기둥코를 코로 세는지 바꾸기', () => {
+  it('구간의 기둥코를 한 번에 바꾸면, 잘못 읽은 도안의 코 수가 맞아진다', () => {
+    expect(turningChains(practiceScarf.sections[0])).toBe('counted')
+    expect(turningChains(practiceBall.sections[0])).toBeNull()
+    const flipped = setTurningChains(practiceScarf, 0, false)
+    expect(turningChains(flipped.sections[0])).toBe('uncounted')
+    expect(setTurningChains(flipped, 0, true)).toEqual(practiceScarf)
+    // 코 수가 숫자로 적힌 단에서는 세는 방식이 틀리면 검산에 걸립니다: 10코 위에 "기둥코, 한길긴뜨기 9"
+    const p = crochet([{ id: 'a', name: '판', shape: 'flat', start: { kind: 'chain', count: 10 }, groups: [once(row('RS', [{ st: 'tch', n: 1 }, { st: 'dc', n: 9 }], 10))] }])
+    expect(verify(p).ok).toBe(true)
+    const wrong = setTurningChains(p, 0, false)
+    expect(verify(wrong).errors.map((e) => e.code)).toContain('leftover')
+    expect(verify(setTurningChains(wrong, 0, true)).ok).toBe(true)
+  })
+})
+

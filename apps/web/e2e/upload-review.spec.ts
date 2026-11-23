@@ -40,7 +40,7 @@ test.describe.serial('도안 올리기와 읽은 내용 확인', () => {
     await expect(page.getByText('PDF는 비공개 저장소에 보관하고, 올린 사람만 열 수 있어요.', { exact: false })).toBeVisible()
     await expect(page.getByText('PDF가 LLM 제공자(Claude API)에게 전송됩니다', { exact: false })).toBeVisible()
     await expect(page.getByText('대바늘 도안과 코바늘 도안')).toBeVisible()
-    await expect(page.getByText('코바늘은 매직링에서 시작해 둥글게 뜨는 도안(인형, 소품)을 읽어요', { exact: false })).toBeVisible()
+    await expect(page.getByText('코바늘은 둥글게 뜨는 인형·소품과 왕복으로 뜨는 목도리·블랭킷을 읽어요', { exact: false })).toBeVisible()
     await expect(page.getByRole('button', { name: '예시 도안으로 둘러보기' })).toBeVisible()
     await expect(page.getByText('20MB까지 올릴 수 있어요', { exact: false })).toBeVisible()
     // API 키가 없으면 새 PDF를 읽을 수 없다고 먼저 알려 줍니다.

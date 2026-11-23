@@ -368,7 +368,7 @@ describe('템플릿 고르기', () => {
     expect(suggestTemplate(bare(practiceHood))).toBe('hood')
     expect(suggestTemplate(bare(garterScarf))).toBe('flat')
     expect(suggestTemplate(bare(garterScarf, { title: '이름 없는 편물' }))).toBe('flat')
-    expect(suggestTemplate(bare(garterScarf, { craft: 'crochet' }))).toBe('none')
+    expect(suggestTemplate(bare(garterScarf, { craft: 'crochet' }))).toBe('flat')
     expect(suggestTemplate(bare(garterScarf, { sections: [] }))).toBe('none')
     const round = garterScarf.sections.map((s) => ({ ...s, shape: 'round' as const }))
     expect(suggestTemplate(bare(garterScarf, { title: '이름 없는 편물', sections: round }))).toBe('tube')

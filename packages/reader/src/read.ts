@@ -12,14 +12,19 @@ import { OutlineSchema, RowsSchema, toGroups, toPattern, type Outline } from './
 
 export type ReadStage = 'extract' | 'structure' | 'verify' | 'feedback' | 'review'
 
-export type CrochetScope = 'none' | 'rounds' | 'all'
+export type CrochetScope = 'none' | 'rounds' | 'flat' | 'all'
 
 /** 받지 않는 도안이면 사람에게 보여 줄 까닭을, 받으면 null을 돌려줍니다. */
 export function outOfScope(outline: Pick<Outline, 'craft' | 'sections'>, scope: CrochetScope): string | null {
   if (outline.craft !== 'crochet' || scope === 'all') return null
   if (scope === 'none') return '코바늘 도안 읽기는 아직 준비 중이에요. 지금은 대바늘 도안만 읽습니다.'
-  const rounds = outline.sections.every((s) => s.shape !== 'flat' && (s.start.kind === 'ring' || s.start.kind === 'continue'))
-  return rounds ? null : '코바늘은 지금 매직링에서 시작해 둥글게 뜨는 도안(인형, 소품)만 읽어요. 평면으로 뜨거나 사슬에서 시작하는 도안은 준비 중이에요.'
+  const round = (s: Outline['sections'][number]) => s.shape !== 'flat' && (s.start.kind === 'ring' || s.start.kind === 'continue')
+  if (scope === 'rounds') {
+    return outline.sections.every(round) ? null : '코바늘은 지금 매직링에서 시작해 둥글게 뜨는 도안(인형, 소품)만 읽어요. 평면으로 뜨거나 사슬에서 시작하는 도안은 준비 중이에요.'
+  }
+  // flat: 위에 더해, 사슬에서 시작해 왕복으로 뜨는 구간도 받습니다 (목도리, 블랭킷).
+  const flat = (s: Outline['sections'][number]) => s.shape === 'flat' && (s.start.kind === 'chain' || s.start.kind === 'continue')
+  return outline.sections.every((s) => round(s) || flat(s)) ? null : '코바늘은 지금 매직링에서 둥글게 뜨는 도안과 사슬에서 시작해 왕복으로 뜨는 도안을 읽어요. 사슬에서 시작해 둥글게 뜨는 도안(타원 바닥 등)은 준비 중이에요.'
 }
 
 export type ReadOptions = {
@@ -29,6 +34,7 @@ export type ReadOptions = {
   /**
    * 코바늘 도안을 어디까지 받을지. 기본은 받지 않습니다 (none).
    * - rounds: 매직링에서 시작해 둥글게 뜨는 도안만 (인형, 소품)
+   * - flat: rounds에 더해, 사슬에서 시작해 왕복으로 뜨는 도안 (목도리, 블랭킷)
    * - all: 모두
    * 받지 않는 도안은 개요에서 판별해, 단을 읽기 전에 까닭을 알리며 멈춥니다.
    */

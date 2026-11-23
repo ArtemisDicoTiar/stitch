@@ -379,6 +379,110 @@ function magicRing(): Tutorial {
   return tut('RING', '매직링', '둥글게 뜨는 것을 시작하는 방법이에요. 실 고리 안에 첫 단을 뜨고 실 꼬리를 당겨 구멍을 닫아요.', L)
 }
 
+// ===== 긴 코: 긴뜨기, 한길긴뜨기, 두길긴뜨기 =====
+/**
+ * 긴 코는 바늘을 넣기 전에 실을 먼저 감습니다. 감는 횟수와 고리를 빼는 횟수만 다릅니다.
+ * - 긴뜨기: 1번 감고, 끌어낸 뒤 고리 3개를 한 번에
+ * - 한길긴뜨기: 1번 감고, 고리를 2개씩 두 번
+ * - 두길긴뜨기: 2번 감고, 고리를 2개씩 세 번
+ */
+function tall(id: 'HDC' | 'DC' | 'TR', title: string, summary: string): Tutorial {
+  const wraps = id === 'TR' ? 2 : 1
+  const pulls = id === 'HDC' ? 1 : id === 'DC' ? 2 : 3
+  const L: TutorialStep[] = []
+  let s = base()
+  mark(s, 'b0').hl = 1
+  s.tags = hands('편물을 잡고 검지에 실 걸기', '코바늘 잡기')
+  L.push(st(s, `${title.split(' (')[0]}는 짧은뜨기보다 키가 큰 코예요. 다음 코의 머리(주황색)에 뜹니다.`))
+
+  // 바늘을 넣기 전에 실을 감습니다. 감은 실은 바늘 위의 고리가 됩니다.
+  s = clone(s)
+  for (let i = 0; i < wraps; i++) s.rings[`W${i}`] = loop(20 - i * 10, 'work')
+  setYarn(s, feed({ ring: `W${wraps - 1}`, at: 'top' }))
+  s.arrows = [{ id: 'a', pts: [{ n: 'H', d: 30, off: [-30, -40] }, { n: 'H', d: 6, off: [-22, -22] }, { n: 'H', d: 8, off: [-2, 4] }], t: wraps === 2 ? '실을 2번 감기' : '실을 먼저 감기' }]
+  s.tags = hands('실을 팽팽하게', `바늘에 실을 ${wraps}번 감기`)
+  L.push(st(s, `바늘을 넣기 전에 바늘에 실을 ${wraps}번 감아요.`))
+
+  s = clone(s)
+  s.needles.H = into(NEXT_X)
+  s.arrows = [{ id: 'a', pts: [[NEXT_X + 60, 246], [NEXT_X + 26, 268], [NEXT_X - 6, BASE_Y + 4]], t: '머리 두 가닥 아래로' }]
+  s.yarn = s.yarn.filter((y) => y.id !== 'tail')
+  s.tags = hands(SAME, '코 머리 아래로 바늘 넣기')
+  L.push(st(s, '감은 실을 그대로 둔 채, 코 머리의 두 가닥 아래로 바늘을 넣어요.'))
+
+  s = clone(s)
+  s.needles.H = REST
+  const up = `U`
+  s.rings[up] = loop(wraps === 2 ? -4 : 6, 'work')
+  // 바늘 위의 고리에 번호를 붙입니다. 바늘 끝 쪽이 큰 번호입니다.
+  const order = ['H1', ...Array.from({ length: wraps }, (_, i) => `W${i}`), up]
+  order.forEach((k, i) => (s.rings[k].lab = String(i + 1)))
+  // 고리가 많으면 바늘 끝 쪽으로 고르게 벌려 놓습니다.
+  order.forEach((k, i) => (s.rings[k].d = 36 - i * (wraps === 2 ? 11 : 13)))
+  setYarn(s, feed({ ring: up, at: 'top' }))
+  s.arrows = []
+  s.tags = hands(SAME, '실을 걸어 끌어내기')
+  L.push(st(s, `실을 걸어 코 밖으로 끌어내요. 바늘에 고리가 ${order.length}개가 됐어요.`))
+
+  let left = order.length
+  for (let p = 0; p < pulls; p++) {
+    s = clone(s)
+    const take = id === 'HDC' ? left : 2
+    const last = p === pulls - 1
+    // 바늘 끝 쪽 고리부터 take개를 빼고, 새 고리 하나가 생깁니다.
+    const keys = Object.keys(s.rings).sort((a, b) => (s.rings[a].d ?? 0) - (s.rings[b].d ?? 0))
+    for (const k of keys.slice(0, take)) delete s.rings[k]
+    left = left - take + 1
+    const fresh = `N${p}`
+    s.rings[fresh] = loop(last ? 34 : 10, 'work')
+    Object.keys(s.rings).sort((a, b) => (s.rings[b].d ?? 0) - (s.rings[a].d ?? 0)).forEach((k, i) => (s.rings[k].lab = last ? '' : String(i + 1)))
+    if (last) for (const k of Object.keys(s.rings)) if (!s.rings[k].lab) delete s.rings[k].lab
+    setYarn(s, feed({ ring: fresh, at: 'top' }))
+    if (last) {
+      s.needles.H = restAt(NEXT_X)
+      mark(s, 'b0').hl = 0
+      s.marks.push(...stitch('n', NEXT_X, 'work'))
+      s.yarn.push({ id: 'tail', pts: [{ ring: fresh }, [NEXT_X - 2, TOP_Y - 6]], z: 'f', col: 'work' })
+    }
+    s.tags = hands(SAME, `실을 걸어 고리 ${take}개 빼기`)
+    const done = `${title.split(' (')[0]} 1코예요. 바늘에는 다시 고리 하나가 남아요.`
+    L.push(st(s, last ? `실을 걸어 ${id === 'HDC' ? `고리 ${take}개를 한 번에` : '남은 고리 2개를'} 빼내면 ${done}` : `실을 걸어 바늘 끝 쪽 고리 2개만 빼내요. 고리가 ${left}개 남아요.`))
+  }
+  return tut(id, title, summary, L)
+}
+
+// ===== 기둥코를 세우고 편물 돌리기 =====
+function turn(): Tutorial {
+  const L: TutorialStep[] = []
+  // 단의 끝: 이번 단의 코가 모두 떠져 있습니다.
+  const xs = [215, 265, 315, 365, 415, 465, 515]
+  const rowDone = (): MarkSpec[] => xs.flatMap((x, i) => stitch(`d${i}`, x))
+  let s: SceneSpec = { needles: { H: restAt(xs[0]) }, rings: { H1: loop(34) }, yarn: [{ id: 'tail', pts: [{ ring: 'H1' }, [xs[0] - 2, TOP_Y - 6]], z: 'f', col: 'yarn' }, feed({ ring: 'H1', at: 'top' })], arrows: [], tags: [], marks: rowDone() }
+  s.tags = hands('편물을 잡고 검지에 실 걸기', '코바늘 잡기')
+  L.push(st(s, '단의 끝까지 떴어요. 다음 단을 뜨려면 먼저 그 단의 코 높이만큼 사슬을 세워야 해요. 이 사슬이 기둥코예요.'))
+
+  s = clone(s)
+  s.rings = { H2: loop(34, 'work') }
+  s.needles.H = H(xs[0] - 30, 196)
+  s.marks = [...rowDone(), ...[0, 1, 2].map((i) => ({ id: `t${i}`, kind: 'chain' as const, at: [xs[0] - 18 - i * 4, TOP_Y - 14 - i * 14] as [number, number], col: 'work' as const }))]
+  s.yarn = [feed({ ring: 'H2', at: 'top' })]
+  s.tags = hands(SAME, '사슬 뜨기')
+  L.push(st(s, '사슬을 떠요. 짧은뜨기 단이면 1코, 긴뜨기 2코, 한길긴뜨기 3코, 두길긴뜨기 4코예요.'))
+
+  s = clone(s)
+  s.arrows = [{ id: 'a', pts: [[560, 330], [370, 372], [180, 330]], t: '편물을 돌려 반대쪽 면으로' }]
+  s.tags = hands('편물을 책장 넘기듯 돌리기', '바늘은 그대로')
+  L.push(st(s, '편물을 돌려요. 이제 방금 뜬 단의 머리들이 다음에 뜰 코가 됩니다.'))
+
+  s = clone(s)
+  s.arrows = []
+  mark(s, 'd1t').hl = 1
+  s.tags = hands(SAME, SAME)
+  L.push(st(s, '도안이 기둥코를 1코로 세면(한길긴뜨기 단이 보통 그래요) 기둥코 바로 아래 코는 건너뛰고 그다음 코(주황색)부터 떠요. 세지 않으면(짧은뜨기 단) 첫 코부터 떠요.'))
+
+  return tut('TURN', '기둥코 세우고 돌리기', '왕복으로 뜰 때 단을 바꾸는 방법이에요. 사슬로 다음 단의 높이를 세우고 편물을 돌려요.', L)
+}
+
 /** 코바늘 뜨는 법. 배우는 순서대로 놓았습니다. */
 export const CROCHET_TUTORIALS = {
   RING: magicRing(),
@@ -387,4 +491,8 @@ export const CROCHET_TUTORIALS = {
   INC: increase(),
   SC2: decrease(),
   SL: slipStitch(),
+  HDC: tall('HDC', '긴뜨기', '실을 한 번 감고 떠서 고리 3개를 한 번에 빼요. 짧은뜨기와 한길긴뜨기의 중간 높이예요.'),
+  DC: tall('DC', '한길긴뜨기', '실을 한 번 감고 떠서 고리를 2개씩 두 번 빼요. 목도리와 블랭킷에 많이 쓰는 키 큰 코예요.'),
+  TR: tall('TR', '두길긴뜨기', '실을 두 번 감고 떠서 고리를 2개씩 세 번 빼요. 가장 키가 큰 기본 코예요.'),
+  TURN: turn(),
 }

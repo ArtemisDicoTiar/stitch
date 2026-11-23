@@ -111,3 +111,33 @@ export function reinterpretTerms(pattern: Pattern, to: 'us' | 'uk'): Pattern {
     sections: pattern.sections.map((s) => ({ ...s, groups: s.groups.map((g) => ({ ...g, rows: g.rows.map((r) => ({ ...r, ops: remap(r.ops, table) })) })) })),
   }
 }
+
+/** 구간의 기둥코가 1코로 세는 것(tch)인지, 세지 않는 것(tch0)인지. 기둥코가 없으면 null, 섞여 있으면 'mixed' */
+export function turningChains(section: Pattern['sections'][number]): 'counted' | 'uncounted' | 'mixed' | null {
+  const seen = new Set<string>()
+  const walk = (ops: Op[]) => {
+    for (const op of ops) {
+      if ('st' in op) {
+        const id = op.st.toLowerCase()
+        if (id === 'tch' || id === 'tch0') seen.add(id)
+      } else if ('repeat' in op) walk(op.repeat)
+    }
+  }
+  for (const g of section.groups) for (const r of g.rows) walk(r.ops)
+  if (seen.size === 0) return null
+  if (seen.size === 2) return 'mixed'
+  return seen.has('tch') ? 'counted' : 'uncounted'
+}
+
+/**
+ * 구간의 기둥코를 모두 "1코로 셈" 또는 "세지 않음"으로 바꿉니다.
+ * 도안이 기둥코를 코로 세는지는 LLM이 잘못 읽기 쉬운 곳이라, 확인 화면에서 한 번에 바꿀 수 있게 합니다.
+ */
+export function setTurningChains(pattern: Pattern, sectionIndex: number, counted: boolean): Pattern {
+  const table: Record<string, string> = counted ? { tch0: 'tch' } : { tch: 'tch0' }
+  return {
+    ...pattern,
+    sections: pattern.sections.map((s, i) => (i !== sectionIndex ? s : { ...s, groups: s.groups.map((g) => ({ ...g, rows: g.rows.map((r) => ({ ...r, ops: remap(r.ops, table) })) })) })),
+  }
+}
+
