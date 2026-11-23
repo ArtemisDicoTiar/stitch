@@ -164,3 +164,23 @@ test.describe.serial('코바늘 평면 도안 (목도리)', () => {
   })
 })
 
+test('그래니 스퀘어: 사슬과 한길긴뜨기 기호 도안, 사슬 공간에 뜨는 법이 나온다', async ({ page, request }) => {
+  const { id } = (await (await request.post('/api/patterns', { data: { sample: 'practice-granny' } })).json()) as { id: string }
+  try {
+    await request.post(`/api/patterns/${id}/confirm`)
+    await request.post(`/api/patterns/${id}/gauge`, { data: { mode: 'as_is' } })
+    await page.goto(`/patterns/${id}`)
+    await expect(page.getByRole('heading', { level: 1, name: '연습용 그래니 스퀘어' })).toBeVisible()
+    await expect(page.locator('[data-stage="3d"][data-ready="true"]')).toBeVisible({ timeout: 40_000 })
+    const legend = page.getByRole('list', { name: '기호 범례' })
+    await expect(legend).toContainText('사슬뜨기')
+    await expect(legend).toContainText('한길긴뜨기')
+    await page.getByRole('tab', { name: '기호별 뜨는 법' }).click()
+    await expect(page.locator('#panel-howto').getByRole('tab')).toHaveText(['매직링', '사슬뜨기', '한길긴뜨기', '사슬 공간에 뜨기'])
+    await page.getByRole('tab', { name: '단계별 안내' }).click()
+    await expect(page.getByRole('list', { name: '지시문 조각' })).toContainText('사슬 3코 (한길긴뜨기 1코로 셈)')
+  } finally {
+    await request.delete(`/api/patterns/${id}`)
+  }
+})
+

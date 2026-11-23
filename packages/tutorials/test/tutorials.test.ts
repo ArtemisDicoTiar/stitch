@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest'
 import { KNIT_SYMBOLS } from '@stitch/pattern-ir'
 import { TUTORIALS, TUTORIAL_IDS } from '../src'
 
-const CROCHET_IDS = ['RING', 'CH', 'SC', 'INC', 'SC2', 'SL', 'HDC', 'DC', 'TR', 'TURN'] as const
+const CROCHET_IDS = ['RING', 'CH', 'SC', 'INC', 'SC2', 'SL', 'HDC', 'DC', 'TR', 'TURN', 'SPACE'] as const
 const ALL_IDS = [...KNIT_SYMBOLS, ...CROCHET_IDS]
 
 describe('뜨는 법 자료', () => {
-  it('대바늘 기호 10가지에 모두 뜨는 법이 있고 순서가 코 사전과 같다. 그 뒤에 코바늘 열 가지가 온다', () => {
+  it('대바늘 기호 10가지에 모두 뜨는 법이 있고 순서가 코 사전과 같다. 그 뒤에 코바늘 열한 가지가 온다', () => {
     expect(Object.keys(TUTORIALS)).toEqual([...KNIT_SYMBOLS, ...CROCHET_IDS])
     expect(TUTORIAL_IDS).toEqual([...KNIT_SYMBOLS, ...CROCHET_IDS])
     expect(KNIT_SYMBOLS).toHaveLength(10)

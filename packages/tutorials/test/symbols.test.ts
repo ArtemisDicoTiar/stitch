@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { expand } from '@stitch/engine'
-import { garterScarf, practiceBall, practiceHood, practiceScarf } from '@stitch/fixtures'
+import { garterScarf, practiceBall, practiceGranny, practiceHood, practiceScarf } from '@stitch/fixtures'
 import { KNIT_SYMBOLS, type Expanded } from '@stitch/pattern-ir'
 import { TUTORIALS, symbolsIn, tutorialFor } from '../src'
 
@@ -34,9 +34,13 @@ describe('코바늘 도안에 필요한 뜨는 법', () => {
     expect(symbolsIn(expand(practiceScarf))).toEqual(['CH', 'DC', 'TURN'])
   })
 
+  it('그래니 스퀘어: 매직링, 사슬, 한길긴뜨기, 사슬 공간에 뜨기', () => {
+    expect(symbolsIn(expand(practiceGranny))).toEqual(['RING', 'CH', 'DC', 'SPACE'])
+  })
+
   it('조각의 tech가 코바늘 뜨는 법으로 이어진다: 늘림이 섞인 조각은 늘림', () => {
     const techs = new Set(expand(practiceBall).blocks.flatMap((b) => b.rows.flatMap((r) => r.segments.map((s) => s.tech))))
-    expect([...techs].sort()).toEqual(['INC', 'SC', 'SC2'])
+    expect([...techs].sort()).toEqual(['INC', 'RING', 'SC', 'SC2'])
     for (const t of techs) expect(tutorialFor(t), t).toBe(t)
     expect(tutorialFor('CH')).toBe('CH')
     expect(tutorialFor('ring')).toBe('RING')

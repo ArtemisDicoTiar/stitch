@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { practiceBall, practiceBallExpected, practiceBear, practiceBearExpected, practiceHood, practicePouch, practiceScarf, practiceScarfExpected } from '@stitch/fixtures'
+import { practiceBall, practiceBallExpected, practiceBear, practiceBearExpected, practiceGranny, practiceHood, practicePouch, practiceScarf, practiceScarfExpected, practiceShell } from '@stitch/fixtures'
 import { parsePattern, type Op, type Pattern, type Row, type Section } from '@stitch/pattern-ir'
 import { allRows, describeOp, expand, normalizeStarts, progressFraction, regauge, setTurningChains, stitchesDone, turningChains, verify } from '../src'
 
@@ -438,6 +438,44 @@ describe('연습용 코바늘 파우치 (직접 쓴 도안: 타원 바닥, 닫�
 
   it('왕복으로 뜨는 시작 사슬은 둘러 뜨지 않는다 (뜰 자리가 사슬 수와 같다)', () => {
     expect(allRows(verify(practiceScarf).expanded)[1].cells.length).toBe(24)
+  })
+})
+
+describe('연습용 그래니 스퀘어와 조개무늬 (직접 쓴 도안: 사슬 공간, 건너뛰기, 한 코에 여러 번)', () => {
+  it('그래니 스퀘어: 단마다 한길긴뜨기가 12코씩 늘고, 사슬을 더하면 20, 36, 52칸이다', () => {
+    const v = verify(parsePattern(practiceGranny))
+    expect(v.errors).toEqual([])
+    expect(v.warnings).toEqual([])
+    const rows = allRows(v.expanded)
+    expect(rows.map((r) => r.cells.filter((c) => c.s === 'DC' || c.k === 0).length)).toEqual([12, 24, 36])
+    expect(rows.map((r) => r.count)).toEqual([20, 36, 52])
+    expect(rows.every((r) => r.h === 3)).toBe(true)
+  })
+
+  it('조개무늬: 한 코에 5코를 떠도 건너뛴 코만큼 줄어 단마다 19코 그대로다', () => {
+    const v = verify(parsePattern(practiceShell))
+    expect(v.errors).toEqual([])
+    expect(v.warnings).toEqual([])
+    const rows = allRows(v.expanded)
+    expect(rows[0].count).toBe(20)
+    expect(new Set(rows.slice(1).map((r) => r.count))).toEqual(new Set([19]))
+    expect(v.expanded.totalRows).toBe(12)
+  })
+
+  it('구멍 무늬를 떠도 기호 도안의 폭이 늘어나지 않는다', () => {
+    for (const p of [practiceGranny, practiceShell]) {
+      const e = verify(p).expanded
+      const widest = Math.max(...allRows(e).map((r) => r.count))
+      expect(e.blocks.map((b) => b.W), p.title).toEqual([widest])
+      for (const b of e.blocks) for (const r of b.rows) expect(new Set(r.cells.map((c) => c.x)).size, `${p.title} ${r.label}`).toBe(r.cells.length)
+    }
+  })
+
+  it('매직링 안에 뜨는 조각은 매직링으로, 사슬 공간에 뜨는 조각은 공간에 뜨기로 이어진다', () => {
+    const rows = allRows(verify(practiceGranny).expanded)
+    expect(rows[0].segments[0].tech).toBe('RING')
+    expect(rows[1].segments.some((s) => s.tech === 'SPACE')).toBe(true)
+    expect(rows[0].segments.some((s) => s.tech === 'SPACE')).toBe(false)
   })
 })
 

@@ -1,0 +1,252 @@
+{
+ "kind": "rows",
+ "note": "손으로 만든 대역입니다. 실제 LLM 응답을 녹화한 것이 아닙니다.",
+ "promptVersion": "2026-11-22.3",
+ "model": "hand-written",
+ "usage": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation_input_tokens": 0
+ },
+ "output": {
+  "sections": [
+   {
+    "id": "square",
+    "groups": [
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "1단: 링에 사슬 3코(한길긴뜨기 1코로 셈), 한길긴뜨기 2코, 사슬 2코, (한길긴뜨기 3코, 사슬 2코) 3번, 첫 코에 빼뜨기 (한길긴뜨기 12코)",
+        "expect_count": 12,
+        "ops": [
+         {
+          "op": "st",
+          "st": "tch",
+          "n": 1,
+          "into": "space",
+          "text": "사슬 3코 (한길긴뜨기 1코로 셈)"
+         },
+         {
+          "op": "st",
+          "st": "dc",
+          "n": 2,
+          "into": "same",
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "ch",
+          "n": 2,
+          "into": null,
+          "text": null
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "dc",
+            "n": 3,
+            "into": "same",
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "ch",
+            "n": 2,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "times",
+           "n": 3
+          },
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "join",
+          "n": 1,
+          "into": null,
+          "text": "첫 코에 빼뜨기"
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "2단: 모서리 공간마다 (한길긴뜨기 3코, 사슬 2코, 한길긴뜨기 3코), 모서리 사이에 사슬 1코. 한길긴뜨기 3코는 건너뜁니다 (한길긴뜨기 24코)",
+        "expect_count": 24,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "skip",
+            "n": 3,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "dc",
+            "n": 3,
+            "into": "space",
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "ch",
+            "n": 2,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "dc",
+            "n": 3,
+            "into": "same",
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "ch",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "times",
+           "n": 4
+          },
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "join",
+          "n": 1,
+          "into": null,
+          "text": "첫 코에 빼뜨기"
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "round",
+        "label": null,
+        "text": "3단: 모서리 공간마다 (한길긴뜨기 3코, 사슬 2코, 한길긴뜨기 3코), 변의 사슬 1코 공간마다 한길긴뜨기 3코, 묶음 사이에 사슬 1코 (한길긴뜨기 36코)",
+        "expect_count": 36,
+        "ops": [
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "skip",
+            "n": 3,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "dc",
+            "n": 3,
+            "into": "space",
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "ch",
+            "n": 2,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "dc",
+            "n": 3,
+            "into": "same",
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "ch",
+            "n": 1,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "skip",
+            "n": 3,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "dc",
+            "n": 3,
+            "into": "space",
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "ch",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "times",
+           "n": 4
+          },
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "join",
+          "n": 1,
+          "into": null,
+          "text": "첫 코에 빼뜨기"
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     }
+    ]
+   }
+  ]
+ }
+}

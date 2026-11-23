@@ -1,0 +1,56 @@
+{
+ "kind": "outline",
+ "note": "손으로 만든 대역입니다. 실제 LLM 응답을 녹화한 것이 아닙니다.",
+ "promptVersion": "2026-11-22.3",
+ "model": "hand-written",
+ "usage": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation_input_tokens": 0
+ },
+ "output": {
+  "craft": "crochet",
+  "terms": "kr",
+  "title": "연습용 그래니 스퀘어",
+  "materials": [
+   {
+    "kind": "실",
+    "spec": "중간 굵기 아크릴사",
+    "qty": "약 15g"
+   },
+   {
+    "kind": "바늘",
+    "spec": "4mm 코바늘",
+    "qty": null
+   }
+  ],
+  "gauge": null,
+  "finished": {
+   "width_cm": 9,
+   "height_cm": 9
+  },
+  "template": "round",
+  "sections": [
+   {
+    "id": "square",
+    "name": "모티브",
+    "shape": "round",
+    "start": {
+     "kind": "ring",
+     "count": 0,
+     "from": null
+    },
+    "multiple": null,
+    "copies": 1
+   }
+  ],
+  "finishing": [
+   {
+    "name": "실 정리",
+    "text": "실을 잘라 빼내고 돗바늘로 숨깁니다."
+   }
+  ],
+  "unclear": []
+ }
+}

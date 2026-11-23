@@ -18,6 +18,8 @@ export function symbolsIn(expanded: Expanded): TutorialId[] {
       if (r.opens === 'chain') seen.add('CH')
       // 코바늘을 왕복으로 뜨면 단마다 기둥코를 세우고 편물을 돌립니다.
       if (r.side === 'WS' && r.h !== undefined) seen.add('TURN')
+      // 사슬 공간에 뜨는 조각 (매직링 안에 뜨는 조각은 엔진이 RING으로 적습니다)
+      if (r.segments.some((s) => s.tech === 'SPACE')) seen.add('SPACE')
       for (const c of r.cells) {
         seen.add(c.s)
         if (c.a) seen.add('INC')

@@ -99,11 +99,13 @@ export const VIEWER_DEFAULTS = {
 const NOW_COLOR = 0xff7a2e
 const GHOST_COLOR = 0xf3e6d8
 const FOV = 32
-const VIEW_DIRS: Record<ViewPreset | 'home' | 'homeFlat' | 'homeRound', [number, number, number]> = {
+const VIEW_DIRS: Record<ViewPreset | 'home' | 'homeFlat' | 'homeRound' | 'homeDisc', [number, number, number]> = {
   home: [64, 12, 92],
   homeFlat: [0.22, 0.06, 1],
   // 둥근 조각은 조금 위에서 비스듬히 봐야 둥근 모양이 보입니다.
   homeRound: [0.35, 0.42, 1],
+  // 납작한 조각(받침, 모티브)은 위에서 내려다봐야 모양이 보입니다.
+  homeDisc: [0.2, 1.25, 1],
   front: [0, 0.1, 1],
   side: [1, 0.1, 0],
   back: [0, 0.1, -1],
@@ -470,6 +472,14 @@ export function createViewer(canvas: HTMLCanvasElement, opts: ViewerOptions): Vi
   }
   const currentDistance = () => camera.position.distanceTo(controls.target)
 
+  /** 처음 보는 방향: 마네킹이 있으면 비스듬히, 평면은 정면, 둥근 조각은 조금 위에서, 납작한 조각은 위에서 */
+  function homeDir(): [number, number, number] {
+    if (garment.mannequin) return VIEW_DIRS.home
+    if (garment.template === 'flat') return VIEW_DIRS.homeFlat
+    const size = garment.bbox.size
+    return size[1] < Math.max(size[0], size[2]) * 0.25 ? VIEW_DIRS.homeDisc : VIEW_DIRS.homeRound
+  }
+
   /** 편물과 마네킹이 화면에 들어오도록 기준 거리와 중심을 정합니다. */
   function frameScene() {
     const b = garment.bbox
@@ -491,7 +501,7 @@ export function createViewer(canvas: HTMLCanvasElement, opts: ViewerOptions): Vi
     camera.updateProjectionMatrix()
     controls.minDistance = homeDistance * 0.22
     controls.maxDistance = homeDistance * 3.2
-    flyTo(garment.mannequin ? VIEW_DIRS.home : VIEW_DIRS.homeFlat, homeDistance * portrait(), homeTarget, true)
+    flyTo(homeDir(), homeDistance * portrait(), homeTarget, true)
   }
 
   function resize() {
@@ -623,7 +633,7 @@ export function createViewer(canvas: HTMLCanvasElement, opts: ViewerOptions): Vi
   if (width === 0) {
     width = height = 1
   }
-  flyTo(garment.mannequin ? VIEW_DIRS.home : VIEW_DIRS.homeFlat, homeDistance * portrait(), homeTarget, true)
+  flyTo(homeDir(), homeDistance * portrait(), homeTarget, true)
   render(true)
   raf = requestAnimationFrame(tick)
   if (opts.onReady) {
@@ -700,7 +710,7 @@ export function createViewer(canvas: HTMLCanvasElement, opts: ViewerOptions): Vi
     },
     resetView() {
       if (disposed) return
-      flyTo(garment.mannequin ? VIEW_DIRS.home : VIEW_DIRS.homeFlat, homeDistance * portrait(), homeTarget)
+      flyTo(homeDir(), homeDistance * portrait(), homeTarget)
     },
     resize,
     snapshot() {

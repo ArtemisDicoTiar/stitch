@@ -483,6 +483,48 @@ function turn(): Tutorial {
   return tut('TURN', '기둥코 세우고 돌리기', '왕복으로 뜰 때 단을 바꾸는 방법이에요. 사슬로 다음 단의 높이를 세우고 편물을 돌려요.', L)
 }
 
+// ===== 사슬 공간에 뜨기 =====
+function chainSpace(): Tutorial {
+  const L: TutorialStep[] = []
+  // 아랫단: 코, 사슬 3코(공간), 코
+  const SP = [300, 330, 360]
+  const marks = (): MarkSpec[] => [
+    { id: 'b0', kind: 'top', at: [405, BASE_Y], hl: 0 },
+    ...SP.map((x, i) => ({ id: `c${i}`, kind: 'chain' as const, at: [x, BASE_Y - 16 + (i === 1 ? -6 : 0)] as [number, number], hl: 0 })),
+    { id: 'b1', kind: 'top', at: [255, BASE_Y], hl: 0 },
+    { id: 'b2', kind: 'top', at: [210, BASE_Y], hl: 0 },
+    ...DONE_X.slice(1).flatMap((x, i) => stitch(`d${i}`, x)),
+  ]
+  let s: SceneSpec = { needles: { H: restAt(DONE_X[1]) }, rings: { H1: loop(34) }, yarn: [{ id: 'tail', pts: [{ ring: 'H1' }, [DONE_X[1] - 2, TOP_Y - 6]], z: 'f', col: 'yarn' }, feed({ ring: 'H1', at: 'top' })], arrows: [], tags: [], marks: marks() }
+  s.tags = hands('편물을 잡고 검지에 실 걸기', '코바늘 잡기')
+  L.push(st(s, '아랫단에 사슬 3코가 다리처럼 떠 있어요. 사슬 아래의 빈 곳이 사슬 공간이에요.'))
+
+  s = clone(s)
+  s.needles.H = H(330 - 14, BASE_Y + 2, 545, 96)
+  s.arrows = [{ id: 'a', pts: [[400, 232], [362, 262], [334, BASE_Y - 2]], t: '사슬 아래 빈 곳으로' }]
+  s.yarn = s.yarn.filter((y) => y.id !== 'tail')
+  s.tags = hands(SAME, '사슬 아래로 바늘 넣기')
+  L.push(st(s, '사슬 한 코 한 코에 넣지 않고, 사슬 아래 빈 곳으로 바늘을 넣어요. 사슬을 통째로 감싸며 뜹니다.'))
+
+  s = clone(s)
+  s.needles.H = restAt(350)
+  s.rings = { H2: loop(34, 'work') }
+  s.marks.push(...stitch('n0', 350, 'work'))
+  s.yarn = [{ id: 'tail', pts: [{ ring: 'H2' }, [348, TOP_Y - 6]], z: 'f', col: 'work' }, feed({ ring: 'H2', at: 'top' })]
+  s.arrows = []
+  s.tags = hands(SAME, '실을 걸어 끌어내 코 완성하기')
+  L.push(st(s, '그대로 실을 끌어내 코를 완성해요. 코가 사슬을 감싸고 섭니다.'))
+
+  s = clone(s)
+  s.needles.H = restAt(310)
+  s.marks.push(...stitch('n1', 330, 'work'), ...stitch('n2', 310, 'work'))
+  s.yarn = [{ id: 'tail', pts: [{ ring: 'H2' }, [308, TOP_Y - 6]], z: 'f', col: 'work' }, feed({ ring: 'H2', at: 'top' })]
+  s.tags = hands(SAME, '같은 공간에 이어 뜨기')
+  L.push(st(s, '도안에 적힌 코 수만큼 같은 공간에 이어 떠요. 여기서는 3코를 떴어요. 공간은 넉넉해서 여러 코가 들어갑니다.'))
+
+  return tut('SPACE', '사슬 공간에 뜨기', '사슬 코에 넣지 않고 사슬 아래 빈 곳에 바늘을 넣어 떠요. 그래니 스퀘어나 구멍 무늬에서 써요.', L)
+}
+
 /** 코바늘 뜨는 법. 배우는 순서대로 놓았습니다. */
 export const CROCHET_TUTORIALS = {
   RING: magicRing(),
@@ -495,4 +537,5 @@ export const CROCHET_TUTORIALS = {
   DC: tall('DC', '한길긴뜨기', '실을 한 번 감고 떠서 고리를 2개씩 두 번 빼요. 목도리와 블랭킷에 많이 쓰는 키 큰 코예요.'),
   TR: tall('TR', '두길긴뜨기', '실을 두 번 감고 떠서 고리를 2개씩 세 번 빼요. 가장 키가 큰 기본 코예요.'),
   TURN: turn(),
+  SPACE: chainSpace(),
 }

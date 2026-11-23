@@ -1,0 +1,249 @@
+{
+ "kind": "rows",
+ "note": "손으로 만든 대역입니다. 실제 LLM 응답을 녹화한 것이 아닙니다.",
+ "promptVersion": "2026-11-22.3",
+ "model": "hand-written",
+ "usage": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation_input_tokens": 0
+ },
+ "output": {
+  "sections": [
+   {
+    "id": "body",
+    "groups": [
+     {
+      "rows": [
+       {
+        "side": "RS",
+        "label": null,
+        "text": "1단: 바늘에서 2번째 사슬에 짧은뜨기 1코, (2코 건너뛰고 한 코에 한길긴뜨기 5코, 2코 건너뛰고 짧은뜨기 1코) 3번 (19코)",
+        "expect_count": 19,
+        "ops": [
+         {
+          "op": "st",
+          "st": "skip",
+          "n": 1,
+          "into": null,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "sc",
+          "n": 1,
+          "into": null,
+          "text": null
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "skip",
+            "n": 2,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "dc",
+            "n": 5,
+            "into": "one",
+            "text": "한 코에 한길긴뜨기 5코 (조개)"
+           },
+           {
+            "op": "st",
+            "st": "skip",
+            "n": 2,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "sc",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "times",
+           "n": 3
+          },
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 1,
+       "cm": 0,
+       "from": ""
+      }
+     },
+     {
+      "rows": [
+       {
+        "side": "WS",
+        "label": null,
+        "text": "2단: 사슬 3코(1코로 셈), 같은 코에 한길긴뜨기 2코, (2코 건너뛰고 짧은뜨기 1코, 2코 건너뛰고 한 코에 한길긴뜨기 5코) 2번, 2코 건너뛰고 짧은뜨기 1코, 2코 건너뛰고 마지막 코에 한길긴뜨기 3코 (19코)",
+        "expect_count": 19,
+        "ops": [
+         {
+          "op": "st",
+          "st": "tch",
+          "n": 1,
+          "into": null,
+          "text": "사슬 3코 (기둥코, 1코로 셈)"
+         },
+         {
+          "op": "st",
+          "st": "dc",
+          "n": 2,
+          "into": "same",
+          "text": "같은 코에 한길긴뜨기 2코"
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "skip",
+            "n": 2,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "sc",
+            "n": 1,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "skip",
+            "n": 2,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "dc",
+            "n": 5,
+            "into": "one",
+            "text": "한 코에 한길긴뜨기 5코 (조개)"
+           }
+          ],
+          "end": {
+           "kind": "times",
+           "n": 2
+          },
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "skip",
+          "n": 2,
+          "into": null,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "sc",
+          "n": 1,
+          "into": null,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "skip",
+          "n": 2,
+          "into": null,
+          "text": null
+         },
+         {
+          "op": "st",
+          "st": "dc",
+          "n": 3,
+          "into": "one",
+          "text": "마지막 코에 한길긴뜨기 3코"
+         }
+        ]
+       },
+       {
+        "side": "RS",
+        "label": null,
+        "text": "3단: 사슬 1코, 짧은뜨기 1코, (2코 건너뛰고 한 코에 한길긴뜨기 5코, 2코 건너뛰고 짧은뜨기 1코) 3번 (19코)",
+        "expect_count": 19,
+        "ops": [
+         {
+          "op": "st",
+          "st": "tch0",
+          "n": 1,
+          "into": null,
+          "text": "사슬 1코 (기둥코, 세지 않음)"
+         },
+         {
+          "op": "st",
+          "st": "sc",
+          "n": 1,
+          "into": null,
+          "text": null
+         },
+         {
+          "op": "repeat",
+          "body": [
+           {
+            "op": "st",
+            "st": "skip",
+            "n": 2,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "dc",
+            "n": 5,
+            "into": "one",
+            "text": "한 코에 한길긴뜨기 5코 (조개)"
+           },
+           {
+            "op": "st",
+            "st": "skip",
+            "n": 2,
+            "into": null,
+            "text": null
+           },
+           {
+            "op": "st",
+            "st": "sc",
+            "n": 1,
+            "into": null,
+            "text": null
+           }
+          ],
+          "end": {
+           "kind": "times",
+           "n": 3
+          },
+          "text": null
+         }
+        ]
+       }
+      ],
+      "repeat": {
+       "kind": "times",
+       "times": 5,
+       "cm": 0,
+       "from": ""
+      }
+     }
+    ]
+   }
+  ]
+ }
+}

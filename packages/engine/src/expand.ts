@@ -555,11 +555,14 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
       return true
     }
 
+    // 매직링 안에 뜨는 단에서는 "공간에 뜨기"가 곧 매직링입니다.
+    const onRing = order.some((c) => c.kind === 'ring')
     let ok = true
     for (const op of row.ops) {
       const sink: Col[] = []
       if (ok) ok = runOps([op], sink)
-      segments.push({ text: op.text ?? describeOp(op), tech: techOf(op), cols: sink })
+      const tech = techOf(op)
+      segments.push({ text: op.text ?? describeOp(op), tech: onRing && tech === 'SPACE' ? 'RING' : tech, cols: sink })
     }
     // 매직링만 남았으면 남은 코가 아닙니다 (링은 코가 아닙니다).
     const left = order.slice(pos).filter((c) => c.kind !== 'ring').length
@@ -578,7 +581,33 @@ export function expand(pattern: Pattern, options: ExpandOptions = {}): Expanded 
     for (const p of pend) if (!p.passed) pass(p)
 
     // 같은 단에서 줄어든 자리 바로 옆에 새 코가 생기면 그 자리를 이어받습니다. (바늘비우기 + 모아뜨기)
-    for (const n of newborn) {
+    // 코바늘: "사슬 3, 3코 건너뛰기"처럼 새 코와 없어진 코가 여럿 이어져 있으면 순서대로 짝지어 자리를 이어받습니다.
+    // 그래야 구멍 무늬를 뜰 때마다 기호 도안이 옆으로 늘어나지 않습니다.
+    if (crochet) {
+      const fresh = new Set(newborn)
+      const gone = (c: Col) => !c.alive && c.diedAt === g && !c.mergedInto
+      let i = 0
+      while (i < b.cols.length) {
+        if (!fresh.has(b.cols[i]) && !gone(b.cols[i])) {
+          i++
+          continue
+        }
+        // 조개무늬처럼 "2코 건너뛰고, 한 코에 5코, 2코 건너뛰고"는 가운데에 살아 있는 코가 하나 끼어 있습니다.
+        // 그런 코 하나는 건너서 이어 봅니다.
+        const part = (c: Col | undefined) => !!c && (fresh.has(c) || gone(c))
+        let j = i
+        while (j < b.cols.length && (part(b.cols[j]) || (part(b.cols[j + 1]) && part(b.cols[j - 1])))) j++
+        const run = b.cols.slice(i, j)
+        const born = run.filter((c) => fresh.has(c))
+        const dead = run.filter((c) => gone(c))
+        const pairs = Math.min(born.length, dead.length)
+        for (let k = 0; k < pairs; k++) dead[k].mergedInto = born[k]
+        const drop = new Set(dead.slice(0, pairs))
+        b.cols.splice(i, j - i, ...run.filter((c) => !drop.has(c)))
+        i = j - pairs
+      }
+    }
+    for (const n of crochet ? [] : newborn) {
       const at = b.cols.indexOf(n)
       for (const d of [b.cols[at - 1], b.cols[at + 1]]) {
         if (d && !d.alive && d.diedAt === g && !d.mergedInto) {
@@ -709,10 +738,13 @@ export function techOf(op: Op): string {
   const ids: string[] = []
   /** 한 자리에 여러 코를 뜨는 조각이 있는지 (코바늘의 늘림) */
   let adds = false
+  /** 사슬 공간에 뜨는 조각이 있는지 */
+  let space = false
   const walk = (o: Op) => {
     if ('st' in o) {
       ids.push(o.st.toLowerCase())
       if ((o.into === 'one' && o.n > 1) || o.into === 'same') adds = true
+      if (o.into === 'space') space = true
     } else if ('repeat' in o) o.repeat.forEach(walk)
   }
   walk(op)
@@ -721,6 +753,7 @@ export function techOf(op: Op): string {
   // 코바늘: 늘림이 섞인 조각은 늘림을, 그 밖에는 처음 나오는 코를 보여 줍니다. 기둥코와 건너뛰기는 대표가 되지 않습니다.
   const crochetIds = uniq.filter((i) => getStitch(i)?.craft === 'crochet')
   if (crochetIds.length > 0) {
+    if (space) return 'SPACE'
     if (crochetIds.includes('inc') || adds) return 'INC'
     const main = crochetIds.find((i) => getStitch(i)?.symbol && i !== 'tch') ?? crochetIds[0]
     return (getStitch(main)?.symbol as string | null) ?? main.toUpperCase()

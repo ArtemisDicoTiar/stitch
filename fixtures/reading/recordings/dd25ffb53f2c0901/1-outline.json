@@ -1,0 +1,59 @@
+{
+ "kind": "outline",
+ "note": "손으로 만든 대역입니다. 실제 LLM 응답을 녹화한 것이 아닙니다.",
+ "promptVersion": "2026-11-22.3",
+ "model": "hand-written",
+ "usage": {
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation_input_tokens": 0
+ },
+ "output": {
+  "craft": "crochet",
+  "terms": "kr",
+  "title": "연습용 조개무늬 수세미",
+  "materials": [
+   {
+    "kind": "실",
+    "spec": "수세미실",
+    "qty": "약 30g"
+   },
+   {
+    "kind": "바늘",
+    "spec": "5mm 코바늘",
+    "qty": null
+   }
+  ],
+  "gauge": null,
+  "finished": {
+   "width_cm": 12,
+   "height_cm": 12
+  },
+  "template": "flat",
+  "sections": [
+   {
+    "id": "body",
+    "name": "몸판",
+    "shape": "flat",
+    "start": {
+     "kind": "chain",
+     "count": 20,
+     "from": null
+    },
+    "multiple": {
+     "of": 6,
+     "plus": 2
+    },
+    "copies": 1
+   }
+  ],
+  "finishing": [
+   {
+    "name": "고리 달기",
+    "text": "모서리에 사슬 10코를 떠서 빼뜨기로 고리를 만들고, 실을 숨깁니다."
+   }
+  ],
+  "unclear": []
+ }
+}

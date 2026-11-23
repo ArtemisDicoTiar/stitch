@@ -17,7 +17,9 @@ import { PROMPT_VERSION, toWire } from '@stitch/reader'
 import type { Pattern } from '@stitch/pattern-ir'
 import { practiceBall } from './practice-ball'
 import { practiceBear } from './practice-bear'
+import { practiceGranny } from './practice-granny'
 import { practiceHood } from './practice-hood'
+import { practiceShell } from './practice-shell'
 import { practicePouch } from './practice-pouch'
 import { practiceScarf } from './practice-scarf'
 
@@ -122,6 +124,16 @@ const FIXTURES: Fixture[] = [
     slug: 'practice-pouch',
     pattern: practicePouch,
     intro: '사슬의 양쪽을 돌며 타원 바닥을 뜨고, 단마다 첫 코에 빼뜨기로 닫으며 옆면을 올리는 작은 파우치입니다. 단을 시작하는 사슬 1코는 코로 세지 않습니다.',
+  },
+  {
+    slug: 'practice-granny',
+    pattern: practiceGranny,
+    intro: '링에서 시작해 한길긴뜨기 3코 묶음과 사슬로 네모를 키워 가는 모티브입니다. 단마다 첫 코에 빼뜨기로 닫습니다.',
+  },
+  {
+    slug: 'practice-shell',
+    pattern: practiceShell,
+    intro: '한 코에 한길긴뜨기 5코를 떠서 조개 모양을 만드는 수세미입니다. 사슬에서 시작해 왕복으로 뜹니다.',
   },
   {
     slug: 'practice-scarf',
